@@ -21,6 +21,8 @@ final class AppState {
     private(set) var phase: Phase = .loading
     /// The server demands a newer app version; everything else is blocked.
     var appOutdated = false
+    /// Chat that is open right now. Pushes for it are not shown.
+    var openChatId: UUID?
     /// Push tokens and caches that must be dropped on sign-out hook in here.
     var onSignOut: [@MainActor () async -> Void] = []
 

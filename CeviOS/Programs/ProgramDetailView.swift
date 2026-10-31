@@ -67,6 +67,8 @@ struct ProgramDetailView: View {
     @Environment(AppState.self) private var appState
     let programId: UUID
     @State private var model = ProgramDetailModel()
+    @State private var directChat: ChatSummary?
+    @State private var directChatError: String?
 
     var body: some View {
         Group {
@@ -80,6 +82,30 @@ struct ProgramDetailView: View {
         }
         .navigationBarTitleDisplayMode(.inline)
         .task { await model.load(programId: programId, client: appState.client) }
+        .navigationDestination(item: $directChat) { chat in
+            if let profile = appState.profile { ChatView(chat: chat, profile: profile) }
+        }
+    }
+
+    /// Parents write to the unit leaders of the unit their child belongs to. The direct chat is created if needed.
+    private func openDirectChat(unit: UnitRef) async {
+        directChatError = nil
+        guard let client = appState.client else { return }
+        do {
+            let id = try await client.openDirectChat(unitId: unit.id)
+            directChat = try await client.chats().first { $0.id == id }
+        } catch let error as APIError {
+            directChatError = error.displayText
+        } catch {
+            directChatError = APIError.network.displayText
+        }
+    }
+
+    /// Units of the program in which the person has a child.
+    private func chatUnits(_ program: Program) -> [UnitRef] {
+        guard let profile = appState.profile else { return [] }
+        let childUnits = Set(profile.children.map(\.unitId))
+        return program.units.filter { childUnits.contains($0.id) }
     }
 
     private func content(_ program: Program) -> some View {
@@ -102,7 +128,7 @@ struct ProgramDetailView: View {
             details(program)
             if !program.children.isEmpty { participation(program) }
             leadershipSections(program)
-            contactsSection
+            contactsSection(program)
             if let description = program.description, !description.isEmpty {
                 Section("Beschreibung") { Text(description) }
             }
@@ -196,7 +222,7 @@ struct ProgramDetailView: View {
     }
 
     @ViewBuilder
-    private var contactsSection: some View {
+    private func contactsSection(_ program: Program) -> some View {
         Section("Kontakt") {
             if model.contacts.isEmpty {
                 Text("Stufenleitung")
@@ -210,6 +236,11 @@ struct ProgramDetailView: View {
                     }
                 }
             }
+            ForEach(chatUnits(program)) { unit in
+                Button("Nachricht an die Stufenleitung \(unit.name)") { Task { await openDirectChat(unit: unit) } }
+                    .frame(minHeight: 44)
+            }
+            if let error = directChatError { ErrorRow(text: error) }
         }
     }
 }
