@@ -140,11 +140,11 @@ struct ProgramStatusLabel: View {
         case .cancelled:
             Label("Abgesagt", systemImage: "xmark.octagon.fill")
                 .font(.subheadline.bold())
-                .foregroundStyle(Color.error)
+                .foregroundStyle(Color.ceviOnErrorContainer)
         case .review:
             Label("Wird geprüft", systemImage: "questionmark.circle.fill")
                 .font(.subheadline.bold())
-                .foregroundStyle(Color.warning)
+                .foregroundStyle(Color.ceviOnWarningContainer)
         }
     }
 }

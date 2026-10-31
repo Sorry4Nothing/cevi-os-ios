@@ -34,7 +34,7 @@ Die Unit- und UI-Tests laufen im Scheme Dev (`Product > Test`). Die Icons sind v
 
 Alles liegt an einer Stelle, nichts davon im Code:
 
-- **Farben:** nur in `CeviOS/Assets.xcassets` (je mit Hell- und Dunkelwert, nach Bedeutung benannt: `AccentColor`, `BrandRed`, `Success`, `Error`, `Warning`). Im Code nur die generierten Symbole (`Color.brandRed`), keine Hex- oder RGB-Werte.
+- **Farben:** nur in `CeviOS/Assets.xcassets` (je mit Hell- und Dunkelwert, nach Bedeutung benannt: `AccentColor`, `cevi-<Token>` laut Design-System). Im Code nur die generierten Symbole (`Color.ceviSurface`), keine Hex- oder RGB-Werte.
 - **App-Icons:** je Umgebung ein Set im selben Asset Catalog (`AppIcon`, `AppIcon-Int`, `AppIcon-Dev`), gewählt über `ASSETCATALOG_COMPILER_APPICON_NAME` in `Config/<Umgebung>.xcconfig`.
 - **Texte:** alle Nutzertexte in `CeviOS/Localizable.xcstrings` (Deutsch, Schweizer Schreibweise). Neue Texte als Literal in `Text("…")` oder `String(localized:)` schreiben; Xcode trägt sie beim Build in den Catalog ein.
 

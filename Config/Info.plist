@@ -6,5 +6,9 @@
 	<string>$(API_BASE_URL)</string>
 	<key>AppStoreURL</key>
 	<string>$(APP_STORE_URL)</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Archivo.ttf</string>
+	</array>
 </dict>
 </plist>

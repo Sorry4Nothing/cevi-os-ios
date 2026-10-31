@@ -18,7 +18,7 @@ struct ErrorRow: View {
 
     var body: some View {
         Label(text, systemImage: "exclamationmark.triangle.fill")
-            .foregroundStyle(Color.error)
+            .foregroundStyle(Color.ceviOnErrorContainer)
             .font(.callout)
             .accessibilityLabel(Text("Fehler: \(text)"))
     }
