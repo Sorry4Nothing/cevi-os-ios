@@ -45,6 +45,7 @@ final class AppState {
             Task { @MainActor in self?.handle(event) }
         }
         phase = hasCookies ? .loading : .signIn
+        onSignOut.append { ProfileImageCache.shared.removeAll() }
     }
 
     func handle(_ event: APIEvent) {
@@ -114,6 +115,12 @@ final class AppState {
         await client?.signOut(everywhere: everywhere)
         for task in onSignOut { await task() }
         phase = .signIn
+    }
+
+    /// Loads the profile again after it changed (settings, phone, image). Errors keep the current state.
+    func reloadProfile() async {
+        guard let client, case .ready = phase, let profile = try? await client.loadProfile() else { return }
+        proceed(with: profile)
     }
 
     private func loadProfileAfterSignIn() async throws {

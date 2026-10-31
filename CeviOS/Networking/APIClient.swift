@@ -69,7 +69,8 @@ actor APIClient {
         _ method: String,
         _ path: String,
         query: [URLQueryItem] = [],
-        body: (any Encodable & Sendable)? = nil
+        body: (any Encodable & Sendable)? = nil,
+        rawBody: Data? = nil
     ) async throws -> Data {
         var components = URLComponents(url: baseURL, resolvingAgainstBaseURL: false)
         components?.path = path
@@ -89,6 +90,11 @@ actor APIClient {
         if let body {
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
             request.httpBody = try JSONEncoder.api.encode(body)
+        }
+        if let rawBody {
+            // The server derives the image type from the bytes, never from this header.
+            request.setValue("application/octet-stream", forHTTPHeaderField: "Content-Type")
+            request.httpBody = rawBody
         }
 
         let data: Data
@@ -123,6 +129,12 @@ actor APIClient {
             break
         }
         throw error
+    }
+
+    /// GET of a server-provided path that may carry a query (e.g. `bildUrl`), authenticated like every other call.
+    func data(path: String) async throws -> Data {
+        guard let components = URLComponents(string: path), components.host == nil else { throw APIError.network }
+        return try await send("GET", components.path, query: components.queryItems ?? [])
     }
 
     /// Like `send`, with a decoded response.

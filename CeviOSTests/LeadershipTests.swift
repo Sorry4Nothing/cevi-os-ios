@@ -125,4 +125,10 @@ struct LeadershipModelsTests {
         #expect(LeadershipMessages.message(for: closed).text.contains("14 Tage"))
         #expect(LeadershipMessages.message(for: .from(status: 403, data: Data())).reload)
     }
+
+    @Test func participationListPutsOpenFirstThenYesThenNoByName() {
+        let items: [(String, OverviewAnswer)] = [("Jonas", .no), ("Mia", .yes), ("Tim", .open), ("Anna", .no), ("Elin", .open), ("Lena", .yes)]
+        let sorted = ParticipationOrder.sorted(items, answer: \.1, name: \.0)
+        #expect(sorted.map(\.0) == ["Elin", "Tim", "Lena", "Mia", "Anna", "Jonas"])
+    }
 }

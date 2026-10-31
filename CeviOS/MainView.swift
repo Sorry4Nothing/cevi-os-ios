@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Main navigation of the signed-in person. Chat and profile tabs follow with their issues.
+/// Main navigation of the signed-in person.
 struct MainView: View {
     @Environment(AppState.self) private var state
     @Environment(\.scenePhase) private var scenePhase
@@ -37,27 +37,7 @@ struct MainView: View {
                 }
             }
             Tab("Profil", systemImage: "person.crop.circle", value: MainTab.profile) {
-                NavigationStack {
-                    List {
-                        Section {
-                            Text("Hallo \(profile.ceviName ?? profile.name)")
-                                .font(.title(.title2))
-                                .accessibilityAddTraits(.isHeader)
-                        }
-                        Section("App") {
-                            NavigationLink {
-                                PrivacyPolicyView()
-                            } label: {
-                                Label("Datenschutz", systemImage: "hand.raised")
-                            }
-                        }
-                        Section("Konto") {
-                            SignOutButton()
-                                .foregroundStyle(Color.ceviPrimaryText)
-                        }
-                    }
-                    .navigationTitle("Profil")
-                }
+                ProfileView(profile: profile)
             }
         }
         // Chat list (and the badge) stay current while the app is in the foreground.

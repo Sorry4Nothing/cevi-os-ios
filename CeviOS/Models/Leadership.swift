@@ -181,3 +181,22 @@ nonisolated struct UnitList: Decodable, Sendable {
 
     enum CodingKeys: String, CodingKey { case units = "stufen" }
 }
+
+/// Order of the participation lists: open first, then yes, then no; by name within each group.
+nonisolated enum ParticipationOrder {
+    static func sorted<T>(_ items: [T], answer: (T) -> OverviewAnswer, name: (T) -> String) -> [T] {
+        items.sorted { a, b in
+            let (ra, rb) = (rank(answer(a)), rank(answer(b)))
+            if ra != rb { return ra < rb }
+            return name(a).localizedStandardCompare(name(b)) == .orderedAscending
+        }
+    }
+
+    private static func rank(_ answer: OverviewAnswer) -> Int {
+        switch answer {
+        case .open: 0
+        case .yes: 1
+        case .no: 2
+        }
+    }
+}
