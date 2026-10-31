@@ -7,6 +7,7 @@ final class ProgramDetailModel {
     private(set) var loadError: String?
     /// Children whose answer is being saved. Blocks double taps.
     private(set) var saving: Set<UUID> = []
+    private(set) var savingOwn = false
     var answerError: String?
 
     func load(programId: UUID, client: APIClient?) async {
@@ -25,6 +26,23 @@ final class ProgramDetailModel {
         }
         // Contacts are not critical: without them the detail still works.
         contacts = (try? await client.contacts(programId: programId)) ?? []
+    }
+
+    func setOwnRegistration(_ answer: Answer, programId: UUID, client: APIClient?) async {
+        guard let client, !savingOwn else { return }
+        savingOwn = true
+        answerError = nil
+        defer { savingOwn = false }
+        do {
+            try await client.setOwnRegistration(programId: programId, answer: answer)
+            await load(programId: programId, client: client)
+        } catch let error as APIError {
+            let message = LeadershipMessages.message(for: error)
+            answerError = message.text
+            if message.reload { await load(programId: programId, client: client) }
+        } catch {
+            answerError = APIError.network.displayText
+        }
     }
 
     func answer(_ answer: Answer, for child: ProgramChild, programId: UUID, client: APIClient?) async {
@@ -83,6 +101,7 @@ struct ProgramDetailView: View {
             }
             details(program)
             if !program.children.isEmpty { participation(program) }
+            leadershipSections(program)
             contactsSection
             if let description = program.description, !description.isEmpty {
                 Section("Beschreibung") { Text(description) }
@@ -131,9 +150,8 @@ struct ProgramDetailView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     AnswerLabel(name: child.firstName, answer: child.answer).font(.headline)
                     if program.canAnswer {
-                        HStack {
-                            answerButton(.yes, "Ja", child: child, program: program)
-                            answerButton(.no, "Nein", child: child, program: program)
+                        AnswerButtons(name: child.firstName, selected: child.answer, disabled: model.saving.contains(child.id)) { answer in
+                            Task { await model.answer(answer, for: child, programId: program.id, client: appState.client) }
                         }
                     }
                 }
@@ -149,28 +167,32 @@ struct ProgramDetailView: View {
         }
     }
 
-    /// The selected answer is marked by a filled button and a check mark, not by color alone.
-    private func answerButton(_ answer: Answer, _ title: LocalizedStringKey, child: ProgramChild, program: Program) -> some View {
-        let selected = child.answer == answer
-        let action = { Task { await model.answer(answer, for: child, programId: program.id, client: appState.client) } }
-        return Group {
-            if selected {
-                Button(action: { action() }) { answerLabel(title, selected: true) }.buttonStyle(.borderedProminent)
-            } else {
-                Button(action: { action() }) { answerLabel(title, selected: false) }.buttonStyle(.bordered)
+    @ViewBuilder
+    private func leadershipSections(_ program: Program) -> some View {
+        if let profile = appState.profile {
+            let permissions = LeadershipPermissions(profile: profile)
+            if permissions.canRegisterAsLeader(for: program), let own = program.ownRegistration {
+                Section("Meine Anmeldung als Leitung") {
+                    AnswerButtons(name: String(localized: "Ich"), selected: own.answer, disabled: model.savingOwn) { answer in
+                        Task { await model.setOwnRegistration(answer, programId: program.id, client: appState.client) }
+                    }
+                    if own == .open { Text("Noch keine Antwort").font(.callout) }
+                }
+            }
+            if permissions.canSeeOverview(of: program) || permissions.canAssign {
+                Section("Leitung") {
+                    if permissions.canSeeOverview(of: program) {
+                        NavigationLink("Teilnahmen") { ParticipationOverviewView(programId: program.id) }.frame(minHeight: 44)
+                    }
+                    if permissions.canAssign {
+                        NavigationLink("Stufen und Sichtbarkeit") {
+                            AssignmentView(program: program, profile: profile) { Task { await model.load(programId: program.id, client: appState.client) } }
+                        }
+                        .frame(minHeight: 44)
+                    }
+                }
             }
         }
-        .disabled(model.saving.contains(child.id))
-        .accessibilityLabel(Text("\(child.firstName): \(title)"))
-        .accessibilityAddTraits(selected ? .isSelected : [])
-    }
-
-    private func answerLabel(_ title: LocalizedStringKey, selected: Bool) -> some View {
-        HStack {
-            if selected { Image(systemName: "checkmark") }
-            Text(title)
-        }
-        .frame(maxWidth: .infinity, minHeight: 44)
     }
 
     @ViewBuilder

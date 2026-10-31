@@ -60,6 +60,19 @@
     "Anmeldung" : {
 
     },
+    "Anwesend: %lld von %lld%@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Anwesend: %1$lld von %2$lld%3$@"
+          }
+        }
+      }
+    },
+    "Anwesenheit" : {
+
+    },
     "Benutzername" : {
 
     },
@@ -112,16 +125,28 @@
     "Code" : {
 
     },
+    "Da" : {
+
+    },
+    "Dafür fehlt dir die Berechtigung." : {
+
+    },
     "Das aktuelle Passwort stimmt nicht." : {
 
     },
     "Das Entsperren hat nicht geklappt." : {
 
     },
+    "Das gibt es nicht mehr oder du siehst es nicht." : {
+
+    },
     "Das neue Passwort darf höchstens 128 Zeichen haben." : {
 
     },
     "Das neue Passwort muss mindestens 12 Zeichen haben." : {
+
+    },
+    "Das Programm hat schon begonnen. Die Anmeldung lässt sich nicht mehr ändern." : {
 
     },
     "Datenschutz" : {
@@ -137,6 +162,9 @@
 
     },
     "Die Anmeldung ist nicht mehr möglich. Das Programm ist abgesagt oder hat schon begonnen." : {
+
+    },
+    "Die Anwesenheit lässt sich erst nach Beginn des Programms und bis 14 Tage danach erfassen." : {
 
     },
     "Die beiden neuen Passwörter sind nicht gleich." : {
@@ -165,6 +193,12 @@
 
     },
     "Du darfst für dieses Kind nicht antworten." : {
+
+    },
+    "Du kannst nur Stufen ändern, in denen du Stufenleitung bist." : {
+
+    },
+    "Eltern" : {
 
     },
     "Entsperren" : {
@@ -200,6 +234,9 @@
     "Hilfe und Kontakt" : {
 
     },
+    "Ich" : {
+
+    },
     "Ich habe die Datenschutzerklärung gelesen" : {
 
     },
@@ -209,8 +246,21 @@
     "In den nächsten Monaten ist nichts geplant." : {
 
     },
+    "Intern (Admin und Stufenleitung)" : {
+
+    },
     "Ja" : {
 
+    },
+    "Ja: %lld, Nein: %lld, Offen: %lld" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Ja: %1$lld, Nein: %2$lld, Offen: %3$lld"
+          }
+        }
+      }
     },
     "Keine Programme" : {
 
@@ -218,10 +268,22 @@
     "Keine Verbindung zum Server. Bitte später nochmals versuchen." : {
 
     },
+    "Kinder" : {
+
+    },
     "Kontakt" : {
 
     },
     "Lädt" : {
+
+    },
+    "Leitende" : {
+
+    },
+    "Leitung" : {
+
+    },
+    "Meine Anmeldung als Leitung" : {
 
     },
     "Mitnehmen" : {
@@ -236,7 +298,22 @@
     "Neues Passwort wiederholen" : {
 
     },
+    "Nicht da" : {
+
+    },
+    "Nicht erfasst" : {
+
+    },
+    "Noch keine Antwort" : {
+
+    },
+    "Noch keine Programme." : {
+
+    },
     "Nochmals versuchen" : {
+
+    },
+    "Ohne Stufe ist nur «Intern» möglich." : {
 
     },
     "Passwort" : {
@@ -248,16 +325,37 @@
     "Profil" : {
 
     },
+    "Programm" : {
+
+    },
     "Programme" : {
 
     },
     "Schluss" : {
 
     },
+    "Sichtbar für" : {
+
+    },
+    "Sichtbarkeit" : {
+
+    },
     "So richtest du ihn ein: Öffne die Einstellungen, tippe auf «Face ID & Code» (oder «Touch ID & Code») und dann auf «Code aktivieren». Danach öffnest du Cevi OS wieder." : {
 
     },
+    "Speichern" : {
+
+    },
+    "Stufen" : {
+
+    },
+    "Stufen und Sichtbarkeit" : {
+
+    },
     "Stufenleitung" : {
+
+    },
+    "Teilnahmen" : {
 
     },
     "Treffpunkt" : {
@@ -275,6 +373,15 @@
       }
     },
     "Wird geprüft" : {
+
+    },
+    "Zusage: Ja" : {
+
+    },
+    "Zusage: Nein" : {
+
+    },
+    "Zusage: Offen" : {
 
     },
     "Zweiter Faktor" : {
