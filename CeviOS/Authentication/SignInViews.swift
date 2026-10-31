@@ -20,7 +20,28 @@ struct ErrorRow: View {
         Label(text, systemImage: "exclamationmark.triangle.fill")
             .foregroundStyle(Color.ceviOnErrorContainer)
             .font(.callout)
+            .frame(maxWidth: .infinity, alignment: .leading)
             .accessibilityLabel(Text("Fehler: \(text)"))
+    }
+}
+
+/// Fulfilled or open rule, with symbol and word (not color alone).
+struct RuleRow: View {
+    let text: LocalizedStringKey
+    let isMet: Bool
+
+    var body: some View {
+        Label {
+            Text(text)
+        } icon: {
+            Image(systemName: isMet ? "checkmark.circle.fill" : "circle")
+        }
+        .font(.subheadline)
+        .foregroundStyle(isMet ? Color.ceviOnSuccessContainer : Color.ceviOnSurfaceVariant)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text(text))
+        .accessibilityValue(isMet ? Text("erfüllt") : Text("nicht erfüllt"))
     }
 }
 
@@ -46,67 +67,142 @@ final class ActionState {
     }
 }
 
+/// Label of a main button with a spinner while the action runs.
+private struct ProgressLabel: View {
+    let title: LocalizedStringKey
+    let isRunning: Bool
+
+    var body: some View {
+        HStack(spacing: Spacing.s2) {
+            Text(title)
+            if isRunning { ProgressView().tint(Color.ceviOnSurfaceVariant) }
+        }
+    }
+}
+
+/// Layout of the sign-in steps after the password (T02): title, content, main action at the bottom.
+/// At accessibility text sizes the actions scroll with the content so they never cover it.
+private struct StepScreen<Content: View, Actions: View>: View {
+    let title: LocalizedStringKey
+    var subtitle: LocalizedStringKey?
+    @ViewBuilder var content: Content
+    @ViewBuilder var actions: Actions
+    @Environment(\.dynamicTypeSize) private var typeSize
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: Spacing.s5) {
+                VStack(alignment: .leading, spacing: Spacing.s1) {
+                    Text(title)
+                        .font(.title(.title1))
+                        .foregroundStyle(Color.ceviOnSurface)
+                        .accessibilityAddTraits(.isHeader)
+                    if let subtitle {
+                        Text(subtitle)
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(Color.ceviOnSurfaceVariant)
+                    }
+                }
+                content
+                if typeSize.isAccessibilitySize { actionStack }
+            }
+            .padding(.horizontal, Spacing.s4)
+            .padding(.top, Spacing.s8)
+            .padding(.bottom, Spacing.s4)
+            .frame(maxWidth: Size.contentMax)
+            .frame(maxWidth: .infinity)
+        }
+        .scrollDismissesKeyboard(.interactively)
+        .safeAreaInset(edge: .bottom) {
+            if !typeSize.isAccessibilitySize {
+                actionStack
+                    .padding(.horizontal, Spacing.s4)
+                    .padding(.vertical, Spacing.s3)
+                    .frame(maxWidth: Size.contentMax)
+                    .frame(maxWidth: .infinity)
+                    .background(Color.ceviSurface)
+            }
+        }
+        .ceviScreenBackground()
+    }
+
+    private var actionStack: some View {
+        VStack(spacing: Spacing.s1) { actions }
+    }
+}
+
+/// T01 Login.
 struct SignInView: View {
     @Environment(AppState.self) private var state
     @Environment(\.appConfiguration) private var configuration
     @State private var username = ""
     @State private var password = ""
     @State private var action = ActionState()
-    @FocusState private var focus: Field?
-
-    private enum Field { case username, password }
+    @FocusState private var usernameFocused: Bool
+    @FocusState private var passwordFocused: Bool
 
     var body: some View {
-        Form {
-            Section {
-                Text("Cevi OS")
-                    .font(.largeTitle.bold())
-                    .accessibilityAddTraits(.isHeader)
-                    .listRowBackground(Color.clear)
+        FillingScrollView {
+            VStack(spacing: 0) {
+                VStack(alignment: .leading, spacing: Spacing.s1) {
+                    Spacer(minLength: Spacing.s8)
+                    // App name as eyebrow: the screen names the app it belongs to.
+                    Eyebrow("Cevi OS")
+                    Text("Schön, bist du da.")
+                        .font(.title(.display))
+                        .foregroundStyle(Color.ceviOnSurface)
+                        .accessibilityAddTraits(.isHeader)
+                }
+                .frame(maxWidth: Size.contentMax, maxHeight: .infinity, alignment: .bottomLeading)
+                .padding(.horizontal, Spacing.s6)
+                .padding(.bottom, Spacing.s6)
+                panel
             }
-            Section {
-                // Label above the field instead of a placeholder: placeholder text has too little contrast.
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Benutzername").font(.subheadline)
-                    TextField("", text: $username)
-                        .textContentType(.username)
-                        .textInputAutocapitalization(.never)
-                        .autocorrectionDisabled()
-                        .focused($focus, equals: .username)
-                        .submitLabel(.next)
-                        .onSubmit { focus = .password }
-                        .accessibilityLabel(Text("Benutzername"))
-                }
-                .frame(minHeight: 44)
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Passwort").font(.subheadline)
-                    SecureField("", text: $password)
-                        .textContentType(.password)
-                        .focused($focus, equals: .password)
-                        .submitLabel(.go)
-                        .onSubmit(signIn)
-                        .accessibilityLabel(Text("Passwort"))
-                }
-                .frame(minHeight: 44)
+        }
+        .ceviScreenBackground()
+    }
+
+    private var panel: some View {
+        VStack(spacing: Spacing.s4) {
+            CeviField(label: "Benutzername", isFocused: usernameFocused) {
+                TextField("", text: $username)
+                    .textContentType(.username)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+                    .focused($usernameFocused)
+                    .submitLabel(.next)
+                    .onSubmit { passwordFocused = true }
+                    .frame(minHeight: Size.touchTarget)
+                    .accessibilityLabel(Text("Benutzername"))
+            }
+            CeviField(label: "Passwort", isFocused: passwordFocused) {
+                PasswordField(label: "Passwort", text: $password, isFocused: $passwordFocused)
+                    .submitLabel(.go)
+                    .onSubmit(signIn)
             }
             if let error = action.error {
-                Section { ErrorRow(text: error) }
+                ErrorRow(text: error)
             }
-            Section {
-                Button(action: signIn) {
-                    HStack {
-                        Text("Anmelden")
-                        if action.isRunning { ProgressView() }
-                    }
-                    .frame(maxWidth: .infinity, minHeight: 44)
-                }
-                .disabled(action.isRunning)
+            Button(action: signIn) {
+                ProgressLabel(title: "Anmelden", isRunning: action.isRunning)
             }
-            Section {
-                if let url = ServerPage.support.url(base: configuration.apiBaseURL) {
-                    Link("Hilfe und Kontakt", destination: url).frame(minHeight: 44)
-                }
+            .buttonStyle(.ceviPrimary)
+            .disabled(action.isRunning)
+            .padding(.top, Spacing.s1)
+            if let url = ServerPage.support.url(base: configuration.apiBaseURL) {
+                Link("Passwort vergessen?", destination: url)
+                    .frame(minHeight: Size.touchTarget)
             }
+        }
+        .frame(maxWidth: Size.contentMax)
+        .padding(.horizontal, Spacing.s5)
+        .padding(.vertical, Spacing.s6)
+        .frame(maxWidth: .infinity)
+        .background {
+            UnevenRoundedRectangle(topLeadingRadius: Radius.xl, topTrailingRadius: Radius.xl, style: .continuous)
+                .fill(Color.ceviSurfaceContainerLow)
+                .stroke(Color.ceviOutlineVariant, lineWidth: Size.border)
+                .ignoresSafeArea(edges: .bottom)
         }
     }
 
@@ -123,58 +219,56 @@ struct SignInView: View {
     }
 }
 
+/// Second factor after the password. No template; styled like T02.
 struct SecondFactorView: View {
     @Environment(AppState.self) private var state
     @State private var code = ""
     @State private var isBackupCode = false
     @State private var action = ActionState()
+    @FocusState private var codeFocused: Bool
 
     private var canSubmit: Bool {
         !action.isRunning && (isBackupCode ? code.count == 11 : code.count == 6)
     }
 
     var body: some View {
-        Form {
-            Section {
-                Text(isBackupCode
-                    ? "Gib einen deiner Ersatzcodes ein (Format xxxxx-xxxxx). Jeder Code gilt nur einmal."
-                    : "Gib den 6-stelligen Code aus deiner Authenticator-App ein.")
-            } header: {
-                Text("Zweiter Faktor").accessibilityAddTraits(.isHeader)
-            }
-            Section {
-                TextField(isBackupCode ? "Ersatzcode" : "Code", text: $code)
+        StepScreen(title: "Zweiter Faktor", subtitle: "Anmelden") {
+            Text(isBackupCode
+                ? "Gib einen deiner Ersatzcodes ein (Format xxxxx-xxxxx). Jeder Code gilt nur einmal."
+                : "Gib den 6-stelligen Code aus deiner Authenticator-App ein.")
+                .font(.body)
+                .foregroundStyle(Color.ceviOnSurfaceVariant)
+            CeviField(label: isBackupCode ? "Ersatzcode" : "Code", isFocused: codeFocused) {
+                TextField("", text: $code)
                     .keyboardType(isBackupCode ? .asciiCapable : .numberPad)
                     .textContentType(.oneTimeCode)
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled()
-                    .frame(minHeight: 44)
+                    .focused($codeFocused)
+                    .frame(minHeight: Size.touchTarget)
+                    .accessibilityLabel(isBackupCode ? Text("Ersatzcode") : Text("Code"))
                     .onChange(of: code) { _, new in
                         code = String(new.prefix(isBackupCode ? 11 : 6))
                     }
-                Toggle("Ersatzcode verwenden", isOn: $isBackupCode)
-                    .frame(minHeight: 44)
-                    .onChange(of: isBackupCode) { code = "" }
             }
+            Toggle("Ersatzcode verwenden", isOn: $isBackupCode)
+                .tint(Color.ceviSwitchOn)
+                .foregroundStyle(Color.ceviOnSurface)
+                .frame(minHeight: Size.touchTarget)
+                .onChange(of: isBackupCode) { code = "" }
             if let error = action.error {
-                Section { ErrorRow(text: error) }
+                ErrorRow(text: error)
             }
-            Section {
-                Button {
-                    submit()
-                } label: {
-                    HStack {
-                        Text("Bestätigen")
-                        if action.isRunning { ProgressView() }
-                    }
-                    .frame(maxWidth: .infinity, minHeight: 44)
-                }
-                .disabled(!canSubmit)
-                Button("Abbrechen", role: .cancel) {
-                    Task { await state.restartSignIn() }
-                }
-                .frame(minHeight: 44)
+        } actions: {
+            Button(action: submit) {
+                ProgressLabel(title: "Bestätigen", isRunning: action.isRunning)
             }
+            .buttonStyle(.ceviPrimary)
+            .disabled(!canSubmit)
+            Button("Abbrechen", role: .cancel) {
+                Task { await state.restartSignIn() }
+            }
+            .buttonStyle(.ceviText)
         }
     }
 
@@ -194,106 +288,235 @@ struct SecondFactorView: View {
     }
 }
 
+/// T02 Passwort: own password after the first sign-in.
 struct ChangePasswordView: View {
     @Environment(AppState.self) private var state
     @State private var current = ""
     @State private var new = ""
     @State private var repeated = ""
     @State private var action = ActionState()
+    @FocusState private var currentFocused: Bool
+    @FocusState private var newFocused: Bool
+    @FocusState private var repeatedFocused: Bool
 
-    private var tooShort: Bool { !new.isEmpty && new.count < 12 }
     private var mismatch: Bool { !repeated.isEmpty && repeated != new }
     private var canSubmit: Bool { !current.isEmpty && new.count >= 12 && new == repeated && !action.isRunning }
 
     var body: some View {
-        Form {
-            Section {
-                Text("Bitte wähle ein neues Passwort. Es braucht mindestens 12 Zeichen, Regeln für Zeichen gibt es nicht.")
-            } header: {
-                Text("Neues Passwort").accessibilityAddTraits(.isHeader)
+        StepScreen(title: "Eigenes Passwort wählen", subtitle: "Erster Login") {
+            Text("Du hast ein Startpasswort von der Abteilung bekommen. Wähle jetzt ein eigenes, das nur du kennst.")
+                .font(.body)
+                .foregroundStyle(Color.ceviOnSurfaceVariant)
+            CeviField(label: "Startpasswort", isFocused: currentFocused) {
+                PasswordField(label: "Startpasswort", text: $current, isFocused: $currentFocused)
             }
-            Section {
-                SecureField("Aktuelles Passwort", text: $current)
-                    .textContentType(.password)
-                    .frame(minHeight: 44)
-                SecureField("Neues Passwort", text: $new)
-                    .textContentType(.newPassword)
-                    .frame(minHeight: 44)
-                SecureField("Neues Passwort wiederholen", text: $repeated)
-                    .textContentType(.newPassword)
-                    .frame(minHeight: 44)
+            VStack(alignment: .leading, spacing: Spacing.s2) {
+                CeviField(label: "Neues Passwort", isFocused: newFocused) {
+                    PasswordField(label: "Neues Passwort", text: $new, contentType: .newPassword, isFocused: $newFocused)
+                }
+                RuleRow(text: "Mindestens 12 Zeichen", isMet: new.count >= 12)
             }
-            if tooShort { Section { ErrorRow(text: String(localized: "Das neue Passwort muss mindestens 12 Zeichen haben.")) } }
-            if mismatch { Section { ErrorRow(text: String(localized: "Die beiden neuen Passwörter sind nicht gleich.")) } }
+            VStack(alignment: .leading, spacing: Spacing.s2) {
+                CeviField(label: "Passwort wiederholen", isFocused: repeatedFocused) {
+                    PasswordField(label: "Passwort wiederholen", text: $repeated, contentType: .newPassword,
+                                  isFocused: $repeatedFocused)
+                }
+                if mismatch {
+                    ErrorRow(text: String(localized: "Die beiden neuen Passwörter sind nicht gleich."))
+                } else if !repeated.isEmpty {
+                    RuleRow(text: "Stimmt überein", isMet: true)
+                }
+            }
             if let error = action.error {
-                Section { ErrorRow(text: error) }
+                ErrorRow(text: error)
             }
-            Section {
-                Button {
-                    Task {
-                        await action.perform(message: AuthMessages.changePassword) {
-                            try await state.passwordChanged(current: current, new: new)
-                        }
+        } actions: {
+            Button {
+                Task {
+                    await action.perform(message: AuthMessages.changePassword) {
+                        try await state.passwordChanged(current: current, new: new)
                     }
-                } label: {
-                    HStack {
-                        Text("Passwort ändern")
-                        if action.isRunning { ProgressView() }
-                    }
-                    .frame(maxWidth: .infinity, minHeight: 44)
                 }
-                .disabled(!canSubmit)
-                Button("Abmelden", role: .destructive) {
-                    Task { await state.signOut() }
-                }
-                .frame(minHeight: 44)
+            } label: {
+                ProgressLabel(title: "Passwort speichern", isRunning: action.isRunning)
             }
+            .buttonStyle(.ceviPrimary)
+            .disabled(!canSubmit)
+            SignOutButton()
+                .buttonStyle(CeviTextButtonStyle(color: .ceviPrimaryText))
         }
     }
 }
 
+/// T03 Willkommen: confirm the privacy statement before the app opens.
 struct PrivacyView: View {
     @Environment(AppState.self) private var state
     @Environment(\.appConfiguration) private var configuration
+    /// Name in the greeting.
+    let name: String
+    /// First names of the children (parents); empty for leaders.
+    let childNames: [String]
     @State private var action = ActionState()
     @State private var isPageOpen = false
+    @State private var accepted = false
 
     var body: some View {
         let url = ServerPage.privacy.url(base: configuration.apiBaseURL)
-        Form {
-            Section {
-                Text("Bevor es losgeht, lies bitte die Datenschutzerklärung. Sie sagt, welche Daten die App verwendet und wer sie sieht.")
-            } header: {
-                Text("Datenschutz").accessibilityAddTraits(.isHeader)
-            }
-            Section {
-                Button("Datenschutzerklärung lesen") { isPageOpen = true }
-                    .frame(minHeight: 44)
-                    .disabled(url == nil)
-            }
-            if let error = action.error {
-                Section { ErrorRow(text: error) }
-            }
-            Section {
-                Button {
-                    Task { await action.perform { try await state.privacyAcknowledged() } }
-                } label: {
-                    HStack {
-                        Text("Ich habe die Datenschutzerklärung gelesen")
-                        if action.isRunning { ProgressView() }
+        FillingScrollView {
+            VStack(alignment: .leading, spacing: Spacing.s5) {
+                Spacer(minLength: Spacing.s8)
+                VStack(alignment: .leading, spacing: Spacing.s1) {
+                    Eyebrow("Cevi Stäfa-Hombrechtikon")
+                    Text("Willkommen, \(name)!")
+                        .font(.title(.display))
+                        .foregroundStyle(Color.ceviOnSurface)
+                        .accessibilityAddTraits(.isHeader)
+                }
+                VStack(alignment: .leading, spacing: Spacing.s4) {
+                    feature("Programme", text: programsText, symbol: "calendar")
+                    feature("Zusagen", text: "Mit einem Tipp Ja oder Nein sagen.", symbol: "checkmark")
+                    feature("Chat", text: "Nachrichten an die Stufenleitung und in der Gruppe.",
+                            symbol: "bubble.left.and.bubble.right")
+                }
+                VStack(alignment: .leading, spacing: Spacing.s1) {
+                    Toggle("Ich habe die Datenschutzerklärung gelesen und bin einverstanden.", isOn: $accepted)
+                        .toggleStyle(CheckboxToggleStyle())
+                    Button("Datenschutzerklärung lesen") { isPageOpen = true }
+                        .buttonStyle(.ceviText)
+                        .disabled(url == nil)
+                    if let error = action.error {
+                        ErrorRow(text: error)
                     }
-                    .frame(maxWidth: .infinity, minHeight: 44)
+                    Button {
+                        Task { await action.perform { try await state.privacyAcknowledged() } }
+                    } label: {
+                        ProgressLabel(title: "Los geht’s", isRunning: action.isRunning)
+                    }
+                    .buttonStyle(.ceviPrimary)
+                    .disabled(!accepted || action.isRunning)
+                    SignOutButton()
+                        .buttonStyle(CeviTextButtonStyle(color: .ceviPrimaryText))
+                        .frame(maxWidth: .infinity)
                 }
-                .disabled(action.isRunning)
-                Button("Abmelden", role: .destructive) {
-                    Task { await state.signOut() }
-                }
-                .frame(minHeight: 44)
             }
+            .frame(maxWidth: Size.contentMax, alignment: .leading)
+            .padding(.horizontal, Spacing.s6)
+            .padding(.bottom, Spacing.s4)
         }
+        .ceviScreenBackground()
         .fullScreenCover(isPresented: $isPageOpen) {
             if let url { SafariView(url: url).ignoresSafeArea() }
         }
+    }
+
+    private var programsText: LocalizedStringKey {
+        childNames.isEmpty
+            ? "Alle Anlässe deiner Stufe auf einen Blick."
+            : "Alle Anlässe von \(childNames.formatted(.list(type: .and))) auf einen Blick."
+    }
+
+    private func feature(_ title: LocalizedStringKey, text: LocalizedStringKey, symbol: String) -> some View {
+        HStack(alignment: .top, spacing: Spacing.s4) {
+            Image(systemName: symbol)
+                .font(.body.weight(.semibold))
+                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+                .foregroundStyle(Color.ceviOnSecondaryContainer)
+                .frame(width: Size.avatar, height: Size.avatar)
+                .background(Color.ceviSecondaryContainer, in: Circle())
+                .accessibilityHidden(true)
+            VStack(alignment: .leading, spacing: 0) {
+                Text(title).font(.headline).foregroundStyle(Color.ceviOnSurface)
+                Text(text).font(.subheadline).foregroundStyle(Color.ceviOnSurfaceVariant)
+            }
+            .accessibilityElement(children: .combine)
+        }
+    }
+}
+
+/// T12: sign-out with confirmation. The caller picks the button style.
+struct SignOutButton: View {
+    @Environment(AppState.self) private var state
+    @State private var isConfirming = false
+
+    var body: some View {
+        Button("Abmelden", role: .destructive) { isConfirming = true }
+            .alert("Abmelden?", isPresented: $isConfirming) {
+                Button("Abbrechen", role: .cancel) {}
+                Button("Abmelden", role: .destructive) {
+                    Task { await state.signOut() }
+                }
+            } message: {
+                Text("Danach brauchst du wieder Benutzername und Passwort.")
+            }
+    }
+}
+
+/// T11 Datenschutz: short version of the privacy statement inside the app.
+struct PrivacyPolicyView: View {
+    var body: some View {
+        List {
+            section("Was wir speichern", bullets: [
+                "Deinen Namen, Benutzernamen und deine Rolle",
+                "Bei Eltern: die Namen eurer Kinder und ihre Stufe",
+                "Deine Zusagen zu Programmen",
+                "Deine Chat-Nachrichten und dein Profilbild",
+            ])
+            section("Wer was sieht", text: "Programme sehen alle aus der Stufe. Zusagen sieht die Leitung. Nachrichten an die Stufenleitung lesen alle Stufenleitenden dieser Stufe.")
+            section("Was wir nicht machen", bullets: [
+                "Keine Werbung und keine Tracker",
+                "Keine Weitergabe an andere",
+                "Keine Nachrichten oder Namen in Mitteilungen",
+            ])
+            Section {
+                card("Löschen") {
+                    paragraph("Dein Konto löscht die Abteilung. Schreib dafür an die Abteilungsleitung.")
+                }
+            } footer: {
+                Text("Stand: 1. November 2026 · Cevi Stäfa-Hombrechtikon")
+                    .font(.footnote)
+                    .foregroundStyle(Color.ceviOnSurfaceVariant)
+            }
+        }
+        .listSectionSpacing(Spacing.s3)
+        .scrollContentBackground(.hidden)
+        .ceviScreenBackground()
+        .navigationTitle("Datenschutz")
+        .navigationSubtitle("Cevi Stäfa-Hombrechtikon")
+    }
+
+    private func section(_ title: LocalizedStringKey, text: LocalizedStringKey) -> some View {
+        Section { card(title) { paragraph(text) } }
+    }
+
+    private func section(_ title: LocalizedStringKey, bullets: [LocalizedStringKey]) -> some View {
+        Section {
+            card(title) {
+                ForEach(bullets.indices, id: \.self) { index in
+                    HStack(alignment: .firstTextBaseline, spacing: Spacing.s2) {
+                        Text(verbatim: "•").accessibilityHidden(true)
+                        Text(bullets[index])
+                    }
+                    .font(.subheadline)
+                    .foregroundStyle(Color.ceviOnSurfaceVariant)
+                }
+            }
+        }
+    }
+
+    private func card(_ title: LocalizedStringKey, @ViewBuilder content: () -> some View) -> some View {
+        VStack(alignment: .leading, spacing: Spacing.s2) {
+            Text(title)
+                .font(.headline)
+                .foregroundStyle(Color.ceviOnSurface)
+                .accessibilityAddTraits(.isHeader)
+            content()
+        }
+        .padding(.vertical, Spacing.s1)
+        .listRowBackground(Color.ceviSurfaceContainerLow)
+    }
+
+    private func paragraph(_ text: LocalizedStringKey) -> some View {
+        Text(text).font(.subheadline).foregroundStyle(Color.ceviOnSurfaceVariant)
     }
 }
 
@@ -312,21 +535,13 @@ struct LockView: View {
     @Environment(AppLock.self) private var lock
 
     var body: some View {
-        VStack(spacing: 24) {
-            Image(systemName: "lock.fill")
-                .font(.system(size: 48))
-                .accessibilityHidden(true)
-            Text("Cevi OS ist gesperrt")
-                .font(.title2.bold())
-                .accessibilityAddTraits(.isHeader)
-            if lock.failed {
-                ErrorRow(text: String(localized: "Das Entsperren hat nicht geklappt."))
-            }
-            Button("Entsperren") { Task { await lock.unlock() } }
-                .buttonStyle(.borderedProminent)
-                .frame(minHeight: 44)
-        }
-        .padding()
+        StateView(
+            symbol: lock.failed ? "lock.trianglebadge.exclamationmark" : "lock.fill",
+            title: "Cevi OS ist gesperrt",
+            message: lock.failed ? "Das Entsperren hat nicht geklappt." : nil,
+            tone: lock.failed ? .error : .neutral,
+            primary: StateView.Action(title: "Entsperren", symbol: "faceid") { Task { await lock.unlock() } }
+        )
         .task { await lock.unlock() }
     }
 }
@@ -335,30 +550,69 @@ struct LockView: View {
 struct DeviceCodeMissingView: View {
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
+            VStack(alignment: .leading, spacing: Spacing.s4) {
                 Text("Geräte-Code einrichten")
-                    .font(.title2.bold())
+                    .font(.title(.title1))
+                    .foregroundStyle(Color.ceviOnSurface)
                     .accessibilityAddTraits(.isHeader)
                 Text("Als Leitung siehst du Daten von Kindern. Dafür braucht dein iPhone einen Geräte-Code. Ohne ihn zeigt Cevi OS nichts an.")
                 Text("So richtest du ihn ein: Öffne die Einstellungen, tippe auf «Face ID & Code» (oder «Touch ID & Code») und dann auf «Code aktivieren». Danach öffnest du Cevi OS wieder.")
             }
-            .padding()
+            .foregroundStyle(Color.ceviOnSurfaceVariant)
+            .padding(.horizontal, Spacing.s4)
+            .padding(.top, Spacing.s8)
+            .frame(maxWidth: Size.contentMax, alignment: .leading)
+            .frame(maxWidth: .infinity)
         }
+        .ceviScreenBackground()
     }
 }
 
-/// No connection at launch.
+/// ZT4: no connection at launch.
 struct OfflineView: View {
     @Environment(AppState.self) private var state
 
     var body: some View {
-        VStack(spacing: 16) {
-            Text("Keine Verbindung zum Server. Bitte später nochmals versuchen.")
-                .multilineTextAlignment(.center)
-            Button("Nochmals versuchen") { Task { await state.start() } }
-                .buttonStyle(.borderedProminent)
-                .frame(minHeight: 44)
-        }
-        .padding()
+        StateView.offline { Task { await state.start() } }
     }
+}
+
+#Preview("Login") {
+    SignInView().environment(AppState())
+}
+
+#Preview("Login Nacht") {
+    SignInView().environment(AppState()).preferredColorScheme(.dark)
+}
+
+#Preview("Zweiter Faktor") {
+    SecondFactorView().environment(AppState())
+}
+
+#Preview("Passwort") {
+    ChangePasswordView().environment(AppState())
+}
+
+#Preview("Passwort Nacht") {
+    ChangePasswordView().environment(AppState()).preferredColorScheme(.dark)
+}
+
+#Preview("Willkommen") {
+    PrivacyView(name: "Marion", childNames: ["Lena", "Noah"]).environment(AppState())
+}
+
+#Preview("Willkommen Nacht") {
+    PrivacyView(name: "Marion", childNames: []).environment(AppState()).preferredColorScheme(.dark)
+}
+
+#Preview("Datenschutz") {
+    NavigationStack { PrivacyPolicyView() }
+}
+
+#Preview("Abmelden") {
+    List { SignOutButton().foregroundStyle(Color.ceviPrimaryText) }.environment(AppState())
+}
+
+#Preview("Gesperrt") {
+    LockView().environment(AppLock())
 }
