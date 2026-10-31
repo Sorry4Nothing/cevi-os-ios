@@ -1,14 +1,59 @@
 {
   "sourceLanguage" : "de",
   "strings" : {
+    "Anmeldung" : {
+
+    },
+    "Bitte die App aktualisieren" : {
+
+    },
+    "Bitte die App aktualisieren." : {
+
+    },
+    "Bitte kurz warten." : {
+
+    },
     "Cevi OS" : {
-      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Cevi OS" } } }
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cevi OS"
+          }
+        }
+      }
     },
     "Die Verbindung zum Server ist nicht eingerichtet." : {
-      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Die Verbindung zum Server ist nicht eingerichtet." } } }
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Verbindung zum Server ist nicht eingerichtet."
+          }
+        }
+      }
+    },
+    "Diese Version von Cevi OS wird nicht mehr unterstützt." : {
+
+    },
+    "Etwas ist schiefgegangen. Bitte später nochmals versuchen." : {
+
+    },
+    "Im App Store öffnen" : {
+
+    },
+    "Keine Verbindung zum Server. Bitte später nochmals versuchen." : {
+
     },
     "Umgebung: %@" : {
-      "localizations" : { "de" : { "stringUnit" : { "state" : "translated", "value" : "Umgebung: %@" } } }
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Umgebung: %@"
+          }
+        }
+      }
     }
   },
   "version" : "1.1"

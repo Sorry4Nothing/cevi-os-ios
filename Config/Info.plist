@@ -4,5 +4,7 @@
 <dict>
 	<key>APIBaseURL</key>
 	<string>$(API_BASE_URL)</string>
+	<key>AppStoreURL</key>
+	<string>$(APP_STORE_URL)</string>
 </dict>
 </plist>

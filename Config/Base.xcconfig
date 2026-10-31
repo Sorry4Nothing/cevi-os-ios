@@ -3,3 +3,5 @@
 APP_BUNDLE_ID_PREFIX = io.github.sorry4nothing
 APP_BUNDLE_BASENAME = cevios
 PRODUCT_BUNDLE_IDENTIFIER = $(APP_BUNDLE_IDENTIFIER)
+// Link zur App im App Store (ohne «//»: «:/$()/» statt «://»). Leer, bis die App im Store steht.
+APP_STORE_URL =

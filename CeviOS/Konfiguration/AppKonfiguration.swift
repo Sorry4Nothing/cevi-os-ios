@@ -16,9 +16,13 @@ struct AppKonfiguration: Equatable, Sendable {
     /// Basis-URL der API. `nil`, wenn sie fehlt oder ungültig ist (nur `https` ist erlaubt).
     let apiBasisURL: URL?
 
+    /// Link zur App im App Store für den Hinweis «Bitte die App aktualisieren». `nil`, solange er nicht eingetragen ist.
+    let appStoreURL: URL?
+
     init(umgebung: Umgebung, infoDictionary: [String: Any]) {
         self.umgebung = umgebung
         apiBasisURL = Self.gueltigeBasisURL(infoDictionary[Self.basisURLSchluessel] as? String)
+        appStoreURL = Self.gueltigeBasisURL(infoDictionary["AppStoreURL"] as? String)
     }
 
     var istVollstaendig: Bool {
