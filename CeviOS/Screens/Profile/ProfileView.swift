@@ -98,7 +98,7 @@ struct ProfileView: View {
             Task { await upload(item) }
         }
         .fullScreenCover(item: $page) { page in
-            if let url = page.url(base: configuration.apiBaseURL) { SafariView(url: url).ignoresSafeArea() }
+            if let url = page.url(base: configuration.apiBaseURL) { WebPageView(url: url) }
         }
         .alert("Überall abmelden?", isPresented: $isConfirmingSignOutEverywhere) {
             Button("Abbrechen", role: .cancel) {}
@@ -255,8 +255,7 @@ struct ProfileView: View {
     private func upload(_ item: PhotosPickerItem) async {
         await action.perform(message: imageMessage) {
             guard let data = try await item.loadTransferable(type: Data.self),
-                  let image = UIImage(data: data),
-                  let jpeg = ProfileImage.jpeg(from: image)
+                  let jpeg = ProfileImage.jpeg(from: data)
             else { throw APIError(kind: .unsupportedMediaType, status: nil, code: nil, message: nil) }
             try await requireClient().uploadProfileImage(jpeg)
         }

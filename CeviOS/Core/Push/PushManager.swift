@@ -1,6 +1,5 @@
 import Foundation
 import Observation
-import UIKit
 import UserNotifications
 #if canImport(FirebaseMessaging)
 import FirebaseCore
@@ -45,7 +44,6 @@ final class PushManager: NSObject {
         switch settings.authorizationStatus {
         case .notDetermined: needsExplanation = true
         case .authorized, .provisional, .ephemeral:
-            UIApplication.shared.registerForRemoteNotifications()
             await registerToken()
         default: break
         }
@@ -56,16 +54,8 @@ final class PushManager: NSObject {
         needsExplanation = false
         let granted = (try? await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound])) ?? false
         if granted {
-            UIApplication.shared.registerForRemoteNotifications()
             await registerToken()
         }
-    }
-
-    func apnsTokenReceived(_ data: Data) {
-        #if canImport(FirebaseMessaging)
-        guard isConfigured else { return }
-        Messaging.messaging().apnsToken = data
-        #endif
     }
 
     /// Sends the current token to the server if it is new for this session.
@@ -91,7 +81,6 @@ final class PushManager: NSObject {
         guard isConfigured else { return }
         try? await Messaging.messaging().deleteToken()
         #endif
-        UIApplication.shared.unregisterForRemoteNotifications()
     }
 }
 

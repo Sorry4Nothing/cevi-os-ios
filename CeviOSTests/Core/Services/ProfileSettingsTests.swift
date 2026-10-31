@@ -1,6 +1,8 @@
 import Foundation
 import Testing
-import UIKit
+import CoreGraphics
+import ImageIO
+import UniformTypeIdentifiers
 @testable import CeviOS
 
 struct ProfileSettingsTests {
@@ -23,17 +25,24 @@ struct ProfileSettingsTests {
         #expect(remove == #"{"telefon":null}"#)
     }
 
-    @MainActor @Test func imageIsCroppedScaledAndSmall() throws {
-        let format = UIGraphicsImageRendererFormat()
-        format.scale = 1
-        let source = UIGraphicsImageRenderer(size: CGSize(width: 3000, height: 2000), format: format).image { context in
-            UIColor.red.setFill()
-            context.fill(CGRect(x: 0, y: 0, width: 3000, height: 2000))
-        }
-        let data = try #require(ProfileImage.jpeg(from: source))
-        let result = try #require(UIImage(data: data))
-        #expect(result.size == CGSize(width: 1024, height: 1024))
+    @Test func imageIsCroppedScaledAndSmall() throws {
+        // A 3000 x 2000 red picture as PNG data, made with CoreGraphics only.
+        let context = try #require(CGContext(
+            data: nil, width: 3000, height: 2000, bitsPerComponent: 8, bytesPerRow: 0,
+            space: CGColorSpace(name: CGColorSpace.sRGB)!, bitmapInfo: CGImageAlphaInfo.noneSkipLast.rawValue
+        ))
+        context.setFillColor(CGColor(red: 1, green: 0, blue: 0, alpha: 1))
+        context.fill(CGRect(x: 0, y: 0, width: 3000, height: 2000))
+        let png = NSMutableData()
+        let destination = try #require(CGImageDestinationCreateWithData(png, UTType.png.identifier as CFString, 1, nil))
+        CGImageDestinationAddImage(destination, try #require(context.makeImage()), nil)
+        #expect(CGImageDestinationFinalize(destination))
+
+        let data = try #require(ProfileImage.jpeg(from: png as Data))
+        let result = try #require(ProfileImage.cgImage(from: data))
+        #expect(result.width == 1024 && result.height == 1024)
         #expect(data.count < ProfileImage.maxBytes)
         #expect(data.prefix(2) == Data([0xFF, 0xD8]))
+        #expect(ProfileImage.jpeg(from: Data("kein Bild".utf8)) == nil)
     }
 }

@@ -57,7 +57,7 @@ struct PrivacyView: View {
         }
         .ceviScreenBackground()
         .fullScreenCover(isPresented: $isPageOpen) {
-            if let url { SafariView(url: url).ignoresSafeArea() }
+            if let url { WebPageView(url: url) }
         }
     }
 

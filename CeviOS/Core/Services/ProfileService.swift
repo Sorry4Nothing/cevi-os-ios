@@ -1,5 +1,6 @@
 import Foundation
-import UIKit
+import ImageIO
+import UniformTypeIdentifiers
 
 /// Body of `PATCH /api/v1/ich`: only the changed keys are sent. `phone == .some(nil)` sends `null` and removes the number.
 nonisolated struct ProfilePatch: Encodable, Sendable {
@@ -44,32 +45,61 @@ nonisolated enum PhoneInput: Equatable {
 }
 
 /// Prepares a picked photo for `PUT /api/v1/ich/bild`: center square, at most 1024 px, JPEG under 5 MiB.
+/// Uses ImageIO and CoreGraphics only.
 nonisolated enum ProfileImage {
-    static let maxSide: CGFloat = 1024
+    static let maxSide = 1024
     static let maxBytes = 5 * 1024 * 1024
 
-    static func jpeg(from image: UIImage) -> Data? {
-        let size = image.size
-        let side = min(size.width, size.height)
-        guard side > 0 else { return nil }
-        let target = min(side, maxSide)
-        let format = UIGraphicsImageRendererFormat()
-        format.scale = 1
-        let renderer = UIGraphicsImageRenderer(size: CGSize(width: target, height: target), format: format)
-        let scale = target / side
-        let square = renderer.image { _ in
-            // Drawing centered and scaled crops the longer side evenly.
-            image.draw(in: CGRect(
-                x: (target - size.width * scale) / 2,
-                y: (target - size.height * scale) / 2,
-                width: size.width * scale,
-                height: size.height * scale
-            ))
-        }
+    /// Decodes image data (JPEG, PNG, HEIC, WebP …) applying the EXIF orientation.
+    static func cgImage(from data: Data) -> CGImage? {
+        guard let source = CGImageSourceCreateWithData(data as CFData, nil) else { return nil }
+        let options: [CFString: Any] = [
+            kCGImageSourceCreateThumbnailFromImageAlways: true,
+            kCGImageSourceCreateThumbnailWithTransform: true,
+            kCGImageSourceThumbnailMaxPixelSize: 16_000,
+        ]
+        return CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary)
+    }
+
+    /// Center square, scaled down to `maxSide`, as JPEG below `maxBytes`. `nil` if the data is no image.
+    static func jpeg(from data: Data) -> Data? {
+        guard let source = CGImageSourceCreateWithData(data as CFData, nil),
+              let properties = CGImageSourceCopyPropertiesAtIndex(source, 0, nil) as? [CFString: Any],
+              let width = properties[kCGImagePropertyPixelWidth] as? Int,
+              let height = properties[kCGImagePropertyPixelHeight] as? Int,
+              width > 0, height > 0
+        else { return nil }
+        let options: [CFString: Any] = [
+            kCGImageSourceCreateThumbnailFromImageAlways: true,
+            kCGImageSourceCreateThumbnailWithTransform: true,
+            kCGImageSourceThumbnailMaxPixelSize: min(max(width, height), 16_000),
+        ]
+        guard let full = CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary) else { return nil }
+        let side = min(full.width, full.height)
+        let crop = CGRect(x: (full.width - side) / 2, y: (full.height - side) / 2, width: side, height: side)
+        guard var square = full.cropping(to: crop) else { return nil }
+        if side > maxSide, let scaled = scaled(square, to: maxSide) { square = scaled }
         for quality in stride(from: 0.85, through: 0.25, by: -0.15) {
-            if let data = square.jpegData(compressionQuality: quality), data.count < maxBytes { return data }
+            if let jpeg = encodeJPEG(square, quality: quality), jpeg.count < maxBytes { return jpeg }
         }
         return nil
+    }
+
+    private static func scaled(_ image: CGImage, to side: Int) -> CGImage? {
+        guard let context = CGContext(
+            data: nil, width: side, height: side, bitsPerComponent: 8, bytesPerRow: 0,
+            space: CGColorSpace(name: CGColorSpace.sRGB)!, bitmapInfo: CGImageAlphaInfo.noneSkipLast.rawValue
+        ) else { return nil }
+        context.interpolationQuality = .high
+        context.draw(image, in: CGRect(x: 0, y: 0, width: side, height: side))
+        return context.makeImage()
+    }
+
+    private static func encodeJPEG(_ image: CGImage, quality: Double) -> Data? {
+        let output = NSMutableData()
+        guard let destination = CGImageDestinationCreateWithData(output, UTType.jpeg.identifier as CFString, 1, nil) else { return nil }
+        CGImageDestinationAddImage(destination, image, [kCGImageDestinationLossyCompressionQuality: quality] as CFDictionary)
+        return CGImageDestinationFinalize(destination) ? output as Data : nil
     }
 }
 

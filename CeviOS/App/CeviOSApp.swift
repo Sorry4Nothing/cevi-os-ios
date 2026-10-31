@@ -2,11 +2,15 @@ import SwiftUI
 
 @main
 struct CeviOSApp: App {
-    @UIApplicationDelegateAdaptor private var appDelegate: AppDelegate
     @State private var state = AppState()
     @State private var lock = AppLock()
     @State private var push = PushManager.shared
     @Environment(\.scenePhase) private var scenePhase
+
+    init() {
+        // Starts Firebase (only with GoogleService-Info.plist).
+        PushManager.shared.configure()
+    }
 
     var body: some Scene {
         WindowGroup {

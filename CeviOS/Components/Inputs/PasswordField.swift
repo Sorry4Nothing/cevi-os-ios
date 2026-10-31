@@ -4,7 +4,9 @@ import SwiftUI
 struct PasswordField: View {
     let label: LocalizedStringKey
     @Binding var text: String
-    var contentType: UITextContentType = .password
+    var kind: Kind = .current
+
+    enum Kind { case current, new }
     var isFocused: FocusState<Bool>.Binding
     @State private var isRevealed = false
 
@@ -17,7 +19,7 @@ struct PasswordField: View {
                     SecureField("", text: $text)
                 }
             }
-            .textContentType(contentType)
+            .textContentType(kind == .new ? .newPassword : .password)
             .textInputAutocapitalization(.never)
             .autocorrectionDisabled()
             .focused(isFocused)

@@ -24,13 +24,13 @@ struct ChangePasswordView: View {
             }
             VStack(alignment: .leading, spacing: Spacing.s2) {
                 CeviField(label: "Neues Passwort", isFocused: newFocused) {
-                    PasswordField(label: "Neues Passwort", text: $new, contentType: .newPassword, isFocused: $newFocused)
+                    PasswordField(label: "Neues Passwort", text: $new, kind: .new, isFocused: $newFocused)
                 }
                 RuleRow(text: "Mindestens 12 Zeichen", isMet: new.count >= 12)
             }
             VStack(alignment: .leading, spacing: Spacing.s2) {
                 CeviField(label: "Passwort wiederholen", isFocused: repeatedFocused) {
-                    PasswordField(label: "Passwort wiederholen", text: $repeated, contentType: .newPassword,
+                    PasswordField(label: "Passwort wiederholen", text: $repeated, kind: .new,
                                   isFocused: $repeatedFocused)
                 }
                 if mismatch {

@@ -5,12 +5,12 @@ struct ProfileAvatar: View {
     @Environment(AppState.self) private var state
     let path: String?
     let initials: String
-    @State private var image: UIImage?
+    @State private var image: CGImage?
 
     var body: some View {
         Group {
             if let image {
-                Image(uiImage: image).resizable().scaledToFill()
+                Image(decorative: image, scale: 1).resizable().scaledToFill()
             } else {
                 Text(initials)
                     .font(.headline)
@@ -29,7 +29,7 @@ struct ProfileAvatar: View {
     private func load() async {
         guard let path else { image = nil; return }
         if let cached = ProfileImageCache.shared[path] { image = cached; return }
-        guard let data = try? await state.client?.data(path: path), let loaded = UIImage(data: data) else { return }
+        guard let data = try? await state.client?.data(path: path), let loaded = ProfileImage.cgImage(from: data) else { return }
         ProfileImageCache.shared[path] = loaded
         image = loaded
     }
