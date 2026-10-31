@@ -1,7 +1,34 @@
 {
   "sourceLanguage" : "de",
   "strings" : {
-    "Anmeldung" : {
+    "" : {
+
+    },
+    "Abbrechen" : {
+
+    },
+    "Abmelden" : {
+
+    },
+    "Aktuelles Passwort" : {
+
+    },
+    "Als Leitung siehst du Daten von Kindern. Dafür braucht dein iPhone einen Geräte-Code. Ohne ihn zeigt Cevi OS nichts an." : {
+
+    },
+    "Anmelden" : {
+
+    },
+    "Benutzername" : {
+
+    },
+    "Bestätigen" : {
+
+    },
+    "Bevor es losgeht, lies bitte die Datenschutzerklärung. Sie sagt, welche Daten die App verwendet und wer sie sieht." : {
+
+    },
+    "Bitte Benutzername und Passwort eingeben." : {
 
     },
     "Bitte die App aktualisieren" : {
@@ -13,6 +40,12 @@
     "Bitte kurz warten." : {
 
     },
+    "Bitte noch einmal anmelden." : {
+
+    },
+    "Bitte wähle ein neues Passwort. Es braucht mindestens 12 Zeichen, Regeln für Zeichen gibt es nicht." : {
+
+    },
     "Cevi OS" : {
       "localizations" : {
         "de" : {
@@ -22,6 +55,39 @@
           }
         }
       }
+    },
+    "Cevi OS entsperren" : {
+
+    },
+    "Cevi OS ist gesperrt" : {
+
+    },
+    "Code" : {
+
+    },
+    "Das aktuelle Passwort stimmt nicht." : {
+
+    },
+    "Das Entsperren hat nicht geklappt." : {
+
+    },
+    "Das neue Passwort darf höchstens 128 Zeichen haben." : {
+
+    },
+    "Das neue Passwort muss mindestens 12 Zeichen haben." : {
+
+    },
+    "Datenschutz" : {
+
+    },
+    "Datenschutzerklärung lesen" : {
+
+    },
+    "Der Code stimmt nicht." : {
+
+    },
+    "Die beiden neuen Passwörter sind nicht gleich." : {
+
     },
     "Die Verbindung zum Server ist nicht eingerichtet." : {
       "localizations" : {
@@ -36,7 +102,40 @@
     "Diese Version von Cevi OS wird nicht mehr unterstützt." : {
 
     },
+    "Dieses Passwort stammt aus einem bekannten Datenleck. Bitte ein anderes wählen." : {
+
+    },
+    "Entsperren" : {
+
+    },
+    "Ersatzcode" : {
+
+    },
+    "Ersatzcode verwenden" : {
+
+    },
     "Etwas ist schiefgegangen. Bitte später nochmals versuchen." : {
+
+    },
+    "Fehler: %@" : {
+
+    },
+    "Geräte-Code einrichten" : {
+
+    },
+    "Gib den 6-stelligen Code aus deiner Authenticator-App ein." : {
+
+    },
+    "Gib einen deiner Ersatzcodes ein (Format xxxxx-xxxxx). Jeder Code gilt nur einmal." : {
+
+    },
+    "Hallo %@" : {
+
+    },
+    "Hilfe und Kontakt" : {
+
+    },
+    "Ich habe die Datenschutzerklärung gelesen" : {
 
     },
     "Im App Store öffnen" : {
@@ -45,7 +144,29 @@
     "Keine Verbindung zum Server. Bitte später nochmals versuchen." : {
 
     },
+    "Lädt" : {
+
+    },
+    "Neues Passwort" : {
+
+    },
+    "Neues Passwort wiederholen" : {
+
+    },
+    "Nochmals versuchen" : {
+
+    },
+    "Passwort" : {
+
+    },
+    "Passwort ändern" : {
+
+    },
+    "So richtest du ihn ein: Öffne die Einstellungen, tippe auf «Face ID & Code» (oder «Touch ID & Code») und dann auf «Code aktivieren». Danach öffnest du Cevi OS wieder." : {
+
+    },
     "Umgebung: %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "de" : {
           "stringUnit" : {
@@ -54,6 +175,9 @@
           }
         }
       }
+    },
+    "Zweiter Faktor" : {
+
     }
   },
   "version" : "1.1"

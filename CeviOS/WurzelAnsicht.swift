@@ -1,36 +1,56 @@
 import SwiftUI
 
-/// Wurzel der App. Ist die App veraltet, sperrt der Hinweis alles andere. Anmeldung und Navigation folgen in den nächsten Issues.
+/// Wurzel der App. Ist die App veraltet, sperrt der Hinweis alles andere. Sonst folgt der Bildschirm der Phase des `AppZustand`.
 struct WurzelAnsicht: View {
     @Environment(\.appKonfiguration) private var konfiguration
     @Environment(AppZustand.self) private var zustand
+    @Environment(AppSperre.self) private var sperre
 
     var body: some View {
         if zustand.appVeraltet {
             AppVeraltetAnsicht(appStoreURL: konfiguration.appStoreURL)
         } else {
-            platzhalter
+            inhalt
+                .task { await zustand.starten() }
         }
     }
 
-    private var platzhalter: some View {
-        VStack(spacing: 16) {
-            Text("Cevi OS")
-                .font(.largeTitle.bold())
-            if konfiguration.umgebung != .prod {
-                Text("Umgebung: \(konfiguration.umgebung.rawValue)")
-                    .font(.subheadline)
-            }
-            if !konfiguration.istVollstaendig {
-                Text("Die Verbindung zum Server ist nicht eingerichtet.")
-                    .font(.callout)
-                    .multilineTextAlignment(.center)
-            } else if !zustand.hatSitzung {
-                Text("Anmeldung")
-                    .font(.headline)
-            }
+    @ViewBuilder
+    private var inhalt: some View {
+        switch zustand.phase {
+        case .laden:
+            ProgressView().accessibilityLabel(Text("Lädt"))
+        case .konfigurationFehlt:
+            Text("Die Verbindung zum Server ist nicht eingerichtet.")
+                .multilineTextAlignment(.center)
+                .padding()
+        case .offline:
+            OfflineAnsicht()
+        case .anmelden:
+            AnmeldungAnsicht()
+        case .zweiterFaktor:
+            ZweiterFaktorAnsicht()
+        case .passwortAendern:
+            PasswortAendernAnsicht()
+        case .datenschutz:
+            DatenschutzAnsicht()
+        case .bereit(let profil):
+            geschuetzt(profil)
         }
-        .padding()
+    }
+
+    @ViewBuilder
+    private func geschuetzt(_ profil: Profil) -> some View {
+        if !sperre.istErforderlich(fuer: profil) || !sperre.istGesperrt {
+            HauptAnsicht(profil: profil)
+        } else if AppSperre.geraeteCodeVorhanden {
+            SperreAnsicht()
+        } else if profil.istLeitung {
+            GeraeteCodeFehltAnsicht()
+        } else {
+            // Ohne Geräte-Code lässt sich für Eltern nichts sperren.
+            HauptAnsicht(profil: profil)
+        }
     }
 }
 
@@ -55,11 +75,6 @@ struct AppVeraltetAnsicht: View {
         }
         .padding()
     }
-}
-
-#Preview {
-    WurzelAnsicht()
-        .environment(AppZustand())
 }
 
 #Preview("App veraltet") {
