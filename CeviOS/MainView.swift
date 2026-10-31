@@ -4,7 +4,13 @@ import SwiftUI
 struct MainView: View {
     @Environment(AppState.self) private var state
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(PushManager.self) private var push
     @State private var chatList = ChatListModel()
+    @State private var selectedTab: MainTab = .programs
+    @State private var programPath: [UUID] = []
+    @State private var chatPath: [UUID] = []
+
+    enum MainTab: Hashable { case programs, chat, attendance, profile }
     let profile: Profile
 
     private var attendanceUnits: [UnitSummary] {
@@ -15,22 +21,22 @@ struct MainView: View {
     private var hasChat: Bool { !profile.children.isEmpty || profile.isUnitLeader }
 
     var body: some View {
-        TabView {
-            Tab("Programme", systemImage: "calendar") {
-                ProgramListView()
+        TabView(selection: $selectedTab) {
+            Tab("Programme", systemImage: "calendar", value: MainTab.programs) {
+                ProgramListView(path: $programPath)
             }
             if hasChat {
-                Tab("Chat", systemImage: "bubble.left.and.bubble.right") {
-                    ChatListView(model: chatList, profile: profile)
+                Tab("Chat", systemImage: "bubble.left.and.bubble.right", value: MainTab.chat) {
+                    ChatListView(model: chatList, profile: profile, path: $chatPath)
                 }
                 .badge(chatList.totalUnread)
             }
             if !attendanceUnits.isEmpty {
-                Tab("Anwesenheit", systemImage: "checklist") {
+                Tab("Anwesenheit", systemImage: "checklist", value: MainTab.attendance) {
                     AttendanceListView(units: attendanceUnits)
                 }
             }
-            Tab("Profil", systemImage: "person.crop.circle") {
+            Tab("Profil", systemImage: "person.crop.circle", value: MainTab.profile) {
                 VStack(spacing: 16) {
                     Text("Hallo \(profile.ceviName ?? profile.name)")
                         .font(.title.bold())
@@ -48,5 +54,26 @@ struct MainView: View {
             guard hasChat, scenePhase == .active else { return }
             await chatList.poll(client: state.client)
         }
+        .task { await push.prepare() }
+        .sheet(isPresented: Binding(get: { push.needsExplanation }, set: { push.needsExplanation = $0 })) {
+            PushExplanationView()
+        }
+        .onChange(of: state.pendingTarget, initial: true) { _, target in open(target) }
+    }
+
+    /// Opens the target of a tapped push.
+    private func open(_ target: PushTarget?) {
+        guard let target else { return }
+        switch target {
+        case .chat(let id) where hasChat:
+            selectedTab = .chat
+            chatPath = [id]
+        case .program(let id):
+            selectedTab = .programs
+            programPath = [id]
+        default:
+            break
+        }
+        state.pendingTarget = nil
     }
 }

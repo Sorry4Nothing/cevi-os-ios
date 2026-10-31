@@ -23,6 +23,8 @@ final class AppState {
     var appOutdated = false
     /// Chat that is open right now. Pushes for it are not shown.
     var openChatId: UUID?
+    /// Target of a tapped push; the main view opens it and clears it.
+    var pendingTarget: PushTarget?
     /// Push tokens and caches that must be dropped on sign-out hook in here.
     var onSignOut: [@MainActor () async -> Void] = []
 

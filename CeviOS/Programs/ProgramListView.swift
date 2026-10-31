@@ -54,9 +54,10 @@ final class ProgramListModel {
 struct ProgramListView: View {
     @Environment(AppState.self) private var appState
     @State private var model = ProgramListModel()
+    @Binding var path: [UUID]
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             Group {
                 switch model.state {
                 case .loading:

@@ -2,10 +2,17 @@
   "default-configuration": "Prod",
   "configurations": [
     "Debug",
-    "Release",
     { "name": "Dev", "file": { "anchor": "Config", "relative-path": "Dev.xcconfig" } },
     { "name": "Int", "file": { "anchor": "Config", "relative-path": "Int.xcconfig" } },
     { "name": "Prod", "file": { "anchor": "Config", "relative-path": "Prod.xcconfig" } },
+    "Release",
+  ],
+  "packages": [
+    {
+      "kind": "remote",
+      "repository": "https://github.com/firebase/firebase-ios-sdk",
+      "version": { "up-to-next-major-version": "12.0.0" },
+    },
   ],
   "localizations": {
     "development": "de",
@@ -32,6 +39,9 @@
     {
       "name": "CeviOS",
       "id": "000000000000000100000000",
+      "package-product-members": [
+        { "package": "firebase-ios-sdk", "product-name": "FirebaseMessaging", "build-phase": { "build-phase": "frameworks" } },
+      ],
       "product": "Products/CeviOS.app",
       "product-type": "application",
       "build-phases": [
@@ -60,14 +70,15 @@
         "SWIFT_VERSION": "6.0",
         "TARGETED_DEVICE_FAMILY": "1",
       },
-    },
-    {
+    }, {
       "name": "CeviOSTests",
       "id": "000000000000000100000001",
       "product": "Products/CeviOSTests.xctest",
       "product-type": "bundle.unit-test",
       "test-host-target": "CeviOS",
-      "dependencies": [ "CeviOS" ],
+      "dependencies": [
+        "CeviOS",
+      ],
       "build-phases": [
         "compile-sources",
         "frameworks",
@@ -87,13 +98,14 @@
         "TARGETED_DEVICE_FAMILY": "1",
         "TEST_HOST": "$(BUILT_PRODUCTS_DIR)/CeviOS.app/CeviOS",
       },
-    },
-    {
+    }, {
       "name": "CeviOSUITests",
       "id": "000000000000000100000002",
       "product": "Products/CeviOSUITests.xctest",
       "product-type": "bundle.ui-testing",
-      "dependencies": [ "CeviOS" ],
+      "dependencies": [
+        "CeviOS",
+      ],
       "build-phases": [
         "compile-sources",
         "frameworks",
@@ -147,12 +159,12 @@
     "DEAD_CODE_STRIPPING": "YES",
     "DEBUG_INFORMATION_FORMAT[config=Debug]": "dwarf",
     "DEBUG_INFORMATION_FORMAT[config=Dev]": "dwarf",
-    "DEBUG_INFORMATION_FORMAT[config=Release]": "dwarf-with-dsym",
     "DEBUG_INFORMATION_FORMAT[config=Int]": "dwarf-with-dsym",
     "DEBUG_INFORMATION_FORMAT[config=Prod]": "dwarf-with-dsym",
-    "ENABLE_NS_ASSERTIONS[config=Release]": "NO",
+    "DEBUG_INFORMATION_FORMAT[config=Release]": "dwarf-with-dsym",
     "ENABLE_NS_ASSERTIONS[config=Int]": "NO",
     "ENABLE_NS_ASSERTIONS[config=Prod]": "NO",
+    "ENABLE_NS_ASSERTIONS[config=Release]": "NO",
     "ENABLE_STRICT_OBJC_MSGSEND": "YES",
     "ENABLE_TESTABILITY[config=Debug]": "YES",
     "ENABLE_TESTABILITY[config=Dev]": "YES",
@@ -181,18 +193,18 @@
     "LOCALIZATION_PREFERS_STRING_CATALOGS": "YES",
     "MTL_ENABLE_DEBUG_INFO[config=Debug]": "INCLUDE_SOURCE",
     "MTL_ENABLE_DEBUG_INFO[config=Dev]": "INCLUDE_SOURCE",
-    "MTL_ENABLE_DEBUG_INFO[config=Release]": "NO",
     "MTL_ENABLE_DEBUG_INFO[config=Int]": "NO",
     "MTL_ENABLE_DEBUG_INFO[config=Prod]": "NO",
+    "MTL_ENABLE_DEBUG_INFO[config=Release]": "NO",
     "MTL_FAST_MATH": "YES",
     "ONLY_ACTIVE_ARCH[config=Debug]": "YES",
     "ONLY_ACTIVE_ARCH[config=Dev]": "YES",
     "SDKROOT": "iphoneos",
     "STRING_CATALOG_GENERATE_SYMBOLS": "YES",
     "SUPPORTED_PLATFORMS": "iphoneos iphonesimulator",
-    "SWIFT_COMPILATION_MODE[config=Release]": "wholemodule",
     "SWIFT_COMPILATION_MODE[config=Int]": "wholemodule",
     "SWIFT_COMPILATION_MODE[config=Prod]": "wholemodule",
+    "SWIFT_COMPILATION_MODE[config=Release]": "wholemodule",
     "SWIFT_OPTIMIZATION_LEVEL[config=Debug]": "-Onone",
     "SWIFT_OPTIMIZATION_LEVEL[config=Dev]": "-Onone",
   },

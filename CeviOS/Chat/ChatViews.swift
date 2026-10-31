@@ -4,9 +4,10 @@ struct ChatListView: View {
     @Environment(AppState.self) private var appState
     let model: ChatListModel
     let profile: Profile
+    @Binding var path: [UUID]
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             Group {
                 if !model.hasLoaded, let error = model.error {
                     ErrorRow(text: error).padding()
