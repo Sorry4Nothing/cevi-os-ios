@@ -2,18 +2,18 @@ import SwiftUI
 
 @main
 struct CeviOSApp: App {
-    @State private var zustand = AppZustand()
-    @State private var sperre = AppSperre()
-    @Environment(\.scenePhase) private var szenenphase
+    @State private var state = AppState()
+    @State private var lock = AppLock()
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some Scene {
         WindowGroup {
-            WurzelAnsicht()
-                .environment(zustand)
-                .environment(sperre)
-                .onChange(of: szenenphase) { _, neu in sperre.szenenphase(neu) }
-                .onChange(of: zustand.phase) { _, neu in
-                    if neu == .anmelden { sperre.zuruecksetzen() }
+            RootView()
+                .environment(state)
+                .environment(lock)
+                .onChange(of: scenePhase) { _, new in lock.scenePhase(new) }
+                .onChange(of: state.phase) { _, new in
+                    if new == .signIn { lock.reset() }
                 }
         }
     }

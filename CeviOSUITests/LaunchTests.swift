@@ -1,29 +1,29 @@
 import XCTest
 
-final class StartTests: XCTestCase {
+final class LaunchTests: XCTestCase {
     override func setUpWithError() throws {
         continueAfterFailure = false
     }
 
     @MainActor
-    func testStartzeigtDenAppNamen() throws {
+    func testStartShowsTheAppName() throws {
         let app = XCUIApplication()
         app.launch()
         XCTAssertTrue(app.staticTexts["Cevi OS"].waitForExistence(timeout: 10))
     }
 
-    /// Apples automatische Prüfung: Kontrast, Beschriftungen, Tippflächen, Schriftgrösse.
+    /// Apple's automatic audit: contrast, labels, hit areas, font size.
     @MainActor
-    func testBarrierefreiheitsPruefung() throws {
+    func testAccessibilityAudit() throws {
         let app = XCUIApplication()
         app.launch()
         XCTAssertTrue(app.staticTexts["Cevi OS"].waitForExistence(timeout: 10))
         try app.performAccessibilityAudit()
     }
 
-    /// Mit der grössten Schriftstufe bleibt der Inhalt vorhanden und die Prüfung besteht.
+    /// With the largest text size the content stays present and the audit passes.
     @MainActor
-    func testGroessteSchriftstufe() throws {
+    func testLargestTextSize() throws {
         let app = XCUIApplication()
         app.launchArguments += ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXXL"]
         app.launch()
