@@ -7,7 +7,7 @@ struct AttendanceListView: View {
     var body: some View {
         NavigationStack {
             List(units) { unit in
-                NavigationLink(unit.name) { AttendanceView(unit: unit) }.frame(minHeight: 44)
+                NavigationLink(unit.name) { AttendanceView(unit: unit) }.frame(minHeight: Size.touchTarget)
             }
             .navigationTitle("Anwesenheit")
         }

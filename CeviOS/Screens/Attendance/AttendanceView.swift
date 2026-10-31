@@ -7,6 +7,7 @@ struct AttendanceView: View {
     @State private var model = AttendanceModel()
     @State private var selectedEvent: UUID?
     @State private var showsLeaders = false
+    @Environment(\.dynamicTypeSize) private var typeSize
 
     var body: some View {
         Group {
@@ -75,7 +76,7 @@ struct AttendanceView: View {
 
     private func quota(_ quota: AttendanceQuota) -> some View {
         let percent = quota.percent.map { " (\($0) %)" } ?? ""
-        return Text("Anwesend: \(quota.present) von \(quota.of)\(percent)").font(.headline)
+        return Text("Anwesend: \(quota.present) von \(quota.of)\(percent)").font(.headline).accessibilityAddTraits(.isHeader)
     }
 
     private func row(
@@ -89,6 +90,7 @@ struct AttendanceView: View {
                 Text("\(rows.quota.present)/\(rows.quota.of)")
                     .font(.subheadline.weight(.bold))
                     .foregroundStyle(Color.ceviOnSurfaceVariant)
+                    .fixedSize()
                     .accessibilityLabel(Text("\(rows.quota.present) von \(rows.quota.of) Anlässen da"))
             }
             HStack(spacing: Spacing.s2) {
@@ -98,10 +100,9 @@ struct AttendanceView: View {
             .accessibilityElement(children: .ignore)
             .accessibilityLabel(Text(answerText(answer)))
             if event.isRecordable {
-                ViewThatFits {
-                    HStack(spacing: Spacing.s2) { presenceButtons(presence, person, isChild, event, overview) }
-                    VStack(spacing: Spacing.s2) { presenceButtons(presence, person, isChild, event, overview) }
-                }
+                // Side by side up to the largest normal size, stacked at accessibility sizes.
+                let layout = typeSize >= .xxxLarge ? AnyLayout(VStackLayout(spacing: Spacing.s2)) : AnyLayout(HStackLayout(spacing: Spacing.s2))
+                layout { presenceButtons(name, presence, person, isChild, event, overview) }
             } else {
                 PresenceChip(presence: presence)
             }
@@ -111,11 +112,11 @@ struct AttendanceView: View {
     }
 
     @ViewBuilder
-    private func presenceButtons(_ presence: Presence?, _ person: UUID, _ isChild: Bool, _ event: AttendanceEvent, _ overview: AttendanceOverview) -> some View {
-        presenceButton("Da", symbol: "checkmark", selected: presence == .present, person: person) {
+    private func presenceButtons(_ name: String, _ presence: Presence?, _ person: UUID, _ isChild: Bool, _ event: AttendanceEvent, _ overview: AttendanceOverview) -> some View {
+        presenceButton("Da", name: name, symbol: "checkmark", selected: presence == .present, person: person) {
             await set(person, isChild, present: presence == .present ? nil : true, event: event, overview: overview)
         }
-        presenceButton("Nicht da", symbol: "xmark", selected: presence == .absent, person: person) {
+        presenceButton("Nicht da", name: name, symbol: "xmark", selected: presence == .absent, person: person) {
             await set(person, isChild, present: presence == .absent ? nil : false, event: event, overview: overview)
         }
     }
@@ -125,11 +126,12 @@ struct AttendanceView: View {
     }
 
     private func presenceButton(
-        _ title: LocalizedStringKey, symbol: String, selected: Bool, person: UUID, action: @escaping () async -> Void
+        _ title: LocalizedStringKey, name: String, symbol: String, selected: Bool, person: UUID, action: @escaping () async -> Void
     ) -> some View {
         Button { Task { await action() } } label: {
             Label(title, systemImage: selected ? "\(symbol).circle.fill" : "circle")
                 .font(.body.weight(.semibold))
+                .fixedSize(horizontal: false, vertical: true)
                 .foregroundStyle(selected ? Color.ceviOnSecondary : Color.ceviOnSurface)
                 .padding(.horizontal, Spacing.s3)
                 .frame(maxWidth: .infinity, minHeight: Size.touchTarget)
@@ -139,6 +141,9 @@ struct AttendanceView: View {
         }
         .buttonStyle(.plain)
         .disabled(model.saving.contains(person))
+        // Several rows have the same buttons: the name tells them apart; Voice Control also takes the visible word.
+        .accessibilityLabel(Text("\(name), \(title)"))
+        .accessibilityInputLabels([Text(title), Text("\(name) \(title)")])
         .accessibilityAddTraits(selected ? .isSelected : [])
     }
 

@@ -45,6 +45,7 @@ struct NewMessageSheet: View {
                         .font(.subheadline)
                         .foregroundStyle(Color.ceviOnSurfaceVariant)
                         .textCase(nil)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
                 if let error {
                     Section { ErrorRow(text: error) }

@@ -10,5 +10,7 @@ struct ErrorRow: View {
             .font(.callout)
             .frame(maxWidth: .infinity, alignment: .leading)
             .accessibilityLabel(Text("Fehler: \(text)"))
+            // An error appearing below the focused control is not reached by VoiceOver on its own.
+            .task(id: text) { AccessibilityNotification.Announcement(String(localized: "Fehler: \(text)")).post() }
     }
 }

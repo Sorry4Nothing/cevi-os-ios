@@ -19,6 +19,7 @@ struct ChangePasswordView: View {
             Text("Du hast ein Startpasswort von der Abteilung bekommen. Wähle jetzt ein eigenes, das nur du kennst.")
                 .font(.body)
                 .foregroundStyle(Color.ceviOnSurfaceVariant)
+                .fixedSize(horizontal: false, vertical: true)
             CeviField(label: "Startpasswort", isFocused: currentFocused) {
                 PasswordField(label: "Startpasswort", text: $current, isFocused: $currentFocused)
             }

@@ -10,6 +10,7 @@ struct SignInView: View {
     @State private var action = ActionState()
     @FocusState private var usernameFocused: Bool
     @FocusState private var passwordFocused: Bool
+    @Environment(\.colorSchemeContrast) private var contrast
 
     var body: some View {
         FillingScrollView {
@@ -70,6 +71,7 @@ struct SignInView: View {
                 // Button instead of Link: the audit reports the Link text as clipped.
                 Button("Passwort vergessen?") { openURL(url) }
                     .buttonStyle(.ceviText)
+                    .accessibilityAddTraits(.isLink)
             }
         }
         .frame(maxWidth: Size.contentMax)
@@ -81,7 +83,7 @@ struct SignInView: View {
                 Color.ceviSurface
                 UnevenRoundedRectangle(topLeadingRadius: Radius.xl, topTrailingRadius: Radius.xl, style: .continuous)
                     .fill(Color.ceviSurfaceContainerLow)
-                    .stroke(Color.ceviOutlineVariant, lineWidth: Size.border)
+                    .stroke(contrast == .increased ? Color.ceviOutline : Color.ceviOutlineVariant, lineWidth: Size.border)
             }
         }
     }

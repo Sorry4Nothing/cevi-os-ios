@@ -57,7 +57,9 @@ struct ProfileView: View {
                         row("Datenschutz", symbol: "hand.raised")
                     }
                     Button { page = .support } label: { row("Support", symbol: "questionmark.circle") }
+                        .accessibilityAddTraits(.isLink)
                     Button { page = .deleteAccount } label: { row("Konto löschen", symbol: "person.crop.circle.badge.xmark") }
+                        .accessibilityAddTraits(.isLink)
                 } header: {
                     sectionHeader("App")
                 } footer: {
@@ -181,11 +183,12 @@ struct ProfileView: View {
 
     private func sectionHeader(_ title: LocalizedStringKey) -> some View {
         Text(title).font(.footnote.weight(.semibold)).foregroundStyle(Color.ceviOnSurfaceVariant)
+            .accessibilityAddTraits(.isHeader)
     }
 
     private func row(_ title: LocalizedStringKey, symbol: String) -> some View {
         Label {
-            Text(title).foregroundStyle(Color.ceviOnSurface)
+            Text(title).foregroundStyle(Color.ceviOnSurface).fixedSize(horizontal: false, vertical: true)
         } icon: {
             Image(systemName: symbol).foregroundStyle(Color.ceviSecondary)
         }
@@ -249,7 +252,9 @@ struct ProfileView: View {
         case .invalid: return
         }
         await action.perform { try await requireClient().updateProfile(ProfilePatch(phone: .some(value))) }
-        if action.error == nil { await state.reloadProfile() }
+        guard action.error == nil else { return }
+        AccessibilityNotification.Announcement(String(localized: "Nummer gespeichert")).post()
+        await state.reloadProfile()
     }
 
     private func upload(_ item: PhotosPickerItem) async {

@@ -14,6 +14,7 @@ struct CheckboxToggleStyle: ToggleStyle {
                     .font(.body)
                     .foregroundStyle(Color.ceviOnSurface)
                     .multilineTextAlignment(.leading)
+                    .fixedSize(horizontal: false, vertical: true)
             }
             .frame(maxWidth: .infinity, minHeight: Size.touchTarget, alignment: .leading)
             .contentShape(Rectangle())

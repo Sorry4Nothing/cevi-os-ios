@@ -10,6 +10,7 @@ struct CeviPrimaryButtonStyle: ButtonStyle {
         configuration.label
             .font(.body.weight(.semibold))
             .multilineTextAlignment(.center)
+            .fixedSize(horizontal: false, vertical: true)
             // Disabled: muted surface instead of a faded red, so the text keeps its contrast.
             .foregroundStyle(isEnabled ? Color.ceviOnPrimary : Color.ceviOnSurfaceVariant)
             .padding(.horizontal, Spacing.s6)

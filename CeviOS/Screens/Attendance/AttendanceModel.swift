@@ -32,6 +32,8 @@ final class AttendanceModel {
             } else {
                 try await client.setLeaderPresence(unitId: unitId, programId: programId, userId: person, present: present)
             }
+            // The selected state changes on the focused button without a new element to focus; say that it worked.
+            AccessibilityNotification.Announcement(String(localized: "Gespeichert")).post()
             await load(unitId: unitId, client: client)
         } catch let apiError as APIError {
             let message = LeadershipMessages.message(for: apiError)

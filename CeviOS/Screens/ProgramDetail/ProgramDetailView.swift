@@ -288,6 +288,7 @@ struct ProgramDetailView: View {
                         if let phone = contact.phone, let url = URL(string: "tel:" + phone.filter { $0.isNumber || $0 == "+" }) {
                             Link(destination: url) { circleIcon("phone.fill") }
                                 .accessibilityLabel(Text("\(contact.name) anrufen, \(phone)"))
+                                .accessibilityInputLabels([Text("Anrufen"), Text("\(contact.name) anrufen")])
                         }
                     }
                 }
@@ -298,6 +299,7 @@ struct ProgramDetailView: View {
                         Text("Nachricht an die Stufenleitung \(unit.name)")
                             .font(.body.weight(.semibold))
                             .foregroundStyle(Color.ceviAccent)
+                            .fixedSize(horizontal: false, vertical: true)
                             .frame(maxWidth: .infinity, alignment: .leading)
                         circleIcon("message.fill")
                     }

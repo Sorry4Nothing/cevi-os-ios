@@ -7,6 +7,7 @@ struct ChatView: View {
     let profile: Profile
     @State private var model: ChatModel
     @State private var draft = ""
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     init(chat: ChatSummary, profile: Profile) {
         self.chat = chat
@@ -95,7 +96,7 @@ struct ChatView: View {
             }
             .defaultScrollAnchor(.bottom)
             .onChange(of: model.messages.first?.id) { _, newest in
-                if let newest { withAnimation { proxy.scrollTo(newest, anchor: .bottom) } }
+                if let newest { withAnimation(reduceMotion ? nil : .default) { proxy.scrollTo(newest, anchor: .bottom) } }
             }
         }
     }
@@ -109,7 +110,7 @@ struct ChatView: View {
                     .foregroundStyle(Color.ceviOnSecondaryContainer)
             }
             HStack(alignment: .bottom, spacing: Spacing.s2) {
-                TextField("Nachricht", text: $draft, prompt: Text("Nachricht schreiben"), axis: .vertical)
+                TextField("Nachricht schreiben", text: $draft, prompt: Text("Nachricht schreiben"), axis: .vertical)
                     .lineLimit(1...5)
                     .padding(.horizontal, Spacing.s4)
                     .padding(.vertical, Spacing.s2)
@@ -117,7 +118,13 @@ struct ChatView: View {
                     .background(Color.ceviSurfaceContainerLow, in: .capsule)
                     .overlay(Capsule().strokeBorder(Color.ceviOutline, lineWidth: Size.border))
                 Button {
-                    Task { if await model.send(draft, client: appState.client) { draft = "" } }
+                    Task {
+                        if await model.send(draft, client: appState.client) {
+                            draft = ""
+                            // Focus stays on the button; the new bubble alone is not announced.
+                            AccessibilityNotification.Announcement(String(localized: "Nachricht gesendet")).post()
+                        }
+                    }
                 } label: {
                     Image(systemName: "paperplane.fill")
                         .foregroundStyle(Color.ceviOnPrimary)
@@ -125,6 +132,7 @@ struct ChatView: View {
                         .background(Color.ceviPrimary, in: .capsule)
                 }
                 .accessibilityLabel(Text("Senden"))
+                .accessibilityInputLabels([Text("Senden"), Text("Nachricht senden")])
                 .disabled(ChatRules.sendableText(draft) == nil || model.isSending)
             }
         }

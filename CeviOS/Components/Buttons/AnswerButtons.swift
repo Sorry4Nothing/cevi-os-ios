@@ -25,6 +25,8 @@ struct AnswerButtons: View {
         .buttonStyle(AnswerCapsuleStyle(answer: answer, isSelected: isSelected))
         .disabled(disabled)
         .accessibilityLabel(Text("\(name), \(title)"))
+        // Voice Control: the visible word works as well as name plus word.
+        .accessibilityInputLabels([Text(title), Text("\(name) \(title)")])
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }

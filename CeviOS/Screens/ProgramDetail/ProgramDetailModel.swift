@@ -35,6 +35,8 @@ final class ProgramDetailModel {
         defer { savingOwn = false }
         do {
             try await client.setOwnRegistration(programId: programId, answer: answer)
+            // The selected state changes on the focused button without a new element to focus; say that it worked.
+            AccessibilityNotification.Announcement(String(localized: "Gespeichert")).post()
             await load(programId: programId, client: client)
         } catch let error as APIError {
             let message = LeadershipMessages.message(for: error)
@@ -52,6 +54,8 @@ final class ProgramDetailModel {
         defer { saving.remove(child.id) }
         do {
             try await client.setParticipation(programId: programId, childId: child.id, answer: answer)
+            // The selected state changes on the focused button without a new element to focus; say that it worked.
+            AccessibilityNotification.Announcement(String(localized: "Gespeichert")).post()
             await load(programId: programId, client: client)
         } catch let error as APIError {
             let message = ParticipationMessages.message(for: error)

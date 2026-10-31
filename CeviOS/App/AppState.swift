@@ -48,6 +48,14 @@ final class AppState {
         onSignOut.append { ProfileImageCache.shared.removeAll() }
     }
 
+    #if DEBUG
+    /// Previews and the UI-test harness: fixed phase, no keychain, no session check.
+    init(client: APIClient?, phase: Phase) {
+        self.client = client
+        self.phase = phase
+    }
+    #endif
+
     func handle(_ event: APIEvent) {
         switch event {
         case .sessionEnded: sessionDidEnd()

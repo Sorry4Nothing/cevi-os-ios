@@ -2,6 +2,7 @@ import SwiftUI
 
 struct MessageRow: View {
     let message: ChatMessage
+    @Environment(\.colorSchemeContrast) private var contrast
 
     private var bubbleShape: UnevenRoundedRectangle {
         // The corner towards the sender stays small, like a speech bubble tail.
@@ -38,7 +39,7 @@ struct MessageRow: View {
                 .padding(.vertical, Spacing.s2)
                 .background(message.isOwn ? Color.ceviSecondary : Color.ceviSurfaceContainerLow, in: bubbleShape)
                 .overlay {
-                    if !message.isOwn { bubbleShape.strokeBorder(Color.ceviOutlineVariant, lineWidth: Size.border) }
+                    if !message.isOwn { bubbleShape.strokeBorder(contrast == .increased ? Color.ceviOutline : Color.ceviOutlineVariant, lineWidth: Size.border) }
                 }
             if let program = message.program {
                 Label(program.title, systemImage: "calendar")

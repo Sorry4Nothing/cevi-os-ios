@@ -78,7 +78,7 @@ struct PrivacyView: View {
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 0) {
                 Text(title).font(.headline).foregroundStyle(Color.ceviOnSurface)
-                Text(text).font(.subheadline).foregroundStyle(Color.ceviOnSurfaceVariant)
+                Text(text).font(.subheadline).foregroundStyle(Color.ceviOnSurfaceVariant).fixedSize(horizontal: false, vertical: true)
             }
             .accessibilityElement(children: .combine)
         }

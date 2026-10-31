@@ -20,6 +20,14 @@ final class AppLock {
         self.defaults = defaults
     }
 
+    #if DEBUG
+    /// UI-test harness: starts unlocked (or locked) without Face ID.
+    init(defaults: UserDefaults, isLocked: Bool) {
+        self.defaults = defaults
+        self.isLocked = isLocked
+    }
+    #endif
+
     /// Parents can switch the lock off; it is suggested (on) anyway. Leaders and unit leaders cannot.
     var parentsLockEnabled: Bool {
         get { defaults.object(forKey: Self.parentsKey) as? Bool ?? true }
@@ -32,7 +40,11 @@ final class AppLock {
 
     /// Is a device code set? Without it nothing can be locked.
     static var deviceCodeSet: Bool {
-        LAContext().canEvaluatePolicy(.deviceOwnerAuthentication, error: nil)
+        #if DEBUG
+        // The simulator has no device code; the lock scenario still needs the lock screen.
+        if UITestScenario.current == .lock { return true }
+        #endif
+        return LAContext().canEvaluatePolicy(.deviceOwnerAuthentication, error: nil)
     }
 
     nonisolated static func lockDue(backgroundSince: Date?, now: Date) -> Bool {
@@ -54,6 +66,10 @@ final class AppLock {
 
     /// Asks for Face ID, Touch ID or the device code.
     func unlock() async {
+        #if DEBUG
+        // The lock scenario shows the lock screen itself; no system authentication sheet over it.
+        if UITestScenario.current == .lock { return }
+        #endif
         failed = false
         let context = LAContext()
         do {
