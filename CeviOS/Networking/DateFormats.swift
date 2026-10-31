@@ -4,7 +4,7 @@ import Foundation
 nonisolated enum DateFormats {
     static let timeZone = TimeZone(identifier: "Europe/Zurich") ?? .current
 
-    private static var calendar: Calendar {
+    static var calendar: Calendar {
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = timeZone
         return calendar

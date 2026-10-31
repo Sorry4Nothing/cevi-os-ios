@@ -1,0 +1,193 @@
+import SwiftUI
+
+@MainActor @Observable
+final class ProgramDetailModel {
+    private(set) var program: Program?
+    private(set) var contacts: [Contact] = []
+    private(set) var loadError: String?
+    /// Children whose answer is being saved. Blocks double taps.
+    private(set) var saving: Set<UUID> = []
+    var answerError: String?
+
+    func load(programId: UUID, client: APIClient?) async {
+        guard let client else { return }
+        do {
+            program = try await client.program(id: programId)
+            loadError = nil
+        } catch is CancellationError {
+            return
+        } catch let error as APIError {
+            loadError = error.displayText
+            return
+        } catch {
+            loadError = APIError.network.displayText
+            return
+        }
+        // Contacts are not critical: without them the detail still works.
+        contacts = (try? await client.contacts(programId: programId)) ?? []
+    }
+
+    func answer(_ answer: Answer, for child: ProgramChild, programId: UUID, client: APIClient?) async {
+        guard let client, !saving.contains(child.id) else { return }
+        saving.insert(child.id)
+        answerError = nil
+        defer { saving.remove(child.id) }
+        do {
+            try await client.setParticipation(programId: programId, childId: child.id, answer: answer)
+            await load(programId: programId, client: client)
+        } catch let error as APIError {
+            let message = ParticipationMessages.message(for: error)
+            answerError = message.text
+            if message.reload { await load(programId: programId, client: client) }
+        } catch {
+            answerError = APIError.network.displayText
+        }
+    }
+}
+
+struct ProgramDetailView: View {
+    @Environment(AppState.self) private var appState
+    let programId: UUID
+    @State private var model = ProgramDetailModel()
+
+    var body: some View {
+        Group {
+            if let program = model.program {
+                content(program)
+            } else if let error = model.loadError {
+                ErrorRow(text: error).padding()
+            } else {
+                ProgressView().accessibilityLabel(Text("Lädt"))
+            }
+        }
+        .navigationBarTitleDisplayMode(.inline)
+        .task { await model.load(programId: programId, client: appState.client) }
+    }
+
+    private func content(_ program: Program) -> some View {
+        List {
+            Section {
+                Text(program.title).font(.title2.bold()).strikethrough(program.status == .cancelled)
+                ProgramStatusLabel(status: program.status)
+                if program.status == .review {
+                    Text("Dieses Programm wird von der Leitung geprüft. Eine Anmeldung ist im Moment nicht möglich.")
+                        .font(.callout)
+                }
+                scheduleRows(program)
+                if let location = program.location, !location.isEmpty {
+                    Label(location, systemImage: "mappin.and.ellipse")
+                }
+                if !program.units.isEmpty {
+                    Label(program.units.map(\.name).joined(separator: ", "), systemImage: "person.3")
+                }
+            }
+            details(program)
+            if !program.children.isEmpty { participation(program) }
+            contactsSection
+            if let description = program.description, !description.isEmpty {
+                Section("Beschreibung") { Text(description) }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func scheduleRows(_ program: Program) -> some View {
+        if program.isAllDay, let first = program.firstDay, let last = program.lastDay {
+            let style = Date.FormatStyle(date: .complete, time: .omitted, locale: Locale(identifier: "de_CH"), timeZone: DateFormats.timeZone)
+            if first == last {
+                Label("\(first.formatted(style)), ganztägig", systemImage: "calendar")
+            } else {
+                Label("\(first.formatted(style)) bis \(last.formatted(style))", systemImage: "calendar")
+            }
+        } else if let start = program.start, let end = program.end {
+            let style = Date.FormatStyle(date: .complete, time: .shortened, locale: Locale(identifier: "de_CH"), timeZone: DateFormats.timeZone)
+            Label("\(start.formatted(style)) bis \(end.formatted(style))", systemImage: "calendar")
+        }
+    }
+
+    @ViewBuilder
+    private func details(_ program: Program) -> some View {
+        let hasClosing = program.closingPlace != nil || program.closingTime != nil
+        if program.meetingPoint != nil || hasClosing || program.bring != nil {
+            Section {
+                if let meetingPoint = program.meetingPoint {
+                    LabeledContent("Treffpunkt") { Text(meetingPoint) }
+                }
+                if hasClosing {
+                    LabeledContent("Schluss") {
+                        Text([program.closingTime, program.closingPlace].compactMap { $0 }.joined(separator: ", "))
+                    }
+                }
+                if let bring = program.bring {
+                    LabeledContent("Mitnehmen") { Text(bring) }
+                }
+            }
+        }
+    }
+
+    private func participation(_ program: Program) -> some View {
+        Section {
+            ForEach(program.children) { child in
+                VStack(alignment: .leading, spacing: 8) {
+                    AnswerLabel(name: child.firstName, answer: child.answer).font(.headline)
+                    if program.canAnswer {
+                        HStack {
+                            answerButton(.yes, "Ja", child: child, program: program)
+                            answerButton(.no, "Nein", child: child, program: program)
+                        }
+                    }
+                }
+                .padding(.vertical, 4)
+            }
+            if let error = model.answerError { ErrorRow(text: error) }
+        } header: {
+            Text("Anmeldung")
+        } footer: {
+            if !program.canAnswer {
+                Text("Die Anmeldung ist nicht mehr möglich.")
+            }
+        }
+    }
+
+    /// The selected answer is marked by a filled button and a check mark, not by color alone.
+    private func answerButton(_ answer: Answer, _ title: LocalizedStringKey, child: ProgramChild, program: Program) -> some View {
+        let selected = child.answer == answer
+        let action = { Task { await model.answer(answer, for: child, programId: program.id, client: appState.client) } }
+        return Group {
+            if selected {
+                Button(action: { action() }) { answerLabel(title, selected: true) }.buttonStyle(.borderedProminent)
+            } else {
+                Button(action: { action() }) { answerLabel(title, selected: false) }.buttonStyle(.bordered)
+            }
+        }
+        .disabled(model.saving.contains(child.id))
+        .accessibilityLabel(Text("\(child.firstName): \(title)"))
+        .accessibilityAddTraits(selected ? .isSelected : [])
+    }
+
+    private func answerLabel(_ title: LocalizedStringKey, selected: Bool) -> some View {
+        HStack {
+            if selected { Image(systemName: "checkmark") }
+            Text(title)
+        }
+        .frame(maxWidth: .infinity, minHeight: 44)
+    }
+
+    @ViewBuilder
+    private var contactsSection: some View {
+        Section("Kontakt") {
+            if model.contacts.isEmpty {
+                Text("Stufenleitung")
+            } else {
+                ForEach(model.contacts) { contact in
+                    VStack(alignment: .leading) {
+                        Text(contact.ceviName.map { "\(contact.name) (\($0))" } ?? contact.name)
+                        if let phone = contact.phone, let url = URL(string: "tel:" + phone.filter { $0.isNumber || $0 == "+" }) {
+                            Link(phone, destination: url).frame(minHeight: 44)
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

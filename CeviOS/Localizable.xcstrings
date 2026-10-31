@@ -4,7 +4,45 @@
     "" : {
 
     },
+    "%@ bis %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ bis %2$@"
+          }
+        }
+      }
+    },
+    "%@, ganztägig" : {
+
+    },
+    "%@: %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@: %2$@"
+          }
+        }
+      }
+    },
+    "%@: Ja" : {
+
+    },
+    "%@: Nein" : {
+
+    },
+    "%@: Offen" : {
+
+    },
+    "ab %@" : {
+
+    },
     "Abbrechen" : {
+
+    },
+    "Abgesagt" : {
 
     },
     "Abmelden" : {
@@ -19,13 +57,22 @@
     "Anmelden" : {
 
     },
+    "Anmeldung" : {
+
+    },
     "Benutzername" : {
+
+    },
+    "Beschreibung" : {
 
     },
     "Bestätigen" : {
 
     },
     "Bevor es losgeht, lies bitte die Datenschutzerklärung. Sie sagt, welche Daten die App verwendet und wer sie sieht." : {
+
+    },
+    "bis %@" : {
 
     },
     "Bitte Benutzername und Passwort eingeben." : {
@@ -86,6 +133,12 @@
     "Der Code stimmt nicht." : {
 
     },
+    "Die Anmeldung ist nicht mehr möglich." : {
+
+    },
+    "Die Anmeldung ist nicht mehr möglich. Das Programm ist abgesagt oder hat schon begonnen." : {
+
+    },
     "Die beiden neuen Passwörter sind nicht gleich." : {
 
     },
@@ -105,6 +158,15 @@
     "Dieses Passwort stammt aus einem bekannten Datenleck. Bitte ein anderes wählen." : {
 
     },
+    "Dieses Programm gibt es nicht mehr oder du siehst es nicht." : {
+
+    },
+    "Dieses Programm wird von der Leitung geprüft. Eine Anmeldung ist im Moment nicht möglich." : {
+
+    },
+    "Du darfst für dieses Kind nicht antworten." : {
+
+    },
     "Entsperren" : {
 
     },
@@ -118,6 +180,9 @@
 
     },
     "Fehler: %@" : {
+
+    },
+    "Ganztägig" : {
 
     },
     "Geräte-Code einrichten" : {
@@ -141,10 +206,28 @@
     "Im App Store öffnen" : {
 
     },
+    "In den nächsten Monaten ist nichts geplant." : {
+
+    },
+    "Ja" : {
+
+    },
+    "Keine Programme" : {
+
+    },
     "Keine Verbindung zum Server. Bitte später nochmals versuchen." : {
 
     },
+    "Kontakt" : {
+
+    },
     "Lädt" : {
+
+    },
+    "Mitnehmen" : {
+
+    },
+    "Nein" : {
 
     },
     "Neues Passwort" : {
@@ -162,7 +245,22 @@
     "Passwort ändern" : {
 
     },
+    "Profil" : {
+
+    },
+    "Programme" : {
+
+    },
+    "Schluss" : {
+
+    },
     "So richtest du ihn ein: Öffne die Einstellungen, tippe auf «Face ID & Code» (oder «Touch ID & Code») und dann auf «Code aktivieren». Danach öffnest du Cevi OS wieder." : {
+
+    },
+    "Stufenleitung" : {
+
+    },
+    "Treffpunkt" : {
 
     },
     "Umgebung: %@" : {
@@ -175,6 +273,9 @@
           }
         }
       }
+    },
+    "Wird geprüft" : {
+
     },
     "Zweiter Faktor" : {
 
