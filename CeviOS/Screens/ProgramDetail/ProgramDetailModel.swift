@@ -1,0 +1,64 @@
+import SwiftUI
+
+@MainActor @Observable
+final class ProgramDetailModel {
+    private(set) var program: Program?
+    private(set) var contacts: [Contact] = []
+    private(set) var loadError: String?
+    /// Children whose answer is being saved. Blocks double taps.
+    private(set) var saving: Set<UUID> = []
+    private(set) var savingOwn = false
+    var answerError: String?
+
+    func load(programId: UUID, client: APIClient?) async {
+        guard let client else { return }
+        do {
+            program = try await client.program(id: programId)
+            loadError = nil
+        } catch is CancellationError {
+            return
+        } catch let error as APIError {
+            loadError = error.displayText
+            return
+        } catch {
+            loadError = APIError.network.displayText
+            return
+        }
+        // Contacts are not critical: without them the detail still works.
+        contacts = (try? await client.contacts(programId: programId)) ?? []
+    }
+
+    func setOwnRegistration(_ answer: Answer, programId: UUID, client: APIClient?) async {
+        guard let client, !savingOwn else { return }
+        savingOwn = true
+        answerError = nil
+        defer { savingOwn = false }
+        do {
+            try await client.setOwnRegistration(programId: programId, answer: answer)
+            await load(programId: programId, client: client)
+        } catch let error as APIError {
+            let message = LeadershipMessages.message(for: error)
+            answerError = message.text
+            if message.reload { await load(programId: programId, client: client) }
+        } catch {
+            answerError = APIError.network.displayText
+        }
+    }
+
+    func answer(_ answer: Answer, for child: ProgramChild, programId: UUID, client: APIClient?) async {
+        guard let client, !saving.contains(child.id) else { return }
+        saving.insert(child.id)
+        answerError = nil
+        defer { saving.remove(child.id) }
+        do {
+            try await client.setParticipation(programId: programId, childId: child.id, answer: answer)
+            await load(programId: programId, client: client)
+        } catch let error as APIError {
+            let message = ParticipationMessages.message(for: error)
+            answerError = message.text
+            if message.reload { await load(programId: programId, client: client) }
+        } catch {
+            answerError = APIError.network.displayText
+        }
+    }
+}

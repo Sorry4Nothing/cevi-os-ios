@@ -30,6 +30,17 @@ Jedes Scheme hat eine eigene Build Configuration mit Werten aus `Config/<Umgebun
 
 Die Unit- und UI-Tests laufen im Scheme Dev (`Product > Test`). Die Icons sind vorerst einfarbige Platzhalter.
 
+## Struktur
+
+Regel: ein Ordner pro Seite, wiederverwendbare Bausteine in `Components`. Pro Datei ein Typ.
+
+- `CeviOS/App/`: Einstieg der App (`CeviOSApp`, `AppState`, `RootView`, `MainView` mit den Tabs, `AppDelegate`)
+- `CeviOS/Screens/<Seite>/`: je Seite ein Ordner mit View, Model und Teilen, die nur diese Seite braucht (z. B. `SignIn`, `ProgramList`, `ProgramDetail`, `Chat`, `Profile`)
+- `CeviOS/Components/`: wiederverwendbare Bausteine, gruppiert nach `Buttons`, `Inputs`, `Labels`, `Cards`, `States`, `Layout`, `Web`, `Media`
+- `CeviOS/Core/`: alles ohne Oberfläche: `Networking`, `Configuration`, `Models`, `Services` (API-Aufrufe), `Formatting`, `Security`, `Push`
+- `CeviOS/Design/`: Design-Tokens (`Spacing`, `Radius`, `Size`, `TitleStyle`) und gemeinsame Modifier
+- `CeviOSTests/`: spiegelt `Core/`, Hilfen für Netzwerk-Tests unter `Helpers/`
+
 ## Farben, Icons und Texte
 
 Alles liegt an einer Stelle, nichts davon im Code:
