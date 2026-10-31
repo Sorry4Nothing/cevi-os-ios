@@ -1,9 +1,7 @@
 {
   "sourceLanguage" : "de",
   "strings" : {
-    "" : {
-
-    },
+    "" : {},
     "%@ bis %@" : {
       "localizations" : {
         "de" : {
@@ -14,9 +12,7 @@
         }
       }
     },
-    "%@, ganztägig" : {
-
-    },
+    "%@, ganztägig" : {},
     "%@: %@" : {
       "localizations" : {
         "de" : {
@@ -27,39 +23,20 @@
         }
       }
     },
-    "%@: Ja" : {
-
-    },
-    "%@: Nein" : {
-
-    },
-    "%@: Offen" : {
-
-    },
-    "ab %@" : {
-
-    },
-    "Abbrechen" : {
-
-    },
-    "Abgesagt" : {
-
-    },
-    "Abmelden" : {
-
-    },
-    "Aktuelles Passwort" : {
-
-    },
-    "Als Leitung siehst du Daten von Kindern. Dafür braucht dein iPhone einen Geräte-Code. Ohne ihn zeigt Cevi OS nichts an." : {
-
-    },
-    "Anmelden" : {
-
-    },
-    "Anmeldung" : {
-
-    },
+    "%@: Ja" : {},
+    "%@: Nein" : {},
+    "%@: Offen" : {},
+    "Abbrechen" : {},
+    "Abgesagt" : {},
+    "Abmelden" : {},
+    "Abmelden?" : {},
+    "Aktualisieren" : {},
+    "Aktuelles Passwort" : {},
+    "Alle Anlässe deiner Stufe auf einen Blick." : {},
+    "Alle Anlässe von %@ auf einen Blick." : {},
+    "Als Leitung siehst du Daten von Kindern. Dafür braucht dein iPhone einen Geräte-Code. Ohne ihn zeigt Cevi OS nichts an." : {},
+    "Anmelden" : {},
+    "Anmeldung" : {},
     "Anwesend: %lld von %lld%@" : {
       "localizations" : {
         "de" : {
@@ -70,42 +47,20 @@
         }
       }
     },
-    "Anwesenheit" : {
-
-    },
-    "Benutzername" : {
-
-    },
-    "Beschreibung" : {
-
-    },
-    "Bestätigen" : {
-
-    },
-    "Bevor es losgeht, lies bitte die Datenschutzerklärung. Sie sagt, welche Daten die App verwendet und wer sie sieht." : {
-
-    },
-    "bis %@" : {
-
-    },
-    "Bitte Benutzername und Passwort eingeben." : {
-
-    },
-    "Bitte die App aktualisieren" : {
-
-    },
-    "Bitte die App aktualisieren." : {
-
-    },
-    "Bitte kurz warten." : {
-
-    },
-    "Bitte noch einmal anmelden." : {
-
-    },
-    "Bitte wähle ein neues Passwort. Es braucht mindestens 12 Zeichen, Regeln für Zeichen gibt es nicht." : {
-
-    },
+    "Anwesenheit" : {},
+    "App" : {},
+    "Bei Eltern: die Namen eurer Kinder und ihre Stufe" : {},
+    "Benutzername" : {},
+    "Beschreibung" : {},
+    "Bestätigen" : {},
+    "Bevor es losgeht, lies bitte die Datenschutzerklärung. Sie sagt, welche Daten die App verwendet und wer sie sieht." : {},
+    "Bitte Benutzername und Passwort eingeben." : {},
+    "Bitte die App aktualisieren" : {},
+    "Bitte die App aktualisieren." : {},
+    "Bitte kurz warten." : {},
+    "Bitte melde dich neu an" : {},
+    "Bitte noch einmal anmelden." : {},
+    "Bitte wähle ein neues Passwort. Es braucht mindestens 12 Zeichen, Regeln für Zeichen gibt es nicht." : {},
     "Cevi OS" : {
       "localizations" : {
         "de" : {
@@ -116,60 +71,31 @@
         }
       }
     },
-    "Cevi OS entsperren" : {
-
-    },
-    "Cevi OS ist gesperrt" : {
-
-    },
-    "Code" : {
-
-    },
-    "Da" : {
-
-    },
-    "Dafür fehlt dir die Berechtigung." : {
-
-    },
-    "Das aktuelle Passwort stimmt nicht." : {
-
-    },
-    "Das Entsperren hat nicht geklappt." : {
-
-    },
-    "Das gibt es nicht mehr oder du siehst es nicht." : {
-
-    },
-    "Das neue Passwort darf höchstens 128 Zeichen haben." : {
-
-    },
-    "Das neue Passwort muss mindestens 12 Zeichen haben." : {
-
-    },
-    "Das Programm hat schon begonnen. Die Anmeldung lässt sich nicht mehr ändern." : {
-
-    },
-    "Datenschutz" : {
-
-    },
-    "Datenschutzerklärung lesen" : {
-
-    },
-    "Der Code stimmt nicht." : {
-
-    },
-    "Die Anmeldung ist nicht mehr möglich." : {
-
-    },
-    "Die Anmeldung ist nicht mehr möglich. Das Programm ist abgesagt oder hat schon begonnen." : {
-
-    },
-    "Die Anwesenheit lässt sich erst nach Beginn des Programms und bis 14 Tage danach erfassen." : {
-
-    },
-    "Die beiden neuen Passwörter sind nicht gleich." : {
-
-    },
+    "Cevi OS entsperren" : {},
+    "Cevi OS ist gesperrt" : {},
+    "Cevi Stäfa-Hombrechtikon" : {},
+    "Chat" : {},
+    "Code" : {},
+    "Da" : {},
+    "Dafür fehlt dir die Berechtigung." : {},
+    "Danach brauchst du wieder Benutzername und Passwort." : {},
+    "Das Entsperren hat nicht geklappt." : {},
+    "Das Programm hat schon begonnen. Die Anmeldung lässt sich nicht mehr ändern." : {},
+    "Das aktuelle Passwort stimmt nicht." : {},
+    "Das gibt es nicht mehr oder du siehst es nicht." : {},
+    "Das liegt nicht an dir. Versuche es in ein paar Minuten nochmals." : {},
+    "Das neue Passwort darf höchstens 128 Zeichen haben." : {},
+    "Das neue Passwort muss mindestens 12 Zeichen haben." : {},
+    "Datenschutz" : {},
+    "Datenschutzerklärung lesen" : {},
+    "Dein Konto löscht die Abteilung. Schreib dafür an die Abteilungsleitung." : {},
+    "Deine Chat-Nachrichten und dein Profilbild" : {},
+    "Deine Zusagen zu Programmen" : {},
+    "Deinen Namen, Benutzernamen und deine Rolle" : {},
+    "Der Code stimmt nicht." : {},
+    "Die Anmeldung ist nicht mehr möglich." : {},
+    "Die Anmeldung ist nicht mehr möglich. Das Programm ist abgesagt oder hat schon begonnen." : {},
+    "Die Anwesenheit lässt sich erst nach Beginn des Programms und bis 14 Tage danach erfassen." : {},
     "Die Verbindung zum Server ist nicht eingerichtet." : {
       "localizations" : {
         "de" : {
@@ -180,78 +106,39 @@
         }
       }
     },
-    "Diese Version von Cevi OS wird nicht mehr unterstützt." : {
-
-    },
-    "Dieses Passwort stammt aus einem bekannten Datenleck. Bitte ein anderes wählen." : {
-
-    },
-    "Dieses Programm gibt es nicht mehr oder du siehst es nicht." : {
-
-    },
-    "Dieses Programm wird von der Leitung geprüft. Eine Anmeldung ist im Moment nicht möglich." : {
-
-    },
-    "Du darfst für dieses Kind nicht antworten." : {
-
-    },
-    "Du kannst nur Stufen ändern, in denen du Stufenleitung bist." : {
-
-    },
-    "Eltern" : {
-
-    },
-    "Entsperren" : {
-
-    },
-    "Ersatzcode" : {
-
-    },
-    "Ersatzcode verwenden" : {
-
-    },
-    "Etwas ist schiefgegangen. Bitte später nochmals versuchen." : {
-
-    },
-    "Fehler: %@" : {
-
-    },
-    "Ganztägig" : {
-
-    },
-    "Geräte-Code einrichten" : {
-
-    },
-    "Gib den 6-stelligen Code aus deiner Authenticator-App ein." : {
-
-    },
-    "Gib einen deiner Ersatzcodes ein (Format xxxxx-xxxxx). Jeder Code gilt nur einmal." : {
-
-    },
-    "Hallo %@" : {
-
-    },
-    "Hilfe und Kontakt" : {
-
-    },
-    "Ich" : {
-
-    },
-    "Ich habe die Datenschutzerklärung gelesen" : {
-
-    },
-    "Im App Store öffnen" : {
-
-    },
-    "In den nächsten Monaten ist nichts geplant." : {
-
-    },
-    "Intern (Admin und Stufenleitung)" : {
-
-    },
-    "Ja" : {
-
-    },
+    "Die beiden neuen Passwörter sind nicht gleich." : {},
+    "Diese Seite ist nur für die Stufenleitung. Wenn du denkst, das ist ein Fehler, frag deine Stufenleitung." : {},
+    "Diese Version von Cevi OS wird nicht mehr unterstützt." : {},
+    "Dieses Passwort stammt aus einem bekannten Datenleck. Bitte ein anderes wählen." : {},
+    "Dieses Programm gibt es nicht mehr oder du siehst es nicht." : {},
+    "Dieses Programm gibt es nicht mehr. Vielleicht wurde es verschoben oder abgesagt." : {},
+    "Dieses Programm wird von der Leitung geprüft. Eine Anmeldung ist im Moment nicht möglich." : {},
+    "Du darfst für dieses Kind nicht antworten." : {},
+    "Du hast ein Startpasswort von der Abteilung bekommen. Wähle jetzt ein eigenes, das nur du kennst." : {},
+    "Du kannst nur Stufen ändern, in denen du Stufenleitung bist." : {},
+    "Du warst länger nicht aktiv. Zu deiner Sicherheit haben wir dich abgemeldet." : {},
+    "Eigenes Passwort wählen" : {},
+    "Eltern" : {},
+    "Entsperren" : {},
+    "Ersatzcode" : {},
+    "Ersatzcode verwenden" : {},
+    "Erster Login" : {},
+    "Etwas ist schiefgegangen. Bitte später nochmals versuchen." : {},
+    "Etwas ist schiefgelaufen" : {},
+    "Fehler: %@" : {},
+    "Ganztägig" : {},
+    "Geräte-Code einrichten" : {},
+    "Gib den 6-stelligen Code aus deiner Authenticator-App ein." : {},
+    "Gib einen deiner Ersatzcodes ein (Format xxxxx-xxxxx). Jeder Code gilt nur einmal." : {},
+    "Hallo %@" : {},
+    "Hilfe und Kontakt" : {},
+    "Ich" : {},
+    "Ich habe die Datenschutzerklärung gelesen" : {},
+    "Ich habe die Datenschutzerklärung gelesen und bin einverstanden." : {},
+    "Im App Store öffnen" : {},
+    "In den nächsten Monaten ist nichts geplant." : {},
+    "Intern (Admin und Stufenleitung)" : {},
+    "Ja" : {},
     "Ja: %lld, Nein: %lld, Offen: %lld" : {
       "localizations" : {
         "de" : {
@@ -262,105 +149,65 @@
         }
       }
     },
-    "Keine Programme" : {
-
-    },
-    "Keine Verbindung zum Server. Bitte später nochmals versuchen." : {
-
-    },
-    "Kinder" : {
-
-    },
-    "Kontakt" : {
-
-    },
-    "Lädt" : {
-
-    },
-    "Leitende" : {
-
-    },
-    "Leitung" : {
-
-    },
-    "Meine Anmeldung als Leitung" : {
-
-    },
-    "Mitnehmen" : {
-
-    },
-    "Nein" : {
-
-    },
-    "Neues Passwort" : {
-
-    },
-    "Neues Passwort wiederholen" : {
-
-    },
-    "Nicht da" : {
-
-    },
-    "Nicht erfasst" : {
-
-    },
-    "Noch keine Antwort" : {
-
-    },
-    "Noch keine Programme." : {
-
-    },
-    "Nochmals versuchen" : {
-
-    },
-    "Ohne Stufe ist nur «Intern» möglich." : {
-
-    },
-    "Passwort" : {
-
-    },
-    "Passwort ändern" : {
-
-    },
-    "Profil" : {
-
-    },
-    "Programm" : {
-
-    },
-    "Programme" : {
-
-    },
-    "Schluss" : {
-
-    },
-    "Sichtbar für" : {
-
-    },
-    "Sichtbarkeit" : {
-
-    },
-    "So richtest du ihn ein: Öffne die Einstellungen, tippe auf «Face ID & Code» (oder «Touch ID & Code») und dann auf «Code aktivieren». Danach öffnest du Cevi OS wieder." : {
-
-    },
-    "Speichern" : {
-
-    },
-    "Stufen" : {
-
-    },
-    "Stufen und Sichtbarkeit" : {
-
-    },
-    "Stufenleitung" : {
-
-    },
-    "Teilnahmen" : {
-
-    },
-    "Treffpunkt" : {
-
-    },
+    "Kein Zugriff" : {},
+    "Keine Nachrichten oder Namen in Mitteilungen" : {},
+    "Keine Programme" : {},
+    "Keine Verbindung" : {},
+    "Keine Verbindung zum Server. Bitte später nochmals versuchen." : {},
+    "Keine Weitergabe an andere" : {},
+    "Keine Werbung und keine Tracker" : {},
+    "Kinder" : {},
+    "Kontakt" : {},
+    "Konto" : {},
+    "Leitende" : {},
+    "Leitung" : {},
+    "Los geht’s" : {},
+    "Lädt" : {},
+    "Löschen" : {},
+    "Meine Anmeldung als Leitung" : {},
+    "Mindestens 12 Zeichen" : {},
+    "Mit einem Tipp Ja oder Nein sagen." : {},
+    "Mitnehmen" : {},
+    "Nachrichten an die Stufenleitung und in der Gruppe." : {},
+    "Nein" : {},
+    "Neues Passwort" : {},
+    "Neues Passwort wiederholen" : {},
+    "Nicht da" : {},
+    "Nicht erfasst" : {},
+    "Nicht gefunden" : {},
+    "Noch keine Antwort" : {},
+    "Noch keine Programme" : {},
+    "Noch keine Programme." : {},
+    "Nochmals versuchen" : {},
+    "Ohne Stufe ist nur «Intern» möglich." : {},
+    "Passwort" : {},
+    "Passwort anzeigen" : {},
+    "Passwort speichern" : {},
+    "Passwort verbergen" : {},
+    "Passwort vergessen?" : {},
+    "Passwort wiederholen" : {},
+    "Passwort ändern" : {},
+    "Profil" : {},
+    "Programm" : {},
+    "Programme" : {},
+    "Programme sehen alle aus der Stufe. Zusagen sieht die Leitung. Nachrichten an die Stufenleitung lesen alle Stufenleitenden dieser Stufe." : {},
+    "Programme werden geladen" : {},
+    "Prüfe dein Internet und versuche es nochmals." : {},
+    "Schluss" : {},
+    "Schön, bist du da." : {},
+    "Sichtbar für" : {},
+    "Sichtbarkeit" : {},
+    "So richtest du ihn ein: Öffne die Einstellungen, tippe auf «Face ID & Code» (oder «Touch ID & Code») und dann auf «Code aktivieren». Danach öffnest du Cevi OS wieder." : {},
+    "Sobald die Leitung neue Programme einträgt, siehst du sie hier." : {},
+    "Speichern" : {},
+    "Stand: 1. November 2026 · Cevi Stäfa-Hombrechtikon" : {},
+    "Startpasswort" : {},
+    "Stimmt überein" : {},
+    "Stufen" : {},
+    "Stufen und Sichtbarkeit" : {},
+    "Stufenleitung" : {},
+    "Teilnahmen" : {},
+    "Treffpunkt" : {},
     "Umgebung: %@" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -372,21 +219,22 @@
         }
       }
     },
-    "Wird geprüft" : {
-
-    },
-    "Zusage: Ja" : {
-
-    },
-    "Zusage: Nein" : {
-
-    },
-    "Zusage: Offen" : {
-
-    },
-    "Zweiter Faktor" : {
-
-    }
+    "Was wir nicht machen" : {},
+    "Was wir speichern" : {},
+    "Wer was sieht" : {},
+    "Willkommen, %@!" : {},
+    "Wird geladen …" : {},
+    "Wird geprüft" : {},
+    "Zu den Programmen" : {},
+    "Zusage: Ja" : {},
+    "Zusage: Nein" : {},
+    "Zusage: Offen" : {},
+    "Zusagen" : {},
+    "Zweiter Faktor" : {},
+    "ab %@" : {},
+    "bis %@" : {},
+    "erfüllt" : {},
+    "nicht erfüllt" : {}
   },
   "version" : "1.1"
 }

@@ -135,6 +135,7 @@ private struct StepScreen<Content: View, Actions: View>: View {
 struct SignInView: View {
     @Environment(AppState.self) private var state
     @Environment(\.appConfiguration) private var configuration
+    @Environment(\.openURL) private var openURL
     @State private var username = ""
     @State private var password = ""
     @State private var action = ActionState()
@@ -159,7 +160,14 @@ struct SignInView: View {
                 panel
             }
         }
-        .ceviScreenBackground()
+        // Surface above, panel color below: overscroll and the home indicator area match the part next to them.
+        .background {
+            VStack(spacing: 0) {
+                Color.ceviSurface
+                Color.ceviSurfaceContainerLow
+            }
+            .ignoresSafeArea()
+        }
     }
 
     private var panel: some View {
@@ -190,8 +198,9 @@ struct SignInView: View {
             .disabled(action.isRunning)
             .padding(.top, Spacing.s1)
             if let url = ServerPage.support.url(base: configuration.apiBaseURL) {
-                Link("Passwort vergessen?", destination: url)
-                    .frame(minHeight: Size.touchTarget)
+                // Button instead of Link: the audit reports the Link text as clipped.
+                Button("Passwort vergessen?") { openURL(url) }
+                    .buttonStyle(.ceviText)
             }
         }
         .frame(maxWidth: Size.contentMax)
@@ -199,10 +208,12 @@ struct SignInView: View {
         .padding(.vertical, Spacing.s6)
         .frame(maxWidth: .infinity)
         .background {
-            UnevenRoundedRectangle(topLeadingRadius: Radius.xl, topTrailingRadius: Radius.xl, style: .continuous)
-                .fill(Color.ceviSurfaceContainerLow)
-                .stroke(Color.ceviOutlineVariant, lineWidth: Size.border)
-                .ignoresSafeArea(edges: .bottom)
+            ZStack {
+                Color.ceviSurface
+                UnevenRoundedRectangle(topLeadingRadius: Radius.xl, topTrailingRadius: Radius.xl, style: .continuous)
+                    .fill(Color.ceviSurfaceContainerLow)
+                    .stroke(Color.ceviOutlineVariant, lineWidth: Size.border)
+            }
         }
     }
 

@@ -37,16 +37,27 @@ struct MainView: View {
                 }
             }
             Tab("Profil", systemImage: "person.crop.circle", value: MainTab.profile) {
-                VStack(spacing: 16) {
-                    Text("Hallo \(profile.ceviName ?? profile.name)")
-                        .font(.title.bold())
-                        .accessibilityAddTraits(.isHeader)
-                    Button("Abmelden", role: .destructive) {
-                        Task { await state.signOut() }
+                NavigationStack {
+                    List {
+                        Section {
+                            Text("Hallo \(profile.ceviName ?? profile.name)")
+                                .font(.title(.title2))
+                                .accessibilityAddTraits(.isHeader)
+                        }
+                        Section("App") {
+                            NavigationLink {
+                                PrivacyPolicyView()
+                            } label: {
+                                Label("Datenschutz", systemImage: "hand.raised")
+                            }
+                        }
+                        Section("Konto") {
+                            SignOutButton()
+                                .foregroundStyle(Color.ceviPrimaryText)
+                        }
                     }
-                    .frame(minHeight: 44)
+                    .navigationTitle("Profil")
                 }
-                .padding()
             }
         }
         // Chat list (and the badge) stay current while the app is in the foreground.

@@ -1,12 +1,13 @@
 import SwiftUI
 
+/// Feedback while a button is held down.
+private let pressedOpacity = 0.85
+
 /// The one main action of a screen: Cevi-Rot capsule, at least `Size.button` high.
 struct CeviPrimaryButtonStyle: ButtonStyle {
     /// Full width (forms) or as wide as the label (state screens).
     var expands = true
     @Environment(\.isEnabled) private var isEnabled
-
-    private static let pressedOpacity = 0.85
 
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
@@ -19,7 +20,7 @@ struct CeviPrimaryButtonStyle: ButtonStyle {
             .frame(maxWidth: expands ? .infinity : nil, minHeight: Size.button)
             .background(isEnabled ? Color.ceviPrimary : Color.ceviSurfaceContainerHigh, in: Capsule())
             .contentShape(Capsule())
-            .opacity(configuration.isPressed ? Self.pressedOpacity : 1)
+            .opacity(configuration.isPressed ? pressedOpacity : 1)
     }
 }
 
@@ -36,10 +37,11 @@ struct CeviTextButtonStyle: ButtonStyle {
             .font(.body.weight(.semibold))
             .multilineTextAlignment(.center)
             .foregroundStyle(color)
+            .fixedSize(horizontal: false, vertical: true)
             .padding(.horizontal, Spacing.s3)
             .frame(minWidth: Size.touchTarget, minHeight: Size.touchTarget)
             .contentShape(Rectangle())
-            .opacity(configuration.isPressed ? 0.6 : 1)
+            .opacity(configuration.isPressed ? pressedOpacity : 1)
     }
 }
 
@@ -49,17 +51,16 @@ extension ButtonStyle where Self == CeviTextButtonStyle {
 
 /// Small uppercase line above a display title. Only on Login, Willkommen and Start.
 struct Eyebrow: View {
-    let text: LocalizedStringKey
+    let text: String
 
-    init(_ text: LocalizedStringKey) { self.text = text }
+    init(_ text: String.LocalizationValue) { self.text = String(localized: text) }
 
     var body: some View {
-        Text(text)
+        Text(text.uppercased())
             .font(.footnote.weight(.semibold))
-            .textCase(.uppercase)
             .foregroundStyle(Color.ceviAccent)
-            // VoiceOver reads the normal spelling, not single capitals.
-            .accessibilityLabel(Text(text))
+            // VoiceOver (and UI tests) get the normal spelling, not single capitals.
+            .accessibilityLabel(text)
     }
 }
 

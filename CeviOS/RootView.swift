@@ -7,23 +7,24 @@ struct RootView: View {
     @Environment(AppLock.self) private var lock
 
     var body: some View {
-        if state.appOutdated {
-            AppOutdatedView(appStoreURL: configuration.appStoreURL)
-        } else {
-            content
-                .task { await state.start() }
+        Group {
+            if state.appOutdated {
+                AppOutdatedView(appStoreURL: configuration.appStoreURL)
+            } else {
+                content
+                    .task { await state.start() }
+            }
         }
+        .tint(.ceviAccent)
     }
 
     @ViewBuilder
     private var content: some View {
         switch state.phase {
         case .loading:
-            ProgressView().accessibilityLabel(Text("Lädt"))
+            StartView()
         case .configurationMissing:
-            Text("Die Verbindung zum Server ist nicht eingerichtet.")
-                .multilineTextAlignment(.center)
-                .padding()
+            StateView(symbol: "gearshape", title: "Die Verbindung zum Server ist nicht eingerichtet.", tone: .error)
         case .offline:
             OfflineView()
         case .signIn:
@@ -32,8 +33,8 @@ struct RootView: View {
             SecondFactorView()
         case .changePassword:
             ChangePasswordView()
-        case .privacy:
-            PrivacyView()
+        case .privacy(let profile):
+            PrivacyView(name: profile.ceviName ?? profile.name, childNames: profile.children.map(\.firstName))
         case .ready(let profile):
             protected(profile)
         }
@@ -57,23 +58,15 @@ struct RootView: View {
 /// Full-screen notice for 426 `APP_VERALTET`.
 struct AppOutdatedView: View {
     let appStoreURL: URL?
+    @Environment(\.openURL) private var openURL
 
     var body: some View {
-        VStack(spacing: 24) {
-            Text("Bitte die App aktualisieren")
-                .font(.title.bold())
-                .multilineTextAlignment(.center)
-                .accessibilityAddTraits(.isHeader)
-            Text("Diese Version von Cevi OS wird nicht mehr unterstützt.")
-                .font(.body)
-                .multilineTextAlignment(.center)
-            if let appStoreURL {
-                Link("Im App Store öffnen", destination: appStoreURL)
-                    .buttonStyle(.borderedProminent)
-                    .frame(minHeight: 44)
-            }
-        }
-        .padding()
+        StateView(
+            symbol: "arrow.down.app",
+            title: "Bitte die App aktualisieren",
+            message: "Diese Version von Cevi OS wird nicht mehr unterstützt.",
+            primary: appStoreURL.map { url in StateView.Action(title: "Im App Store öffnen") { openURL(url) } }
+        )
     }
 }
 

@@ -107,10 +107,12 @@ extension StateView {
                   message: "Du warst länger nicht aktiv. Zu deiner Sicherheit haben wir dich abgemeldet.",
                   primary: Action(title: "Anmelden", perform: signIn))
     }
+}
 
+extension StateView.Action {
     /// «Zu den Programmen» as the way back from a state.
-    static func toPrograms(_ perform: @escaping () -> Void) -> Action {
-        Action(title: "Zu den Programmen", perform: perform)
+    static func toPrograms(_ perform: @escaping () -> Void) -> StateView.Action {
+        StateView.Action(title: "Zu den Programmen", perform: perform)
     }
 }
 
