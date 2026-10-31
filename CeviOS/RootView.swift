@@ -5,6 +5,7 @@ struct RootView: View {
     @Environment(\.appConfiguration) private var configuration
     @Environment(AppState.self) private var state
     @Environment(AppLock.self) private var lock
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         Group {
@@ -16,6 +17,8 @@ struct RootView: View {
             }
         }
         .tint(.ceviAccent)
+        // Soft cross-fade between start, sign-in and the app. Not with "Reduce Motion".
+        .animation(reduceMotion ? nil : .easeInOut(duration: 0.25), value: state.phase)
     }
 
     @ViewBuilder

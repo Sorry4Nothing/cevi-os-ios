@@ -7,19 +7,18 @@
     { "name": "Prod", "file": { "anchor": "Config", "relative-path": "Prod.xcconfig" } },
     "Release",
   ],
+  "localizations": {
+    "development": "de",
+  },
   "packages": [
     {
       "kind": "remote",
       "repository": "https://github.com/firebase/firebase-ios-sdk",
-      "version": { "up-to-next-major-version": "12.0.0" },
+      "version": {
+        "up-to-next-major-version": "12.0.0",
+      },
     },
   ],
-  "localizations": {
-    "development": "de",
-    "supported": [
-      "de",
-    ],
-  },
   "files": [
     { "kind": "folder", "path": "CeviOS", "target-membership": [ "CeviOS" ] },
     { "kind": "folder", "path": "CeviOSTests", "target-membership": [ "CeviOSTests" ] },
@@ -39,15 +38,19 @@
     {
       "name": "CeviOS",
       "id": "000000000000000100000000",
-      "package-product-members": [
-        { "package": "firebase-ios-sdk", "product-name": "FirebaseMessaging", "build-phase": { "build-phase": "frameworks" } },
-      ],
       "product": "Products/CeviOS.app",
       "product-type": "application",
       "build-phases": [
         "compile-sources",
         "frameworks",
         "resources",
+      ],
+      "package-product-members": [
+        {
+          "package": "firebase-ios-sdk",
+          "product-name": "FirebaseMessaging",
+          "build-phase": { "build-phase": "frameworks" },
+        },
       ],
       "build-settings": {
         "CODE_SIGN_STYLE": "Automatic",
@@ -57,7 +60,6 @@
         "INFOPLIST_FILE": "Config/Info.plist",
         "INFOPLIST_KEY_UIApplicationSceneManifest_Generation": "YES",
         "INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents": "YES",
-        "INFOPLIST_KEY_UILaunchScreen_Generation": "YES",
         "INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone": "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight",
         "LD_RUNPATH_SEARCH_PATHS": "@executable_path/Frameworks",
         "MARKETING_VERSION": "1.0.0",

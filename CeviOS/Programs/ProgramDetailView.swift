@@ -78,7 +78,7 @@ struct ProgramDetailView: View {
             } else if let error = model.loadError {
                 ErrorRow(text: error).padding(Spacing.s4)
             } else {
-                ProgressView().accessibilityLabel(Text("Lädt"))
+                LoadingView(label: "Lädt")
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)

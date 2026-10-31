@@ -58,7 +58,7 @@ struct AttendanceView: View {
             } else if let error = model.error {
                 ErrorRow(text: error).padding()
             } else {
-                ProgressView().accessibilityLabel(Text("Lädt"))
+                LoadingView(label: "Lädt")
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)

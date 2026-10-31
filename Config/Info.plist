@@ -10,5 +10,10 @@
 	<array>
 		<string>Archivo.ttf</string>
 	</array>
+	<key>UILaunchScreen</key>
+	<dict>
+		<key>UIColorName</key>
+		<string>cevi-surface</string>
+	</dict>
 </dict>
 </plist>

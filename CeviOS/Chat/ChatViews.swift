@@ -17,7 +17,7 @@ struct ChatListView: View {
                 if !model.hasLoaded, let error = model.error {
                     ErrorRow(text: error).padding()
                 } else if !model.hasLoaded {
-                    ProgressView().accessibilityLabel(Text("Lädt"))
+                    LoadingView(label: "Lädt")
                 } else if model.chats.isEmpty && !isParent {
                     ContentUnavailableView("Keine Chats", systemImage: "bubble.left.and.bubble.right")
                 } else {
