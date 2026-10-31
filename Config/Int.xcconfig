@@ -1,0 +1,9 @@
+// Umgebung: Int
+#include "Base.xcconfig"
+#include? "Secrets.xcconfig"
+
+APP_BUNDLE_IDENTIFIER = $(APP_BUNDLE_ID_PREFIX).$(APP_BUNDLE_BASENAME).int
+INFOPLIST_KEY_CFBundleDisplayName = Cevi OS Int
+ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon-Int
+SWIFT_ACTIVE_COMPILATION_CONDITIONS = INT $(inherited)
+API_BASE_URL = $(API_BASE_URL_INT)

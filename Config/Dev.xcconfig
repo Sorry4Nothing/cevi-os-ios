@@ -1,0 +1,9 @@
+// Umgebung: Dev
+#include "Base.xcconfig"
+#include? "Secrets.xcconfig"
+
+APP_BUNDLE_IDENTIFIER = $(APP_BUNDLE_ID_PREFIX).$(APP_BUNDLE_BASENAME).dev
+INFOPLIST_KEY_CFBundleDisplayName = Cevi OS Dev
+ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon-Dev
+SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG DEV $(inherited)
+API_BASE_URL = $(API_BASE_URL_DEV)

@@ -1,0 +1,5 @@
+// Gemeinsame Werte aller Umgebungen.
+// Achtung: In .xcconfig-Dateien beginnt «//» einen Kommentar. In URLs deshalb «:/$()/» statt «://» schreiben.
+APP_BUNDLE_ID_PREFIX = io.github.sorry4nothing
+APP_BUNDLE_BASENAME = cevios
+PRODUCT_BUNDLE_IDENTIFIER = $(APP_BUNDLE_IDENTIFIER)
