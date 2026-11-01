@@ -81,10 +81,17 @@ final class AppState {
         units = try? await client.units()
     }
 
+    /// After a 403: ask `GET /ich`. With an open password change the app shows only the password page.
+    func checkPendingPasswordChange() async {
+        guard case .ready = phase, let client, let profile = try? await client.loadProfile(), profile.mustChangePassword else { return }
+        phase = Self.phase(for: profile)
+    }
+
     func handle(_ event: APIEvent) {
         switch event {
         case .sessionEnded: sessionDidEnd()
         case .appOutdated: appOutdated = true
+        case .mayNeedPasswordChange: Task { await checkPendingPasswordChange() }
         }
     }
 
@@ -106,6 +113,7 @@ final class AppState {
     /// App lock engaged: drop the profile and caches, keep the cookie. After unlocking, `start()` reloads.
     func lock() {
         guard hasSession else { return }
+        loginPassword = nil
         phase = .loading
         for task in onLock { task() }
     }
@@ -133,22 +141,33 @@ final class AppState {
         }
     }
 
+    /// Password of this sign-in, kept ONLY in memory (never stored) so the mandatory password change does not ask for the
+    /// start password again. Deleted after the change, on sign-out, on lock and when the session ends.
+    private(set) var loginPassword: String?
+
     func signIn(username: String, password: String) async throws {
         guard let client else { return }
         signInNotice = nil
+        loginPassword = nil
         switch try await client.signIn(username: username, password: password) {
         case .adminOnly:
             // Only the intermediate second-factor cookie exists; dropping it locally is the whole sign-out.
             await client.clearCookies()
             signInNotice = AuthMessages.adminOnly
             phase = .signIn
-        case .signedIn: try await loadProfileAfterSignIn()
+        case .signedIn:
+            loginPassword = password
+            try await loadProfileAfterSignIn()
+            // Only a pending password change needs it; otherwise forget it at once.
+            if case .changePassword = phase {} else { loginPassword = nil }
         }
     }
 
-    func passwordChanged(current: String, new: String) async throws {
-        guard let client else { return }
-        try await client.changePassword(current: current, new: new)
+    /// `current` is only needed when the app lost the password of the sign-in (e.g. restart during the change).
+    func passwordChanged(current: String?, new: String) async throws {
+        guard let client, let old = loginPassword ?? current else { return }
+        try await client.changePassword(current: old, new: new)
+        loginPassword = nil
         try await loadProfileAfterSignIn()
     }
 
@@ -159,6 +178,7 @@ final class AppState {
     }
 
     func signOut() async {
+        loginPassword = nil
         await client?.signOut()
         for task in onSignOut { await task() }
         phase = .signIn
@@ -176,6 +196,7 @@ final class AppState {
     }
 
     private func sessionDidEnd() {
+        loginPassword = nil
         phase = .signIn
         Task { for task in onSignOut { await task() } }
     }

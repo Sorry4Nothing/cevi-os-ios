@@ -10,7 +10,7 @@ final class ProgramListModel {
     }
 
     /// How far ahead the list reaches.
-    nonisolated static let windowDays = 120
+    nonisolated static let windowMonths = 6
 
     private(set) var state: LoadState = .loading
     private(set) var sections: [DaySection] = []
@@ -25,7 +25,7 @@ final class ProgramListModel {
         guard let client else { return }
         let calendar = DateFormats.calendar
         let from = calendar.startOfDay(for: today)
-        guard let to = calendar.date(byAdding: .day, value: Self.windowDays, to: from) else { return }
+        guard let to = calendar.date(byAdding: .month, value: Self.windowMonths, to: from) else { return }
         if sections.isEmpty { state = .loading }
         do {
             let programs = try await client.programs(from: from, to: to)

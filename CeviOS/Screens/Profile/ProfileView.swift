@@ -29,10 +29,10 @@ struct ProfileView: View {
 
                 Section {
                     toggle("Mitteilungen zum Chat", key: "chat", value: profile.pushChat) { ProfilePatch(pushChat: $0) }
-                    toggle("Mitteilungen zu Programmen", key: "programs", value: profile.pushPrograms) {
+                    toggle("Mitteilungen und Erinnerungen", key: "programs", value: profile.pushPrograms) {
                         ProfilePatch(pushPrograms: $0)
                     }
-                    if profile.isLeader, let registrations = profile.pushRegistrations {
+                    if let registrations = profile.pushRegistrations {
                         toggle("Mitteilungen zu Anmeldungen", key: "registrations", value: registrations) {
                             ProfilePatch(pushRegistrations: $0)
                         }

@@ -6,6 +6,8 @@ nonisolated enum APIEvent: Sendable {
     case sessionEnded
     /// 426: The app is older than the minimum version of the server.
     case appOutdated
+    /// 403 under `/api/v1` (not `GET /ich`): possibly a pending password change.
+    case mayNeedPasswordChange
 }
 
 /// Client for `/api/auth/*` and `/api/v1/*`. The session hangs only on the cookie in the store (Keychain); there is neither
@@ -117,7 +119,8 @@ actor APIClient {
         }
 
         guard !(200..<300).contains(response.statusCode) else { return data }
-        let error = APIError.from(status: response.statusCode, data: data)
+        let retryAfter = (response.value(forHTTPHeaderField: "Retry-After") ?? response.value(forHTTPHeaderField: "X-Retry-After")).flatMap { Int($0) }
+        let error = APIError.from(status: response.statusCode, data: data, retryAfter: retryAfter)
         switch error.kind {
         case .unauthorized where path.hasPrefix("/api/v1/"):
             // Under /api/auth, 401 is also a wrong code or a wrong password, not the end of the session.
@@ -125,6 +128,9 @@ actor APIClient {
             onEvent(.sessionEnded)
         case .appOutdated:
             onEvent(.appOutdated)
+        case .forbidden where path.hasPrefix("/api/v1/") && path != "/api/v1/ich":
+            // 403 can mean "password change still open": the app asks `GET /ich` and leads to the password page.
+            onEvent(.mayNeedPasswordChange)
         default:
             break
         }

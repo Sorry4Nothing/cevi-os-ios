@@ -328,11 +328,16 @@ struct ProgramDetailView: View {
                     Text(subtitle).font(.footnote).foregroundStyle(Color.ceviOnSurfaceVariant)
                 }
                 if let phone = contact.phone, let phoneURL {
-                    Button(phone) { openURL(phoneURL) }
-                        .font(.footnote)
-                        .foregroundStyle(Color.ceviAccent)
-                        .frame(minHeight: Size.touchTarget)
-                        .accessibilityLabel(Text("\(names.title) anrufen, \(phone)"))
+                    // The tap area is the label itself: the frame belongs inside, otherwise the hit area stays text-high.
+                    Button { openURL(phoneURL) } label: {
+                        Text(phone)
+                            .font(.footnote)
+                            .frame(maxWidth: .infinity, minHeight: Size.touchTarget, alignment: .leading)
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .foregroundStyle(Color.ceviAccent)
+                    .accessibilityLabel(Text("Telefonnummer von \(names.title): \(phone)"))
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)

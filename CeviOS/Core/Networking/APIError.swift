@@ -28,8 +28,10 @@ nonisolated struct APIError: Error, Equatable, Sendable {
     let code: String?
     /// Text of the server. For better-auth codes (English) not meant for display.
     let message: String?
+    /// Seconds until the request may be repeated (header `Retry-After`, or `X-Retry-After` of sign-in). Only on 429.
+    var retryAfter: Int?
 
-    static func from(status: Int, data: Data) -> APIError {
+    static func from(status: Int, data: Data, retryAfter: Int? = nil) -> APIError {
         let body = try? JSONDecoder().decode(ErrorBody.self, from: data)
         let kind: Kind = switch status {
         case 400: .invalidInput
@@ -43,7 +45,7 @@ nonisolated struct APIError: Error, Equatable, Sendable {
         case 429: .rateLimited
         default: .server
         }
-        return APIError(kind: kind, status: status, code: body?.code, message: body?.message)
+        return APIError(kind: kind, status: status, code: body?.code, message: body?.message, retryAfter: kind == .rateLimited ? retryAfter : nil)
     }
 
     static let network = APIError(kind: .network, status: nil, code: nil, message: nil)
@@ -52,7 +54,11 @@ nonisolated struct APIError: Error, Equatable, Sendable {
     var displayText: String {
         switch kind {
         case .rateLimited:
-            String(localized: "Bitte kurz warten.")
+            if let retryAfter, retryAfter > 0 {
+                String(localized: "Bitte kurz warten. Noch etwa \(retryAfter) Sekunden.")
+            } else {
+                String(localized: "Bitte kurz warten.")
+            }
         case .network:
             String(localized: "Keine Verbindung zum Server. Bitte später nochmals versuchen.")
         case .appOutdated:
