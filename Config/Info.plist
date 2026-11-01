@@ -14,8 +14,8 @@
 	<dict>
 		<key>UIColorName</key>
 		<string>cevi-surface</string>
-		<key>ITSAppUsesNonExemptEncryption</key>
+	</dict>
+	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
-</dict>
 </dict>
 </plist>

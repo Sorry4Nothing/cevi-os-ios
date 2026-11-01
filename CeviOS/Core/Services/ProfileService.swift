@@ -56,7 +56,7 @@ nonisolated enum ProfileImage {
         let options: [CFString: Any] = [
             kCGImageSourceCreateThumbnailFromImageAlways: true,
             kCGImageSourceCreateThumbnailWithTransform: true,
-            kCGImageSourceThumbnailMaxPixelSize: 16_000,
+            kCGImageSourceThumbnailMaxPixelSize: maxSide, // bounds the decoded size of server images
         ]
         return CGImageSourceCreateThumbnailAtIndex(source, 0, options as CFDictionary)
     }

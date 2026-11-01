@@ -48,7 +48,7 @@ actor APIClient {
         configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
         configuration.timeoutIntervalForRequest = 30
         if let protocolClasses { configuration.protocolClasses = protocolClasses }
-        return URLSession(configuration: configuration)
+        return URLSession(configuration: configuration, delegate: SameOriginRedirects(), delegateQueue: nil)
     }
 
     /// Value for `X-App-Version`. A version that is not `x.y.z` counts as too old for the server; then `0.0.0`.
@@ -159,5 +159,19 @@ actor APIClient {
         } catch {
             throw APIError(kind: .server, status: nil, code: nil, message: nil)
         }
+    }
+}
+
+/// Follows a redirect only within the same origin. The session cookie is set by hand as a header, so a redirect to another
+/// host or to `http` must never carry it along (SR-40).
+final class SameOriginRedirects: NSObject, URLSessionTaskDelegate {
+    func urlSession(
+        _ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse,
+        newRequest request: URLRequest, completionHandler: @escaping (URLRequest?) -> Void
+    ) {
+        let from = task.originalRequest?.url
+        let to = request.url
+        let same = from?.scheme == to?.scheme && from?.host == to?.host && from?.port == to?.port
+        completionHandler(same ? request : nil)
     }
 }

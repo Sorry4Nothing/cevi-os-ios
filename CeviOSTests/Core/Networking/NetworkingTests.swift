@@ -259,3 +259,25 @@ struct APIClientTests {
         #expect(APIClient.appVersion(from: [:]) == "0.0.0")
     }
 }
+
+struct RedirectTests {
+    /// Asks the delegate about a redirect from `https://api.example.org/…` to `target`; the returned request, if it is followed.
+    private func followed(_ target: String) -> URLRequest? {
+        let session = URLSession(configuration: .ephemeral)
+        let task = session.dataTask(with: URLRequest(url: URL(string: "https://api.example.org/api/v1/ich")!))
+        let response = HTTPURLResponse(url: task.originalRequest!.url!, statusCode: 302, httpVersion: nil, headerFields: nil)!
+        var result: URLRequest?
+        SameOriginRedirects().urlSession(session, task: task, willPerformHTTPRedirection: response,
+                                         newRequest: URLRequest(url: URL(string: target)!)) { result = $0 }
+        return result
+    }
+
+    @Test func sameOriginIsFollowed() {
+        #expect(followed("https://api.example.org/api/v1/ich/") != nil)
+    }
+
+    @Test(arguments: ["https://evil.example/x", "http://api.example.org/x", "https://api.example.org:8443/x"])
+    func otherOriginsAreRefused(_ target: String) {
+        #expect(followed(target) == nil)
+    }
+}
