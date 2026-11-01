@@ -7,3 +7,4 @@ PRODUCT_BUNDLE_IDENTIFIER = $(APP_BUNDLE_IDENTIFIER)
 APP_STORE_URL =
 INFOPLIST_KEY_NSFaceIDUsageDescription = Cevi OS entsperrt sich mit Face ID. Der Geräte-Code bleibt als Alternative.
 ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor
+INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait

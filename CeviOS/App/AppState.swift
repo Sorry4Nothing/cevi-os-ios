@@ -10,7 +10,6 @@ final class AppState {
         case configurationMissing
         case offline
         case signIn
-        case secondFactor
         case changePassword(Profile)
         case privacy(Profile)
         case ready(Profile)
@@ -25,6 +24,8 @@ final class AppState {
     var openChatId: UUID?
     /// Target of a tapped push; the main view opens it and clears it.
     var pendingTarget: PushTarget?
+    /// Notice for the sign-in screen after the app signed the person out on its own (admins).
+    var signInNotice: String?
     /// Push tokens and caches that must be dropped on sign-out hook in here.
     var onSignOut: [@MainActor () async -> Void] = []
 
@@ -76,7 +77,7 @@ final class AppState {
                 phase = .signIn
                 return
             }
-            proceed(with: try await client.loadProfile())
+            await proceed(with: try await client.loadProfile())
         } catch let error as APIError where error.kind == .unauthorized {
             phase = .signIn
         } catch {
@@ -86,22 +87,15 @@ final class AppState {
 
     func signIn(username: String, password: String) async throws {
         guard let client else { return }
+        signInNotice = nil
         switch try await client.signIn(username: username, password: password) {
-        case .secondFactor: phase = .secondFactor
+        case .adminOnly:
+            // Only the intermediate second-factor cookie exists; dropping it locally is the whole sign-out.
+            await client.clearCookies()
+            signInNotice = AuthMessages.adminOnly
+            phase = .signIn
         case .signedIn: try await loadProfileAfterSignIn()
         }
-    }
-
-    func confirmSecondFactor(code: String, isBackupCode: Bool) async throws {
-        guard let client else { return }
-        try await client.confirmSecondFactor(code: code, isBackupCode: isBackupCode)
-        try await loadProfileAfterSignIn()
-    }
-
-    /// Back to sign-in when the intermediate second-factor step is no longer valid.
-    func restartSignIn() async {
-        await client?.clearCookies()
-        phase = .signIn
     }
 
     func passwordChanged(current: String, new: String) async throws {
@@ -116,8 +110,8 @@ final class AppState {
         try await loadProfileAfterSignIn()
     }
 
-    func signOut(everywhere: Bool = false) async {
-        await client?.signOut(everywhere: everywhere)
+    func signOut() async {
+        await client?.signOut()
         for task in onSignOut { await task() }
         phase = .signIn
     }
@@ -125,12 +119,12 @@ final class AppState {
     /// Loads the profile again after it changed (settings, phone, image). Errors keep the current state.
     func reloadProfile() async {
         guard let client, case .ready = phase, let profile = try? await client.loadProfile() else { return }
-        proceed(with: profile)
+        await proceed(with: profile)
     }
 
     private func loadProfileAfterSignIn() async throws {
         guard let client else { return }
-        proceed(with: try await client.loadProfile())
+        await proceed(with: try await client.loadProfile())
     }
 
     private func sessionDidEnd() {
@@ -138,7 +132,13 @@ final class AppState {
         Task { for task in onSignOut { await task() } }
     }
 
-    private func proceed(with profile: Profile) {
+    private func proceed(with profile: Profile) async {
+        guard !profile.isAdminOnly else {
+            // Admins without children or unit roles have nothing to do in the app.
+            await signOut()
+            signInNotice = AuthMessages.adminOnly
+            return
+        }
         phase = Self.phase(for: profile)
     }
 

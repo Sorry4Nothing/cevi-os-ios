@@ -10,12 +10,8 @@ struct MainView: View {
     @State private var programPath: [UUID] = []
     @State private var chatPath: [UUID] = []
 
-    enum MainTab: Hashable { case programs, chat, attendance, profile }
+    enum MainTab: Hashable { case programs, chat, profile }
     let profile: Profile
-
-    private var attendanceUnits: [UnitSummary] {
-        LeadershipPermissions(profile: profile).attendanceUnits(from: profile.units)
-    }
 
     /// Parents and unit leaders have chats. Admins and leaders without a unit-leader role do not.
     private var hasChat: Bool { !profile.children.isEmpty || profile.isUnitLeader }
@@ -30,11 +26,6 @@ struct MainView: View {
                     ChatListView(model: chatList, profile: profile, path: $chatPath)
                 }
                 .badge(chatList.totalUnread)
-            }
-            if !attendanceUnits.isEmpty {
-                Tab("Anwesenheit", systemImage: "checklist", value: MainTab.attendance) {
-                    AttendanceListView(units: attendanceUnits)
-                }
             }
             Tab("Profil", systemImage: "person.crop.circle", value: MainTab.profile) {
                 ProfileView(profile: profile)

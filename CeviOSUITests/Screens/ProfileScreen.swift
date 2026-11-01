@@ -15,11 +15,6 @@ struct ProfileScreen: Screen {
         wait(for: element, "value == %@", on ? "1" : "0")
     }
 
-    func openPrivacy() -> PrivacyPolicyScreen {
-        tap("Datenschutz")
-        return PrivacyPolicyScreen(app: app).waitUntilDisplayed()
-    }
-
     @discardableResult
     func signOut(username: String) -> SignInScreen {
         tap("Abmelden")

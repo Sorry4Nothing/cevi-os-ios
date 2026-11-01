@@ -9,7 +9,6 @@ enum AppRobot {
         case parent = "eltern"
         case leader = "leitung"
         case newcomer = "neu"
-        case admin = "admin2fa"
     }
 
     enum TextSize { case standard, largest }

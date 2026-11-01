@@ -57,7 +57,6 @@ nonisolated struct Profile: Decodable, Equatable, Sendable {
     /// Missing for people without a unit role.
     let pushRegistrations: Bool?
     let admin: Bool
-    let secondFactor: Bool
     let roles: [Role]
     let units: [UnitSummary]
     let children: [Child]
@@ -71,7 +70,6 @@ nonisolated struct Profile: Decodable, Equatable, Sendable {
         case imageURL = "bildUrl"
         case pushPrograms = "pushProgramme"
         case pushRegistrations = "pushAnmeldungen"
-        case secondFactor = "zweiterFaktor"
         case roles = "rollen"
         case units = "stufen"
         case children = "kinder"
@@ -87,6 +85,9 @@ nonisolated struct Profile: Decodable, Equatable, Sendable {
     func isLeader(of unitId: UUID) -> Bool {
         roles.contains { $0.unitId == unitId }
     }
+
+    /// Admins who are neither parents nor leaders do not use the app.
+    var isAdminOnly: Bool { admin && children.isEmpty && roles.isEmpty }
 
     var isUnitLeader: Bool { roles.contains { $0.type == .unitLeader } }
 }

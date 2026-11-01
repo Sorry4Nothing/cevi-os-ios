@@ -45,8 +45,7 @@ private nonisolated struct FixedCookieStore: CookieStore {
 
 /// Simulated, stateful in-memory server for the UI tests. Serves every endpoint the app uses with fictional data
 /// (invented names, `example.org`). The persona follows the username typed at sign-in: `eltern…` parent with two
-/// children, `leitung…` unit leader, `neu…` first sign-in, `admin2fa…` admin with a second factor; anything else is a
-/// parent. Any non-empty password is accepted; there are no credentials anywhere.
+/// children, `leitung…` unit leader, `neu…` first sign-in; anything else is a parent. Any non-empty password is accepted; there are no credentials anywhere.
 nonisolated final class UITestBackend: URLProtocol {
     static let sessionCookie = "cevi_session"
     static let seededToken = "seeded"
@@ -140,7 +139,7 @@ private nonisolated struct World {
         static let notFound = error(404, "NICHT_GEFUNDEN", "Nicht gefunden.")
     }
 
-    enum Kind { case parent, leader, newcomer, admin }
+    enum Kind { case parent, leader, newcomer }
 
     struct Person {
         let id: String
@@ -163,10 +162,10 @@ private nonisolated struct World {
         var units: [String] {
             switch kind {
             case .parent, .newcomer: [Ids.jungschar]
-            case .leader, .admin: [Ids.jungschar, Ids.froeschli]
+            case .leader: [Ids.jungschar, Ids.froeschli]
             }
         }
-        func leads(_ unit: String) -> Bool { kind == .admin || roles.contains { $0.unit == unit } }
+        func leads(_ unit: String) -> Bool { roles.contains { $0.unit == unit } }
     }
 
     struct Kid {
@@ -225,7 +224,6 @@ private nonisolated struct World {
         static let otherParent = "00000000-0000-0000-0000-000000000033"
         static let newcomer = "00000000-0000-0000-0000-000000000032"
         static let leader = "00000000-0000-0000-0000-000000000021"
-        static let admin = "00000000-0000-0000-0000-000000000041"
         static let forest = "00000000-0000-0000-0000-0000000000a1"
         static let candles = "00000000-0000-0000-0000-0000000000a2"
         static let weekend = "00000000-0000-0000-0000-0000000000a3"
@@ -250,16 +248,12 @@ private nonisolated struct World {
         Ids.parent: ("Eva Beispiel", nil, false),
         Ids.otherParent: ("Sara Muster", nil, false),
         Ids.newcomer: ("Mara Beispiel", nil, false),
-        Ids.admin: ("Alex Beispiel", "Luchs", false),
     ]
 
     var failure: String?
     var accounts: [String: Person] = [:]
     var sessions: [String: String] = [:]
-    var secondFactor: [String: String] = [:]
     var programs: [Program]
-    /// Program id → person id → present.
-    var presence: [String: [String: Bool]] = [:]
     var chats: [Chat]
     var counter = 0x100
 
@@ -318,7 +312,6 @@ private nonisolated struct World {
         case (_, "programme"): return programmes(request, Array(route.dropFirst()), me)
         case ("GET", "stufen") where route.count == 1:
             return .json(200, ["stufen": [Ids.jungschar, Ids.froeschli].map(unit)])
-        case (_, "stufen") where route.count >= 3 && route[2] == "anwesenheit": return attendance(request, route, me)
         case (_, "chats"): return chatRoutes(request, Array(route.dropFirst()), me)
         case ("PUT", "push-token"): return .noContent
         default: return .notFound
@@ -358,20 +351,6 @@ private nonisolated struct World {
             guard !username.isEmpty, !(request.body["password"] as? String ?? "").isEmpty else {
                 return .error(401, "INVALID_USERNAME_OR_PASSWORD", "Invalid username or password")
             }
-            if account(username).kind == .admin {
-                let token = nextToken()
-                secondFactor[token] = username
-                return .json(200, ["twoFactorRedirect": true], setCookie: "cevi_2fa=\(token); Path=/; HttpOnly")
-            }
-            return signedIn(username)
-        case "two-factor/verify-totp", "two-factor/verify-backup-code":
-            guard let username = request.cookies["cevi_2fa"].flatMap({ secondFactor[$0] }) else {
-                return .error(401, "INVALID_TWO_FACTOR_COOKIE", "Invalid two factor cookie")
-            }
-            // Every code is valid except all zeros, which the tests use for the error message.
-            if (request.body["code"] as? String ?? "").allSatisfy({ $0 == "0" || $0 == "-" }) {
-                return .error(401, "INVALID_CODE", "Invalid code")
-            }
             return signedIn(username)
         case "get-session":
             guard let session else { return Reply(status: 200, body: Data("null".utf8)) }
@@ -383,7 +362,7 @@ private nonisolated struct World {
             if new.lowercased().contains("passwort") { return .error(400, "PASSWORD_COMPROMISED", "Password compromised") }
             accounts[session]?.mustChangePassword = false
             return .json(200, ["token": NSNull()])
-        case "sign-out", "revoke-sessions":
+        case "sign-out":
             if let token = request.cookies[UITestBackend.sessionCookie] { sessions[token] = nil }
             return .json(200, ["success": true], setCookie: "\(UITestBackend.sessionCookie)=; Path=/; Max-Age=0")
         default:
@@ -413,9 +392,6 @@ private nonisolated struct World {
         } else if username.hasPrefix("neu") {
             Person(id: Ids.newcomer, username: username, kind: .newcomer, name: "Mara Beispiel", ceviName: nil,
                    mustChangePassword: true, privacyRead: nil)
-        } else if username.hasPrefix("admin2fa") {
-            Person(id: Ids.admin, username: username, kind: .admin, name: "Alex Beispiel", ceviName: "Luchs",
-                   mustChangePassword: false, privacyRead: .now)
         } else {
             Person(id: Ids.parent, username: username, kind: .parent, name: "Eva Beispiel", ceviName: nil,
                    mustChangePassword: false, privacyRead: .now)
@@ -432,7 +408,7 @@ private nonisolated struct World {
             "mussPasswortAendern": me.mustChangePassword,
             "datenschutzGelesenAm": orNull(me.privacyRead.map(DateFormats.timestampText)),
             "telefon": orNull(me.phone), "bildUrl": NSNull(), "pushChat": me.pushChat, "pushProgramme": me.pushPrograms,
-            "admin": me.kind == .admin, "zweiterFaktor": me.kind == .admin,
+            "admin": false,
             "rollen": me.roles.map { ["stufeId": $0.unit, "typ": $0.type] },
             "stufen": me.units.map(unit),
             "kinder": me.children.map { ["id": $0.id, "vorname": $0.firstName, "nachname": $0.lastName, "stufeId": $0.unit] },
@@ -487,7 +463,7 @@ private nonisolated struct World {
             programs[index].leaderAnswers[me.id] = request.body["status"] as? String
             return .noContent
         case ("PUT", "zuordnung"):
-            guard me.kind == .admin || !me.roles.filter({ $0.type == "stufenleitung" }).isEmpty else {
+            guard !me.roles.filter({ $0.type == "stufenleitung" }).isEmpty else {
                 return .error(403, "KEIN_ZUGRIFF", "Kein Zugriff.")
             }
             programs[index].units = request.body["stufen"] as? [String] ?? []
@@ -499,7 +475,6 @@ private nonisolated struct World {
     }
 
     private func isVisible(_ program: Program, to me: Person) -> Bool {
-        if me.kind == .admin { return true }
         if me.isParent {
             return program.visibility == "eltern" && program.units.contains { unit in me.children.contains { $0.unit == unit } }
         }
@@ -546,70 +521,6 @@ private nonisolated struct World {
     private func counts(_ rows: [[String: Any]]) -> [String: Int] {
         let answers = rows.map { $0["status"] as? String }
         return ["ja": answers.count { $0 == "ja" }, "nein": answers.count { $0 == "nein" }, "offen": answers.count { $0 == "offen" }]
-    }
-
-    // MARK: Attendance
-
-    private mutating func attendance(_ request: Request, _ route: [String], _ me: Person) -> Reply {
-        let unitId = route[1]
-        guard me.leads(unitId) else { return .error(403, "KEIN_ZUGRIFF", "Kein Zugriff.") }
-        let events = programs.filter { $0.units.contains(unitId) && $0.status != "abgesagt" }.sorted { $0.start < $1.start }
-        if request.method == "PUT" {
-            // …/anwesenheit/{programId}/kinder|leitende/{personId}
-            guard route.count == 6, let event = events.first(where: { $0.id == route[3] }) else { return .notFound }
-            guard Self.isRecordable(event) else {
-                return .error(409, "ANWESENHEIT_GESCHLOSSEN", "Die Anwesenheit ist geschlossen.")
-            }
-            presence[event.id, default: [:]][route[5]] = request.body["da"] as? Bool
-            return .noContent
-        }
-        let past = events.filter { $0.start <= .now }
-        func rows(_ person: String, answers: (Program) -> String?) -> [String: Any] {
-            let present = past.count { presence[$0.id]?[person] == true }
-            return [
-                "anwesenheit": events.map { event -> Any in
-                    orNull(presence[event.id]?[person].map { $0 ? "da" : "nicht_da" })
-                },
-                "zusage": events.map { answers($0) ?? "offen" },
-                "da": present, "von": past.count, "prozent": orNull(past.isEmpty ? nil : present * 100 / past.count),
-            ]
-        }
-        let children = Self.kids.filter { $0.unit == unitId }.map { kid in
-            rows(kid.id) { $0.answers[kid.id] }.merging(["id": kid.id, "vorname": kid.firstName, "nachname": kid.lastName]) { a, _ in a }
-        }
-        let leader = Self.people[Ids.leader]!
-        let leaders = [rows(Ids.leader) { $0.leaderAnswers[Ids.leader] }.merging([
-            "id": Ids.leader, "name": leader.name, "ceviName": orNull(leader.ceviName),
-            "rolle": unitId == Ids.jungschar ? "stufenleitung" : "leitung",
-        ]) { a, _ in a }]
-        func total(_ rows: [[String: Any]]) -> [String: Any] {
-            let present = rows.reduce(0) { $0 + ($1["da"] as? Int ?? 0) }
-            let of = rows.reduce(0) { $0 + ($1["von"] as? Int ?? 0) }
-            return ["da": present, "von": of, "prozent": orNull(of == 0 ? nil : present * 100 / of)]
-        }
-        return .json(200, [
-            "stufe": ["id": unitId, "name": Self.unitNames[unitId]?.0 ?? ""],
-            "anlaesse": events.map { event -> [String: Any] in
-                var object: [String: Any] = [
-                    "id": event.id, "titel": event.title, "ganztaegig": event.isAllDay,
-                    "vergangen": event.start <= .now, "erfassbar": Self.isRecordable(event),
-                ]
-                if event.isAllDay {
-                    object["tagVon"] = DateFormats.calendarDayText(Self.date(days: event.day, hour: 2))
-                    object["tagBis"] = DateFormats.calendarDayText(Self.date(days: event.day + event.length - 1, hour: 2))
-                } else {
-                    object["beginn"] = DateFormats.timestampText(event.start)
-                    object["ende"] = DateFormats.timestampText(Self.date(days: event.day, hour: event.endHour))
-                }
-                return object
-            },
-            "zahlen": ["kinder": total(children), "leitende": total(leaders)],
-            "kinder": children, "leitende": leaders,
-        ])
-    }
-
-    private static func isRecordable(_ event: Program) -> Bool {
-        event.start <= .now && Date.now.timeIntervalSince(event.start) <= 14 * 86_400
     }
 
     // MARK: Chats

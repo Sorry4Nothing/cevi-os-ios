@@ -2,8 +2,8 @@ import Foundation
 
 nonisolated enum SignInResult: Equatable, Sendable {
     case signedIn
-    /// Second factor required; the intermediate cookie is stored.
-    case secondFactor
+    /// The account has a second factor (admins only). The app does not support it; admins use the web admin area.
+    case adminOnly
 }
 
 extension APIClient {
@@ -20,13 +20,7 @@ extension APIClient {
     nonisolated static func signInResult(from data: Data) -> SignInResult {
         struct Probe: Decodable { let twoFactorRedirect: Bool? }
         let probe = try? JSONDecoder().decode(Probe.self, from: data)
-        return probe?.twoFactorRedirect == true ? .secondFactor : .signedIn
-    }
-
-    /// `verify-totp` (6 digits) or `verify-backup-code` (`xxxxx-xxxxx`).
-    func confirmSecondFactor(code: String, isBackupCode: Bool) async throws {
-        let path = isBackupCode ? "/api/auth/two-factor/verify-backup-code" : "/api/auth/two-factor/verify-totp"
-        try await send("POST", path, body: ["code": code])
+        return probe?.twoFactorRedirect == true ? .adminOnly : .signedIn
     }
 
     /// `GET /api/auth/get-session`: extends the session. `false` if the server knows no session.
@@ -53,8 +47,8 @@ extension APIClient {
     }
 
     /// Ends the session on the server (errors don't matter, e.g. offline) and discards the cookie.
-    func signOut(everywhere: Bool = false) async {
-        _ = try? await send("POST", everywhere ? "/api/auth/revoke-sessions" : "/api/auth/sign-out", body: [String: String]())
+    func signOut() async {
+        _ = try? await send("POST", "/api/auth/sign-out", body: [String: String]())
         clearCookies()
     }
 }
@@ -72,15 +66,8 @@ nonisolated enum AuthMessages {
         }
     }
 
-    /// `restartSignIn` is true when the intermediate step is invalid and the person has to start over.
-    static func secondFactor(_ error: APIError) -> (text: String, restartSignIn: Bool) {
-        switch error.code {
-        case "INVALID_CODE", "INVALID_BACKUP_CODE":
-            (String(localized: "Der Code stimmt nicht."), false)
-        case "TOO_MANY_ATTEMPTS_REQUEST_NEW_CODE", "INVALID_TWO_FACTOR_COOKIE", "TOTP_NOT_ENABLED", "BACKUP_CODES_NOT_ENABLED":
-            (String(localized: "Bitte noch einmal anmelden."), true)
-        default:
-            (error.displayText, false)
-        }
+    /// Shown when an admin signs in: admins work in the web admin area, not in the app.
+    static var adminOnly: String {
+        String(localized: "Admins melden sich im Admin-Bereich an. Die App ist für Eltern und Leitende.")
     }
 }

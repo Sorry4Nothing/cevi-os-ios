@@ -45,7 +45,7 @@ struct CeviField<Field: View>: View {
         CeviField(label: "Passwort", focus: $focused) {
             PasswordField(label: "Passwort", text: $password, isFocused: $focused)
         }
-        Toggle("Ich habe die Datenschutzerklärung gelesen und bin einverstanden.", isOn: $accepted)
+        Toggle("Ich habe die Datenschutzerklärung gelesen und zur Kenntnis genommen.", isOn: $accepted)
             .toggleStyle(CheckboxToggleStyle())
         Button("Anmelden") {}.buttonStyle(.ceviPrimary)
         Button("Anmelden") {}.buttonStyle(.ceviPrimary).disabled(true)

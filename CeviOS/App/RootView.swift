@@ -32,8 +32,6 @@ struct RootView: View {
             OfflineView()
         case .signIn:
             SignInView()
-        case .secondFactor:
-            SecondFactorView()
         case .changePassword:
             ChangePasswordView()
         case .privacy(let profile):

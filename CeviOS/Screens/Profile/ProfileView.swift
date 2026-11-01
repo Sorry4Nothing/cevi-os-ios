@@ -6,6 +6,7 @@ struct ProfileView: View {
     @Environment(AppState.self) private var state
     @Environment(AppLock.self) private var lock
     @Environment(\.appConfiguration) private var configuration
+    @Environment(\.openURL) private var openURL
     let profile: Profile
 
     @State private var action = ActionState()
@@ -15,8 +16,6 @@ struct ProfileView: View {
     @State private var phone = ""
     @State private var isPickingPhoto = false
     @State private var photo: PhotosPickerItem?
-    @State private var page: ServerPage?
-    @State private var isConfirmingSignOutEverywhere = false
 
     var body: some View {
         NavigationStack {
@@ -51,20 +50,20 @@ struct ProfileView: View {
                         }
                         .tint(Color.ceviSwitchOn)
                     }
-                    NavigationLink {
-                        PrivacyPolicyView()
-                    } label: {
-                        row("Datenschutz", symbol: "hand.raised")
-                    }
-                    Button { page = .support } label: { row("Support", symbol: "questionmark.circle") }
+                    Button { open(.privacy) } label: { row("Datenschutz", symbol: "hand.raised") }
                         .accessibilityAddTraits(.isLink)
-                    Button { page = .deleteAccount } label: { row("Konto löschen", symbol: "person.crop.circle.badge.xmark") }
+                    Button { open(.support) } label: { row("Support", symbol: "questionmark.circle") }
+                        .accessibilityAddTraits(.isLink)
+                    Button { open(.deleteAccount) } label: { row("Konto löschen", symbol: "person.crop.circle.badge.xmark") }
                         .accessibilityAddTraits(.isLink)
                 } header: {
                     sectionHeader("App")
                 } footer: {
-                    if !profile.isLeader {
-                        Text("Mit Face ID öffnet sich die App nur für dich. Ohne Face ID fragt sie nach deinem Gerätecode.")
+                    VStack(alignment: .leading, spacing: Spacing.s2) {
+                        if !profile.isLeader {
+                            Text("Mit Face ID öffnet sich die App nur für dich. Ohne Face ID fragt sie nach deinem Gerätecode.")
+                        }
+                        Text("Auf Anfrage löscht die Leitung Daten.")
                     }
                 }
 
@@ -75,8 +74,6 @@ struct ProfileView: View {
                 Section {
                     SignOutButton()
                         .foregroundStyle(Color.ceviPrimaryText)
-                    Button("Überall abmelden") { isConfirmingSignOutEverywhere = true }
-                        .foregroundStyle(Color.ceviAccent)
                 } header: {
                     sectionHeader("Konto")
                 }
@@ -99,17 +96,11 @@ struct ProfileView: View {
             photo = nil
             Task { await upload(item) }
         }
-        .fullScreenCover(item: $page) { page in
-            if let url = page.url(base: configuration.apiBaseURL) { WebPageView(url: url) }
-        }
-        .alert("Überall abmelden?", isPresented: $isConfirmingSignOutEverywhere) {
-            Button("Abbrechen", role: .cancel) {}
-            Button("Überall abmelden", role: .destructive) {
-                Task { await state.signOut(everywhere: true) }
-            }
-        } message: {
-            Text("Du wirst auf allen Geräten abgemeldet. Danach brauchst du wieder Benutzername und Passwort.")
-        }
+    }
+
+    /// Server pages open in the system browser.
+    private func open(_ page: ServerPage) {
+        if let url = page.url(base: configuration.apiBaseURL) { openURL(url) }
     }
 
     // MARK: Header
@@ -280,10 +271,6 @@ struct ProfileView: View {
         default: error.displayText
         }
     }
-}
-
-extension ServerPage: Identifiable {
-    var id: String { rawValue }
 }
 
 #Preview("Profil") {

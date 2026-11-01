@@ -1,17 +1,5 @@
 import Foundation
 
-/// Body for attendance: `{"da": true | false | null}`. `null` takes the entry back, so the key must always be written.
-nonisolated struct PresenceBody: Encodable, Sendable {
-    let present: Bool?
-
-    enum CodingKeys: String, CodingKey { case present = "da" }
-
-    func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(present, forKey: .present)
-    }
-}
-
 nonisolated struct AssignmentBody: Encodable, Sendable {
     let units: [UUID]
     let visibility: String
@@ -40,24 +28,6 @@ extension APIClient {
         try await send(
             "PUT", "/api/v1/programme/\(id(programId))/zuordnung",
             body: AssignmentBody(units: unitIds, visibility: visibility.rawValue)
-        )
-    }
-
-    func attendance(unitId: UUID, count: Int = 5) async throws -> AttendanceOverview {
-        try await load("GET", "/api/v1/stufen/\(id(unitId))/anwesenheit", query: [URLQueryItem(name: "anzahl", value: String(count))])
-    }
-
-    func setChildPresence(unitId: UUID, programId: UUID, childId: UUID, present: Bool?) async throws {
-        try await send(
-            "PUT", "/api/v1/stufen/\(id(unitId))/anwesenheit/\(id(programId))/kinder/\(id(childId))",
-            body: PresenceBody(present: present)
-        )
-    }
-
-    func setLeaderPresence(unitId: UUID, programId: UUID, userId: UUID, present: Bool?) async throws {
-        try await send(
-            "PUT", "/api/v1/stufen/\(id(unitId))/anwesenheit/\(id(programId))/leitende/\(id(userId))",
-            body: PresenceBody(present: present)
         )
     }
 }
@@ -103,10 +73,6 @@ nonisolated struct LeadershipPermissions {
         !units.isEmpty || visibility == .internalOnly
     }
 
-    /// Units whose attendance the person may see: leaders and unit leaders of the unit, and admins for all.
-    func attendanceUnits(from units: [UnitSummary]) -> [UnitSummary] {
-        profile.admin ? units : units.filter { profile.isLeader(of: $0.id) }
-    }
 }
 
 nonisolated enum LeadershipMessages {
@@ -114,8 +80,6 @@ nonisolated enum LeadershipMessages {
         switch (error.kind, error.code) {
         case (.conflict, "PROGRAMM_BEGONNEN"):
             (String(localized: "Das Programm hat schon begonnen. Die Anmeldung lässt sich nicht mehr ändern."), true)
-        case (.conflict, "ANWESENHEIT_GESCHLOSSEN"):
-            (String(localized: "Die Anwesenheit lässt sich erst nach Beginn des Programms und bis 14 Tage danach erfassen."), true)
         case (.forbidden, _):
             (String(localized: "Dafür fehlt dir die Berechtigung."), true)
         case (.notFound, _):

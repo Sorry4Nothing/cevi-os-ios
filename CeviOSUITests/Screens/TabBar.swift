@@ -5,7 +5,6 @@ struct TabBar: Screen {
     enum Tab: String, CaseIterable {
         case programs = "Programme"
         case chat = "Chat"
-        case attendance = "Anwesenheit"
         case profile = "Profil"
     }
 
@@ -19,7 +18,7 @@ struct TabBar: Screen {
         assertSelected(button(tab))
     }
 
-    /// The tabs follow the role: chat only for parents and unit leaders, attendance only for leaders and admins.
+    /// The tabs follow the role: chat only for parents and unit leaders.
     func assertTabs(_ tabs: [Tab], file: StaticString = #filePath, line: UInt = #line) {
         waitUntilDisplayed()
         for tab in Tab.allCases {

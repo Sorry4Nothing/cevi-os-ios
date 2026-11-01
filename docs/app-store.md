@@ -7,8 +7,9 @@ Alles hier ist ohne Zugangsdaten, echte Namen oder Adressen. Die Basis-Adresse d
 - **Privacy Manifest:** `CeviOS/PrivacyInfo.xcprivacy`. Kein Tracking, keine Tracking-Domains. Erhobene Daten (alle mit Zweck «App-Funktionalität», mit der Person verknüpft, nicht zum Tracking): Name, Benutzer-ID, Telefonnummer (nur Stufenleitung, freiwillig), Foto (Profilbild, freiwillig), Inhalte (Chat-Nachrichten), Geräte-ID (Push-Token). Genutzte API mit Begründung: UserDefaults (`CA92.1`: Einstellungen der App selbst).
 - **Verschlüsselung:** `ITSAppUsesNonExemptEncryption = NO` (nur HTTPS des Systems). Damit entfällt die Exportfrage bei jedem Build.
 - **Face ID:** Text für `NSFaceIDUsageDescription` ist gesetzt.
-- **Links:** Datenschutz, Support und «Konto löschen» sind in der App erreichbar (Profil und Anmeldung). Die Seiten liefert der Server: `/datenschutz`, `/support`, `/konto-loeschen`.
-- **Konto löschen:** Die App löscht keine Konten. Das erklärt `/konto-loeschen` (Weg über die Leitung).
+- **Links:** Datenschutz, Support und «Konto löschen» sind in der App erreichbar (Profil, Anmeldung, Willkommen) und öffnen sich im Browser des Systems. Die Seiten liefert der Server: `/datenschutz`, `/support`, `/konto-loeschen`.
+- **Datenschutz:** Beim ersten Start bestätigt die Person, dass sie die Datenschutzerklärung zur Kenntnis genommen hat.
+- **Konto löschen:** Die App löscht keine Konten. Im Profil steht: «Auf Anfrage löscht die Leitung Daten.» Details auf `/konto-loeschen`.
 - **Universal Links:** Die Apple-App-Site-Association des Backends ist leer. Es gibt nichts zu tun, bis das Backend sie füllt.
 
 ## App Privacy in App Store Connect (Antworten)
@@ -26,7 +27,7 @@ Alles andere: nicht erhoben. Die Antworten müssen mit der Datenschutzerklärung
 
 ## Review-Hinweise (Vorlage, Zugangsdaten nur in App Store Connect)
 
-- Die App ist für genau eine Abteilung des Cevi (Jugendverband) und für Eltern, Leitende und Stufenleitung gedacht. Konten legt die Leitung im Browser an. Es gibt keine Selbstregistrierung.
+- Die App ist für genau eine Abteilung des Cevi (Jugendverband) und für Eltern, Leitende und Stufenleitung gedacht. Admins arbeiten im Admin-Bereich im Browser; meldet sich ein Admin in der App an, zeigt sie einen Hinweis und bleibt abgemeldet. Nur iPhone, nur Hochformat. Konten legt die Leitung im Browser an. Es gibt keine Selbstregistrierung.
 - Demo-Konto: Benutzername und Passwort tragen Sie in App Store Connect unter «Anmeldeinformationen» ein (nicht im Repo, nicht in diesem Dokument).
 - Push-Benachrichtigungen enthalten nie Nachrichtentext oder Namen von Kindern.
 - Konto löschen: Auf Anfrage über die Leitung (Seite `/konto-loeschen`).

@@ -87,9 +87,11 @@ struct AppLockTests {
 }
 
 struct AuthServiceTests {
-    @Test func secondFactorPromptIsRecognized() {
+    /// Only admins have a second factor; the app sends them to the web admin area.
+    @Test func secondFactorPromptMeansAdminOnly() {
         let data = Data(#"{"twoFactorRedirect":true,"twoFactorMethods":["totp"]}"#.utf8)
-        #expect(APIClient.signInResult(from: data) == .secondFactor)
+        #expect(APIClient.signInResult(from: data) == .adminOnly)
+        #expect(AuthMessages.adminOnly == "Admins melden sich im Admin-Bereich an. Die App ist für Eltern und Leitende.")
     }
 
     @Test func regularSignInIsRecognized() {
@@ -108,13 +110,6 @@ struct AuthServiceTests {
         #expect(AuthMessages.changePassword(tooShort) == "Das neue Passwort muss mindestens 12 Zeichen haben.")
         let same = APIError(kind: .invalidInput, status: 400, code: "PASSWORT_UNVERAENDERT", message: "Das neue Passwort muss sich vom bisherigen unterscheiden.")
         #expect(AuthMessages.changePassword(same) == "Das neue Passwort muss sich vom bisherigen unterscheiden.")
-    }
-
-    @Test func secondFactorErrorsDistinguishWrongCodeFromExpiredStep() {
-        let wrong = APIError(kind: .unauthorized, status: 401, code: "INVALID_CODE", message: "Invalid code")
-        #expect(AuthMessages.secondFactor(wrong).restartSignIn == false)
-        let tooMany = APIError(kind: .invalidInput, status: 400, code: "TOO_MANY_ATTEMPTS_REQUEST_NEW_CODE", message: "x")
-        #expect(AuthMessages.secondFactor(tooMany).restartSignIn)
     }
 
     @Test func serverPagesGetTheBaseURL() {

@@ -58,7 +58,7 @@ struct SignInView: View {
                     .submitLabel(.go)
                     .onSubmit(signIn)
             }
-            if let error = action.error {
+            if let error = action.error ?? state.signInNotice {
                 ErrorRow(text: error)
             }
             Button(action: signIn) {

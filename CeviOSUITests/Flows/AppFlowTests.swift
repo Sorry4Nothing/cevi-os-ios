@@ -81,12 +81,7 @@ final class AppFlowTests: XCTestCase {
         profile.setSwitch("Mitteilungen zum Chat", on: false)
         profile.setSwitch("Mitteilungen zu Programmen", on: false)
         profile.setSwitch("Mitteilungen zum Chat", on: true)
-        let privacy = profile.openPrivacy()
-        try privacy.auditAccessibility()
-        privacy.assertSections()
-        privacy.back()
-
-        profile.waitUntilDisplayed().signOut(username: AppRobot.username(.parent))
+        profile.signOut(username: AppRobot.username(.parent))
     }
 
     /// Main screens once in dark mode.
@@ -147,7 +142,7 @@ final class AppFlowTests: XCTestCase {
             .signIn(username: AppRobot.username(.leader), password: AppRobot.password())
 
         let tabs = TabBar(app: app)
-        tabs.assertTabs([.programs, .chat, .attendance, .profile])
+        tabs.assertTabs([.programs, .chat, .profile])
         let programs = ProgramListScreen(app: app).waitUntilDisplayed()
         try programs.auditAccessibility()
 
@@ -174,45 +169,10 @@ final class AppFlowTests: XCTestCase {
         assignment.save()
         detail.waitUntilDisplayed()
 
-        tabs.open(.attendance)
-        let units = AttendanceListScreen(app: app).waitUntilDisplayed()
-        try units.auditAccessibility()
-        let attendance = units.open("Jungschar")
-        try attendance.auditAccessibility()
-        attendance.assertAnswers("Ja", "Nein", "Offen")
-        attendance.assertQuota(0, of: 4)
-        attendance.mark("Lena Beispiel", present: true)
-        attendance.assertQuota(1, of: 4)
-        attendance.mark("Noah Beispiel", present: false)
-        attendance.mark("Lena Beispiel", present: nil)
-        attendance.assertQuota(0, of: 4)
-        try attendance.auditAccessibility()
-        attendance.showLeaders()
-        attendance.mark("Jan Muster (Biber)", present: true)
-        try attendance.auditAccessibility()
-
         tabs.open(.chat)
         let chats = ChatListScreen(app: app).waitUntilDisplayed()
         chats.assertUnread("Sara Muster", count: 1)
         try chats.auditAccessibility()
-    }
-
-    // MARK: Second factor
-
-    func testSecondFactorFlow() throws {
-        let app = AppRobot.launch()
-        SignInScreen(app: app).waitUntilDisplayed()
-            .signIn(username: AppRobot.username(.admin), password: AppRobot.password())
-
-        let secondFactor = SecondFactorScreen(app: app).waitUntilDisplayed()
-        try secondFactor.auditAccessibility()
-        secondFactor.assertConfirmDisabledUntilSixDigits()
-        secondFactor.confirm(code: "000000")
-        secondFactor.assertWrongCode()
-        secondFactor.confirm(code: String(Int.random(in: 100_000...999_999)))
-
-        ProgramListScreen(app: app).waitUntilDisplayed()
-        TabBar(app: app).assertTabs([.programs, .attendance, .profile])
     }
 
     // MARK: States

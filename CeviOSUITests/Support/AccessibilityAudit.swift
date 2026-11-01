@@ -40,8 +40,8 @@ enum AccessibilityAudit {
     private static let verifiedUnclipped = [
         "Du hast ein Startpasswort", "Nochmals versuchen", "An welche Stufenleitung", "Nachricht an die Stufenleitung", "Nachrichten an die Stufenleitung",
         "Ich habe die Datenschutzerklärung", "Konto löschen", "Mitteilungen zu Anmeldungen",
-        // Program card line and second-factor hint: complete on the default-size screenshots of the flow run (Nov 2026).
-        "Ganztägig ·", "Gib den 6-stelligen Code",
+        // Program card line: complete on the default-size screenshots of the flow run (Nov 2026).
+        "Ganztägig ·",
         // Chat list (dark mode, screenshot of the failed audit, Nov 2026): the footnote and the preview wrap and are complete.
         "Neue Nachricht an die Stufenleitung:", "Jan Muster (Biber):",
         // Program detail, default size (screenshot of the failed audit, Nov 2026): the place is complete on one line.

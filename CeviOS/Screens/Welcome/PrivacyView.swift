@@ -4,12 +4,12 @@ import SwiftUI
 struct PrivacyView: View {
     @Environment(AppState.self) private var state
     @Environment(\.appConfiguration) private var configuration
+    @Environment(\.openURL) private var openURL
     /// Name in the greeting.
     let name: String
     /// First names of the children (parents); empty for leaders.
     let childNames: [String]
     @State private var action = ActionState()
-    @State private var isPageOpen = false
     @State private var accepted = false
 
     var body: some View {
@@ -31,10 +31,11 @@ struct PrivacyView: View {
                             symbol: "bubble.left.and.bubble.right")
                 }
                 VStack(alignment: .leading, spacing: Spacing.s1) {
-                    Toggle("Ich habe die Datenschutzerklärung gelesen und bin einverstanden.", isOn: $accepted)
+                    Toggle("Ich habe die Datenschutzerklärung gelesen und zur Kenntnis genommen.", isOn: $accepted)
                         .toggleStyle(CheckboxToggleStyle())
-                    Button("Datenschutzerklärung lesen") { isPageOpen = true }
+                    Button("Datenschutzerklärung lesen") { if let url { openURL(url) } }
                         .buttonStyle(.ceviText)
+                        .accessibilityAddTraits(.isLink)
                         .disabled(url == nil)
                     if let error = action.error {
                         ErrorRow(text: error)
@@ -56,9 +57,6 @@ struct PrivacyView: View {
             .padding(.bottom, Spacing.s4)
         }
         .ceviScreenBackground()
-        .fullScreenCover(isPresented: $isPageOpen) {
-            if let url { WebPageView(url: url) }
-        }
     }
 
     private var programsText: LocalizedStringKey {
