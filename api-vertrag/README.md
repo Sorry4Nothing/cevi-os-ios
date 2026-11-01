@@ -5,4 +5,4 @@
 Der Test `CeviOSTests/Core/Networking/ApiContractTests.swift` liest `openapi.yaml` und prüft, dass jeder Aufruf der App darin steht (Methode und Pfad).
 
 Die Adresse des Servers steht nie im Repo (nur in `Config/Secrets.xcconfig`, nicht eingecheckt).
-Stand der Kopie: 928fdb0 vom 2026-10-31
+Stand der Kopie: aafd844 vom 2026-11-01

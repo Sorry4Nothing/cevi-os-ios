@@ -312,6 +312,36 @@ paths:
             text/javascript:
               schema:
                 type: string
+  /admin/csv.js:
+    get:
+      operationId: getAdminCsvSkript
+      summary: Skript der Verwaltung – CSV-Leser
+      tags:
+        - Allgemein
+      security: []
+      description: Statische Datei der Verwaltung (siehe `GET /admin`), ohne Anmeldung.
+      responses:
+        "200":
+          description: Datei (`text/javascript; charset=UTF-8`).
+          content:
+            text/javascript:
+              schema:
+                type: string
+  /admin/import.js:
+    get:
+      operationId: getAdminImportSkript
+      summary: Skript der Verwaltung – Bereich Import
+      tags:
+        - Allgemein
+      security: []
+      description: Statische Datei der Verwaltung (siehe `GET /admin`), ohne Anmeldung.
+      responses:
+        "200":
+          description: Datei (`text/javascript; charset=UTF-8`).
+          content:
+            text/javascript:
+              schema:
+                type: string
   /.well-known/apple-app-site-association:
     get:
       operationId: getAppleAppSiteAssociation
@@ -845,8 +875,8 @@ paths:
         **Telefonnummer.** Freiwillig, nur für SL. `telefon` ist ein Text mit Ziffern und den Zeichen
         `+ ( ) / . -` sowie Leerzeichen (6 bis 30 Zeichen, nach dem Trimmen); sonst 400. Ein leerer Text oder `null`
         entfernt die Nummer. Eine Nummer speichern darf nur, wer SL einer Stufe ist (sonst 403); entfernen darf sie
-        jede Person, auch eine, die die Rolle verloren hat. Die Nummer sehen danach nur Eltern mit einem aktiven Kind
-        in der Stufe der SL, siehe `GET /api/v1/programme/{id}/kontakte` und `GET /api/v1/stufen/{id}/kontakte`; die
+        jede Person, auch eine, die die Rolle verloren hat. Die Nummer sehen danach Eltern mit einem aktiven Kind
+        in der Stufe der SL sowie Leitende und SL dieser Stufe, siehe `GET /api/v1/programme/{id}/kontakte` und `GET /api/v1/stufen/{id}/kontakte`; die
         App weist vor dem Speichern darauf hin.
 
         **Rollen.** Alle angemeldeten Personen ausser bei offenem Pflichtwechsel des Passworts (403); die Nummer nur
@@ -986,10 +1016,12 @@ paths:
         hält es höchstens im Arbeitsspeicher der laufenden Ansicht. Der Wert `v` in `bildUrl` ändert sich mit
         jedem neuen Bild, ändert aber nichts an der Antwort.
 
-        **Rollen.** Wer eine Person mit Namen sieht, sieht auch ihr Bild, sonst niemand: die Person selbst, wer eine
-        Nachricht von ihr im Chat sieht, die SL im Einzelchat mit einem Elternteil, die Kontakte einer Stufe (Admins,
-        Leitende und SL der Stufe sowie Eltern mit aktivem Kind darin sehen die SL) und die Kontakte eines Programms
-        (die SL mit Status «ja», für alle, die das Programm sehen). Für alle anderen, für Personen ohne Bild, für
+        **Rollen.** Wer eine Person mit Namen sieht, sieht auch ihr Bild, sonst niemand: die Person selbst, Admins für alle
+        Personen ihrer Abteilung, wer eine
+        Nachricht von ihr im Chat sieht, die SL im Einzelchat mit einem Elternteil, die Kontakte einer Stufe (Leitende
+        und SL der Stufe sehen alle Leitenden und SL der Stufe, wie in den Anmeldungen; Eltern mit aktivem Kind darin
+        sehen die SL) und die Kontakte eines Programms
+        (die SL ohne Abmeldung mit Status «nein», für alle, die das Programm sehen). Für alle anderen, für Personen ohne Bild, für
         unbekannte Personen und für andere Abteilungen ist die Antwort 404, ohne Unterschied.
         Statuscodes: 200, 400, 401, 403, 404, 426.
       responses:
@@ -1121,9 +1153,10 @@ paths:
       tags:
         - Stufen
       description: |
-        Liefert alle SL der Stufe mit aktivem Konto, sortiert nach `name`, dann `id`; sie sind die Kontaktpersonen
-        im Gruppenchat. `telefon` ist nur für Eltern mit einem aktiven Kind in der Stufe gefüllt, sonst `null`
-        (auch für Admins, Leitende und SL).
+        Liefert alle SL der Stufe mit aktivem Konto, in der Reihenfolge der Verwaltung (`PUT /api/v1/admin/stufen/{id}/stufenleitung`):
+        die erste ist der Hauptkontakt, wer nicht eingereiht ist, folgt danach, jeweils nach `name`, dann `id`. Sie sind die Kontaktpersonen
+        im Gruppenchat. `telefon` ist für Eltern mit einem aktiven Kind in der Stufe sowie für Leitende und SL der
+        Stufe gefüllt, sonst `null` (auch für Admins ohne Rolle in der Stufe).
 
         Die Antwort trägt `Cache-Control: no-store`.
 
@@ -1519,14 +1552,18 @@ paths:
       tags:
         - Programme
       description: |
-        Kontaktpersonen sind die SL der zugeordneten Stufen, die sich für das Programm mit Status «ja» angemeldet
-        haben (`PUT /api/v1/programme/{id}/leitung`) und deren Konto aktiv ist. Wer sich abmeldet oder noch nicht
-        geantwortet hat, fehlt sofort. Ist keine SL angemeldet, ist `kontakte` leer; die App zeigt dann
-        «Stufenleitung», und der Einzelchat mit der SL der Stufe geht trotzdem.
+        Je zugeordneter Stufe gibt es genau einen Kontakt: die erste SL mit aktivem Konto in der Reihenfolge der
+        Stufenleitung (siehe `PUT /api/v1/admin/stufen/{id}/stufenleitung`), die für das Programm nicht mit «nein»
+        abgesagt hat (`PUT /api/v1/programme/{id}/leitung`). Wer noch nicht geantwortet hat («offen»), zählt als
+        Zusage. Sagt die erste SL ab, rückt die nächste nach. Haben alle SL der Stufe abgesagt, bleibt die erste
+        (der Hauptkontakt), damit die Kontaktkarte nie leer ist. Hat die Stufe keine SL, steuert sie keinen Kontakt bei;
+        haben alle Stufen keine, ist `kontakte` leer, die App zeigt dann «Stufenleitung», und der Einzelchat mit der
+        SL der Stufe geht trotzdem. Bei mehreren Stufen kommt ein Kontakt je Stufe; dieselbe Person steht nur einmal
+        in der Antwort. `GET /api/v1/stufen/{id}/kontakte` liefert weiterhin alle SL einer Stufe.
 
-        **Telefonnummer.** `telefon` ist nur für Eltern mit einem aktiven Kind in einer Stufe dieser SL gefüllt,
-        sonst `null`. Das gilt auch für Admins, Leitende und SL, auch für die der eigenen Stufe. Sortiert nach `name`,
-        dann `id`.
+        **Telefonnummer.** `telefon` ist für Eltern mit einem aktiven Kind in einer Stufe dieser SL sowie für
+        Leitende und SL dieser Stufe gefüllt, sonst `null` (auch für Admins ohne Rolle in der Stufe). Sortiert nach der
+        Reihenfolge der Verwaltung in der Stufe (die erste SL ist der Hauptkontakt, nicht eingereihte folgen), dann `name`, dann `id`.
 
         Die Antwort trägt `Cache-Control: no-store`.
 
@@ -1678,7 +1715,7 @@ paths:
 
         Setzt der Aufruf die Antwort neu oder ändert er sie, geht ein Push an die Leitenden der Stufen des Programms
         (Rolle Leitung oder SL, aktives Konto, `pushAnmeldungen` an), ausser an die Person, die selbst aufruft:
-        «Neue Anmeldung für {Programm} am {Datum}» bei «ja», «Neue Abmeldung für …» bei «nein», ohne Namen. Bleibt der
+        Titel «Neue Anmeldung» bei «ja», «Neue Abmeldung» bei «nein», Text «{Programm} am {Datum}», ohne Namen. Bleibt der
         Wert gleich, geht kein Push hinaus. Ein Fehler beim Push lässt den Aufruf nicht scheitern.
 
         Reihenfolge der Prüfung: Eingabe (400); Programm nicht sichtbar oder Kind nicht in der eigenen Abteilung
@@ -1910,7 +1947,7 @@ paths:
 
         Begrenzung: höchstens 20 Nachrichten pro Person und Minute, gezählt über alle Chats der Person. Die 21. Nachricht innerhalb einer Minute ergibt 429.
 
-        Push: Die anderen Mitglieder des Chats mit eingeschaltetem Chat-Push (`pushChat`) bekommen einen Push mit Titel «Neue Nachricht im Chat <Stufe>» (im Einzelchat «Neue Nachricht im Einzelchat <Stufe>») und `data: { typ: "chat", id: <Chat-ID> }`, nie mit Nachrichtentext oder Namen. Kein Push geht an den Absender und an Konten, die nicht (mehr) Mitglied oder deaktiviert sind. Ein Fehler beim Pushen ändert das Ergebnis nicht.
+        Push: Die anderen Mitglieder des Chats mit eingeschaltetem Chat-Push (`pushChat`) bekommen einen Push mit Titel «Neue Nachricht» und Text «Chat <Stufe>» (im Einzelchat «Einzelchat <Stufe>») und `data: { typ: "chat", id: <Chat-ID> }`, nie mit Nachrichtentext oder Namen. Kein Push geht an den Absender und an Konten, die nicht (mehr) Mitglied oder deaktiviert sind. Ein Fehler beim Pushen ändert das Ergebnis nicht.
 
         Statuscodes: 201 Nachricht angelegt; 400 ungültige Eingabe (Text leer nach dem Trimmen, länger als 2000 Zeichen, enthält NUL, unbekannte Felder, `programmId` nicht zulässig); 401; 403 Passwortwechsel offen; 404 kein Mitglied oder Chat unbekannt; 426; 429 Limit überschritten.
       parameters:
@@ -2308,12 +2345,99 @@ paths:
           $ref: "#/components/responses/AppVeraltet426"
         "429":
           $ref: "#/components/responses/ZuVieleAnfragen429"
+  /api/v1/admin/system/syncs:
+    get:
+      operationId: holeAdminSyncs
+      summary: Ausgaben der Abrufe im Hintergrund
+      description: |
+        Nur Admins (mit zweitem Faktor). Zeigt, was die Abrufe im Hintergrund zuletzt geliefert haben: je Stufe der Abteilung die Adresse der Stufenwebseite, den Ausgang des letzten Laufs und die gelesenen Eckdaten, dazu den Stand des Kalender-Syncs mit der Zahl der Programme.
+
+        Der Ausgang des letzten Laufs liegt im Arbeitsspeicher der API; nach einem Neustart ist er `null`, bis der nächste Lauf fertig ist. Die Antwort enthält nie HTML der Seiten oder Fehlertexte, bei einem Fehler nur dessen Code (etwa `ECONNRESET`).
+
+        Statuscodes: 200 bei Erfolg. 401. 403 für Nicht-Admins (und für Admins ohne zweiten Faktor, Code `ZWEITER_FAKTOR_FEHLT`). 426.
+      tags:
+        - Verwaltung
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+      responses:
+        "200":
+          description: Stand der Abrufe.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminSyncs"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+  /api/v1/admin/system/syncs/eckdaten:
+    post:
+      operationId: stosseAdminEckdatenAn
+      summary: Abruf der Stufenwebseiten anstossen
+      description: |
+        Nur Admins (mit zweitem Faktor). Ruft die Eckdaten aller Stufen von der Webseite ab. Hat die Abteilung keinen Google-Kalender, legt der Abruf zum nächsten Anlass auch das Programm an (Titel «Cevi-Programm <Stufe>», für Eltern sichtbar) oder aktualisiert es. Der Abruf läuft sofort und dieselbe Funktion wie der Takt im Hintergrund; läuft gerade ein anderer Lauf, antwortet die Route mit `gesperrt`. Pro Abteilung und Abruf höchstens einer in 30 Sekunden. Das Audit-Log hält fest, wer ihn angestossen hat.
+
+        Statuscodes: 200 mit `ergebnis` `fertig` oder `gesperrt`. 401. 403 für Nicht-Admins. 426. 429 bei zu kurzem Abstand oder beim Limit. 501, wenn der Server keinen Abruf eingerichtet hat.
+      tags:
+        - Verwaltung
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+      responses:
+        "200":
+          description: Ergebnis des Laufs.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminSyncErgebnis"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+        "501":
+          description: Der Server hat diesen Abruf nicht eingerichtet.
+  /api/v1/admin/system/syncs/kalender:
+    post:
+      operationId: stosseAdminKalenderAn
+      summary: Kalender-Sync anstossen
+      description: |
+        Nur Admins (mit zweitem Faktor). Gleicht die Programme mit dem Google-Kalender ab. Der Abruf läuft sofort und dieselbe Funktion wie der Takt im Hintergrund; läuft gerade ein anderer Lauf, antwortet die Route mit `gesperrt`. Pro Abteilung und Abruf höchstens einer in 30 Sekunden. Das Audit-Log hält fest, wer ihn angestossen hat.
+
+        Statuscodes: 200 mit `ergebnis` `fertig` oder `gesperrt`. 401. 403 für Nicht-Admins. 426. 429 bei zu kurzem Abstand oder beim Limit. 501, wenn der Server keinen Abruf eingerichtet hat.
+      tags:
+        - Verwaltung
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+      responses:
+        "200":
+          description: Ergebnis des Laufs.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminSyncErgebnis"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+        "501":
+          description: Der Server hat diesen Abruf nicht eingerichtet.
   /api/v1/admin/mitteilungen:
     post:
       operationId: sendeAdminMitteilung
       summary: Mitteilung als Push senden
       description: |
-        Nur Admins. Löst einen Push aus mit `typ` `mitteilung`, leerer `id` und dem Android-Kanal `mitteilungen`; der Push trägt nur den Titel, keinen Textkörper. Der Titel darf keine Namen enthalten: Er läuft über Apple und Google.
+        Nur Admins. Löst einen Push aus mit `typ` `mitteilung`, leerer `id` und dem Android-Kanal `mitteilungen`; der Push trägt den Titel und, wenn angegeben, die Beschreibung als Text. Beide dürfen keine Namen enthalten: Sie laufen über Apple und Google.
 
         Empfänger `alle`: alle aktiven Konten der Abteilung. Empfänger `stufen`: die Eltern aktiver Kinder und die Leitenden der gewählten Stufen. Voraussetzung ist in beiden Fällen ein aktives Konto mit eingeschalteter Option «Mitteilungen» (`pushProgramme`). Die absendende Person bekommt den Push auch, sofern ihre Option an ist.
 
@@ -2471,6 +2595,56 @@ paths:
           $ref: "#/components/responses/AppVeraltet426"
         "429":
           $ref: "#/components/responses/ZuVieleAnfragen429"
+  /api/v1/admin/stufen/{id}/stufenleitung:
+    put:
+      operationId: ordneAdminStufenleitung
+      summary: Reihenfolge der Stufenleitung festlegen
+      description: |
+        Nur Admins, nur Stufen der eigenen Abteilung. `ids` nennt SL der Stufe in der Reihenfolge der Kontakte: die erste
+        ist der Hauptkontakt (`prioritaet` 1), dann 2, 3 und so weiter. SL der Stufe, die nicht in `ids` stehen, verlieren
+        ihren Rang und folgen danach nach Name; eine leere Liste hebt die Reihenfolge auf. Die Reihenfolge gilt für
+        `GET /api/v1/programme/{id}/kontakte`, `GET /api/v1/stufen/{id}/kontakte` und die Liste `stufenleitung` der Chats.
+        Der Vorgang steht im Audit-Log (`sl_reihenfolge_geaendert`, mit der Anzahl, ohne Namen).
+
+        Statuscodes: 204 bei Erfolg. 400 bei ungültiger ID, doppelten Einträgen, mehr als 100 Einträgen oder einer Person, die keine SL dieser Stufe ist (auch eine Leitung). 403 für Nicht-Admins. 404, wenn die Stufe unbekannt ist oder zu einer anderen Abteilung gehört.
+      tags:
+        - Verwaltung
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+        - $ref: "#/components/parameters/AdminStufeId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - ids
+              additionalProperties: false
+              properties:
+                ids:
+                  type: array
+                  maxItems: 100
+                  uniqueItems: true
+                  description: IDs der SL, die erste ist der Hauptkontakt.
+                  items:
+                    type: string
+                    format: uuid
+      responses:
+        "204":
+          description: Gespeichert.
+        "400":
+          $ref: "#/components/responses/UngueltigeEingabe400"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "404":
+          $ref: "#/components/responses/NichtGefunden404"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
   /api/v1/admin/stufen/{id}/logo:
     put:
       operationId: setzeAdminStufeLogo
@@ -2619,6 +2793,88 @@ paths:
           $ref: "#/components/responses/NichtAngemeldet401"
         "403":
           $ref: "#/components/responses/KeineBerechtigung403"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+  /api/v1/admin/import/vorschau:
+    post:
+      operationId: vorschauAdminImport
+      summary: Import prüfen, ohne etwas zu schreiben
+      description: |
+        Nur Admins. Prüft eine Liste von Personen aus einem Export der Cevi-Datenbank und zeigt je Zeile, was der Import täte. Schreibt nichts. Die Spalten- und Rollenzuordnung hat der Browser schon getroffen: Jede Zeile trägt ihre Art.
+
+        Je Zeile gilt der Status `ungueltig` (leerer oder zu langer Name, ungültiger Cevi-Name), `ausgelassen` (Art `auslassen`), `vorhanden` (die Abteilung hat schon ein Kind bzw. bei Leitenden ein Konto mit gleichem Vor- und Nachnamen), `doppelt` (ab dem zweiten Vorkommen derselben Person in der Datei, getrennt für Kinder und Leitende) oder `neu`. Namen werden ohne Gross-/Kleinschreibung, Akzente und überzählige Leerzeichen verglichen. Für neue Leitende nennt `benutzername` den vorgesehenen Benutzernamen: aus Vor- und Nachname erzeugt, bei Kollision mit einem Konto oder einer früheren Zeile mit 2, 3, … versehen. Der Import vergibt für dieselbe Datei denselben Namen.
+
+        Statuscodes: 200 bei Erfolg. 400 bei ungültiger Eingabe (unbekannte Felder, keine oder mehr als 500 Zeilen, Name über 200 Zeichen) oder wenn die Stufe unbekannt ist oder zu einer anderen Abteilung gehört. Zeilenfehler sind kein 400, sondern der Status `ungueltig`. 403 für Nicht-Admins.
+      tags:
+        - Verwaltung
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminImportAnfrage"
+      responses:
+        "200":
+          description: Status je Zeile und Summen.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminImportVorschau"
+        "400":
+          $ref: "#/components/responses/UngueltigeEingabe400"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+  /api/v1/admin/import:
+    post:
+      operationId: fuehreAdminImportAus
+      summary: Kinder und Leitende importieren
+      description: |
+        Nur Admins. Legt alle Zeilen mit Status `neu` in einer Transaktion an: Kinder wie `POST /api/v1/admin/kinder`, Leitende wie `POST /api/v1/admin/personen` (kein Admin, Rolle `leitung` oder `stufenleitung` in der gewählten Stufe, keine Elternverknüpfung) mit je eigenem Startpasswort und einem Audit-Eintrag `person_angelegt` pro Konto. Der Server berechnet die Zeilenstatus neu und vertraut dem Browser nicht; alles ausser `neu` wird übersprungen. Ein zweiter Import derselben Datei legt daher nichts doppelt an.
+
+        Die Startpasswörter stehen nur in dieser 201-Antwort. Sie werden nicht gespeichert und lassen sich nicht erneut abrufen. Die Antwort kommt erst nach dem Commit; scheitert irgendein Konto, wird alles zurückgenommen und es gibt keine Passwörter. Das Anlegen von 500 Konten dauert wegen der Passwortprüfung je Konto entsprechend lange.
+
+        `uebersprungen` zählt alle Zeilen, die nicht `neu` waren (vorhanden, doppelt, ungültig, ausgelassen).
+
+        Statuscodes: 201 bei Erfolg. 400 wie bei der Vorschau. 403 für Nicht-Admins. 409 mit Code `BENUTZERNAME_VERGEBEN`, wenn ein Benutzername zwischen Berechnung und Anlegen vergeben wurde.
+      tags:
+        - Verwaltung
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminImportAnfrage"
+      responses:
+        "201":
+          description: Angelegt; enthält die Startpasswörter (einmalig).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminImportErgebnis"
+        "400":
+          $ref: "#/components/responses/UngueltigeEingabe400"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "409":
+          description: Ein Benutzername wurde zwischen Berechnung und Anlegen vergeben (`BENUTZERNAME_VERGEBEN`); nichts wurde geschrieben.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminKonflikt"
         "426":
           $ref: "#/components/responses/AppVeraltet426"
         "429":
@@ -2838,7 +3094,7 @@ components:
           maxLength: 64
           pattern: ^[A-Za-z0-9._-]+$
           description: |
-            Benutzername. Erlaubt sind Buchstaben, Ziffern, Punkt, Unterstrich und Bindestrich (3 bis 64 Zeichen);
+            Benutzername. Erlaubt sind Buchstaben, Ziffern, Punkt, Unterstrich und Bindestrich (2 bis 64 Zeichen);
             Gross-/Kleinschreibung ist egal, gespeichert wird kleingeschrieben. Ein Wert ausserhalb der Regel
             ergibt wie jeder Fehlschlag 401.
           example: vorname.nachname
@@ -3577,6 +3833,7 @@ components:
               - id
               - name
               - ceviName
+              - bildUrl
               - stufeId
               - rolle
               - status
@@ -3591,6 +3848,11 @@ components:
                   - string
                   - "null"
                 description: Cevi-Name (Spitzname), `null` ohne Angabe.
+              bildUrl:
+                type:
+                  - string
+                  - "null"
+                description: Pfad zum Profilbild (`GET /api/v1/personen/{id}/bild`, mit Sitzung), `null` ohne Bild. Das Bild sieht, wer die Person in der Liste sieht. Kinder haben kein Bild.
               stufeId:
                 type: string
                 format: uuid
@@ -3934,7 +4196,7 @@ components:
             - type: "null"
         stufenleitung:
           type: array
-          description: Aktive Stufenleitungen der Stufe, sortiert nach Name; sie lesen jeden Chat der Stufe mit.
+          description: Aktive Stufenleitungen der Stufe, in der Reihenfolge der Verwaltung (nicht eingereihte zuletzt, dann nach Name); sie lesen jeden Chat der Stufe mit.
           items:
             $ref: "#/components/schemas/ChatPerson"
     ChatListe:
@@ -4143,18 +4405,44 @@ components:
           enum:
             - leitung
             - stufenleitung
+    AdminRolleAntwort:
+      type: object
+      description: Stufenrolle einer Person in der Personenliste, mit ihrem Rang unter den SL der Stufe.
+      required:
+        - stufeId
+        - typ
+        - prioritaet
+      additionalProperties: false
+      properties:
+        stufeId:
+          type: string
+          format: uuid
+        typ:
+          type: string
+          enum:
+            - leitung
+            - stufenleitung
+        prioritaet:
+          type:
+            - integer
+            - "null"
+          minimum: 1
+          description: Rang in der Reihenfolge der Kontakte (1 = Hauptkontakt); `null`, wenn die Person nicht eingereiht ist.
     AdminPerson:
       type: object
       required:
         - id
         - name
         - ceviName
+        - bildUrl
+        - telefon
         - benutzername
         - admin
         - zweiterFaktor
         - deaktiviert
         - mussPasswortAendern
         - startpasswortGueltigBis
+        - startpasswort
         - rollen
         - elternteilVon
       properties:
@@ -4169,6 +4457,16 @@ components:
             - string
             - "null"
           description: Cevi-Name (Spitzname), `null` ohne Angabe.
+        bildUrl:
+          type:
+            - string
+            - "null"
+          description: Pfad zum Profilbild (`GET /api/v1/personen/{id}/bild`, mit Sitzung), `null` ohne Bild. Die Verwaltung sieht die Bilder aller Personen der Abteilung.
+        telefon:
+          type:
+            - string
+            - "null"
+          description: Telefonnummer einer Stufenleitung, `null` ohne Nummer.
         benutzername:
           type:
             - string
@@ -4190,11 +4488,16 @@ components:
             - "null"
           format: date-time
           description: Ende der Gültigkeit des Startpassworts; null, wenn keines gesetzt ist.
+        startpasswort:
+          type:
+            - string
+            - "null"
+          description: Das Startpasswort im Klartext, solange es offen und gültig ist; sonst null (auch nach Ablauf, nach dem Wechsel durch die Person und nach einem Wechsel von BETTER_AUTH_SECRET). In der Datenbank liegt es AES-256-GCM-verschlüsselt.
         rollen:
           type: array
           description: Stufenrollen, nach Name der Stufe.
           items:
-            $ref: "#/components/schemas/AdminRolle"
+            $ref: "#/components/schemas/AdminRolleAntwort"
         elternteilVon:
           type: array
           description: IDs der Kinder, deren Elternteil die Person ist.
@@ -4289,9 +4592,13 @@ components:
           type: string
           maxLength: 50
           description: Freiwillig. Leerraum am Rand wird entfernt; leer heisst nicht gesetzt.
+        telefon:
+          type: string
+          description: Freiwillig, nur mit einer Rolle `stufenleitung` (sonst 400). Ziffern mit `+`, Leerzeichen, `()`, `/`, `.` und `-`, 6 bis 30 Zeichen; leer heisst nicht gesetzt.
+          example: +41 79 123 45 67
         benutzername:
           type: string
-          minLength: 3
+          minLength: 2
           maxLength: 64
           pattern: ^[A-Za-z0-9._-]+$
           description: Gross-/Kleinschreibung wird nicht unterschieden; gespeichert wird kleingeschrieben.
@@ -4356,6 +4663,11 @@ components:
             - "null"
           maxLength: 50
           description: Leerraum am Rand wird entfernt; leer oder `null` löscht den Cevi-Namen.
+        telefon:
+          type:
+            - string
+            - "null"
+          description: Eine Nummer speichert nur, wer nach der Änderung eine Rolle `stufenleitung` hat (sonst 400); leer oder `null` entfernt sie, das geht immer. Ändert sich der Wert, schreibt die API `telefon_geaendert` ins Audit-Log, ohne die Nummer.
         admin:
           type: boolean
           description: "`false` für den letzten aktiven Admin ergibt 409 `LETZTER_ADMIN`."
@@ -4404,8 +4716,15 @@ components:
           minLength: 1
           maxLength: 150
           description: |
-            Der ganze Push-Titel. Leerraum am Rand wird entfernt. Der Server ersetzt `{Programm}` durch den Titel und `{Datum}` durch den Tag des Programms (z. B. «Sa 31.10.»). Keine Namen: Der Text läuft über Apple und Google.
+            Der Push-Titel. Leerraum am Rand wird entfernt. Der Server ersetzt `{Programm}` durch den Titel und `{Datum}` durch den Tag des Programms (z. B. «Sa 31.10.»). Keine Namen: Der Text läuft über Apple und Google.
           example: "{Programm} am {Datum}: bitte anmelden oder abmelden"
+        beschreibung:
+          type:
+            - string
+            - "null"
+          minLength: 1
+          maxLength: 300
+          description: Optionaler Text unter dem Titel, mit denselben Platzhaltern. Ohne Angabe oder `null` hat der Push keinen Text. Keine Namen.
         aktiv:
           type: boolean
     AdminZeitregelAendern:
@@ -4429,6 +4748,13 @@ components:
           type: string
           minLength: 1
           maxLength: 150
+        beschreibung:
+          type:
+            - string
+            - "null"
+          minLength: 1
+          maxLength: 300
+          description: "`null` entfernt die Beschreibung."
         aktiv:
           type: boolean
     AdminZeitregel:
@@ -4439,6 +4765,7 @@ components:
         - wochentag
         - uhrzeit
         - text
+        - beschreibung
         - aktiv
       properties:
         id:
@@ -4459,6 +4786,10 @@ components:
           example: "08:00"
         text:
           type: string
+        beschreibung:
+          type:
+            - string
+            - "null"
         aktiv:
           type: boolean
     AdminZeitregelListe:
@@ -4489,7 +4820,12 @@ components:
           type: string
           minLength: 1
           maxLength: 100
-          description: Der ganze Text des Push. Leerraum am Rand wird entfernt. Keine Namen.
+          description: Der Titel des Push. Leerraum am Rand wird entfernt. Keine Namen.
+        beschreibung:
+          type: string
+          minLength: 1
+          maxLength: 300
+          description: Optionaler Text unter dem Titel. Leerraum am Rand wird entfernt. Keine Namen.
         empfaenger:
           type: string
           enum:
@@ -4704,6 +5040,87 @@ components:
           type: integer
         fehler5xx:
           type: integer
+    AdminSyncErgebnis:
+      type: object
+      additionalProperties: false
+      required: [ergebnis]
+      properties:
+        ergebnis:
+          type: string
+          enum: [fertig, gesperrt]
+    AdminSyncs:
+      type: object
+      additionalProperties: false
+      required: [eckdaten, kalender]
+      properties:
+        eckdaten:
+          type: object
+          additionalProperties: false
+          required: [letzterLaufAm, stufen]
+          properties:
+            letzterLaufAm:
+              type: [string, "null"]
+              format: date-time
+            stufen:
+              type: array
+              items:
+                type: object
+                additionalProperties: false
+                required: [id, name, adresse, ausgang, fehlercode, eckdaten]
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  name:
+                    type: string
+                  adresse:
+                    type: [string, "null"]
+                  ausgang:
+                    type: [string, "null"]
+                    enum: [gelesen, keine_seite, ohne_datum, fehler, null]
+                  fehlercode:
+                    type: [string, "null"]
+                  eckdaten:
+                    type: [object, "null"]
+                    additionalProperties: false
+                    required:
+                      [
+                        tag,
+                        treffpunkt,
+                        schlussOrt,
+                        schlussZeit,
+                        mitnehmen,
+                        abgerufenAm,
+                      ]
+                    properties:
+                      tag:
+                        type: string
+                        format: date
+                      treffpunkt:
+                        type: [string, "null"]
+                      schlussOrt:
+                        type: [string, "null"]
+                      schlussZeit:
+                        type: [string, "null"]
+                      mitnehmen:
+                        type: [string, "null"]
+                      abgerufenAm:
+                        type: string
+                        format: date-time
+        kalender:
+          type: object
+          additionalProperties: false
+          required: [eingerichtet, letzterErfolgAm, fehler, programme]
+          properties:
+            eingerichtet:
+              type: boolean
+            letzterErfolgAm:
+              type: [string, "null"]
+              format: date-time
+            fehler:
+              type: [string, "null"]
+            programme:
+              type: integer
     AdminSystemRequests:
       type: object
       additionalProperties: false
@@ -4810,6 +5227,147 @@ components:
                 type: string
               status:
                 type: integer
+    AdminImportAnfrage:
+      type: object
+      required:
+        - stufeId
+        - zeilen
+      additionalProperties: false
+      properties:
+        stufeId:
+          type: string
+          format: uuid
+          description: Stufe der eigenen Abteilung, in die alle Personen kommen; sonst 400.
+        zeilen:
+          type: array
+          minItems: 1
+          maxItems: 500
+          items:
+            type: object
+            required:
+              - vorname
+              - nachname
+              - art
+            additionalProperties: false
+            properties:
+              vorname:
+                type: string
+                maxLength: 200
+                description: Leerraum am Rand wird entfernt; leer oder über 100 Zeichen ist die Zeile `ungueltig`.
+              nachname:
+                type: string
+                maxLength: 200
+                description: Wie `vorname`.
+              ceviName:
+                type: string
+                maxLength: 200
+                description: Freiwillig; über 50 Zeichen ist die Zeile `ungueltig`.
+              art:
+                type: string
+                enum:
+                  - kind
+                  - leitung
+                  - stufenleitung
+                  - auslassen
+                description: Vom Browser aus den Rollenwerten der Datei bestimmt. `auslassen` überspringt die Zeile.
+    AdminImportVorschau:
+      type: object
+      required:
+        - zeilen
+        - summe
+      properties:
+        zeilen:
+          type: array
+          items:
+            type: object
+            required:
+              - nr
+              - status
+              - art
+            properties:
+              nr:
+                type: integer
+                minimum: 0
+                description: Index der Zeile in der Anfrage, ab 0.
+              status:
+                type: string
+                enum:
+                  - neu
+                  - vorhanden
+                  - doppelt
+                  - ungueltig
+                  - ausgelassen
+              art:
+                type: string
+                enum:
+                  - kind
+                  - leitung
+                  - stufenleitung
+                  - auslassen
+              benutzername:
+                type: string
+                description: Nur bei neuen Leitenden.
+              grund:
+                type: string
+                description: Kurze Erklärung bei `vorhanden`, `doppelt` und `ungueltig`; ohne Namen.
+        summe:
+          type: object
+          required:
+            - neu
+            - vorhanden
+            - doppelt
+            - ungueltig
+            - ausgelassen
+            - kinder
+            - leitende
+          properties:
+            neu:
+              type: integer
+            vorhanden:
+              type: integer
+            doppelt:
+              type: integer
+            ungueltig:
+              type: integer
+            ausgelassen:
+              type: integer
+            kinder:
+              type: integer
+              description: Neue Kinder.
+            leitende:
+              type: integer
+              description: Neue Konten.
+    AdminImportErgebnis:
+      type: object
+      required:
+        - kinder
+        - leitende
+        - uebersprungen
+      properties:
+        kinder:
+          type: integer
+          description: Anzahl angelegter Kinder.
+        leitende:
+          type: array
+          description: Angelegte Konten in Dateireihenfolge, mit einmaligem Startpasswort.
+          items:
+            type: object
+            required:
+              - name
+              - benutzername
+              - startpasswort
+            properties:
+              name:
+                type: string
+                description: Vor- und Nachname.
+              benutzername:
+                type: string
+                description: Kleingeschrieben, wie gespeichert.
+              startpasswort:
+                $ref: "#/components/schemas/AdminStartpasswortWert"
+        uebersprungen:
+          type: integer
+          description: Zeilen, die nicht `neu` waren.
     AdminKindAnlegen:
       type: object
       required:
