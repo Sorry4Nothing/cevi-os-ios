@@ -47,6 +47,6 @@ Der Fragebogen in App Store Connect fragt nach nutzergenerierten Inhalten und Ch
 
 Siehe die Liste am Ende des Pull Requests zu Issue #10.
 
-## Offen: Cevi-Logo
+## Cevi-Logo
 
-TODO: `CeviOS/Assets.xcassets/CeviLogo.imageset` enthält nur einen neutralen Platzhalter (SF Symbol `person.3.fill` in `ceviSecondary`). Das echte Cevi-Logo (PNG oder PDF mit Transparenz) muss noch geliefert und dort ersetzt werden. Die App zeigt es überall, wo eine Stufe kein eigenes Logo hat.
+`CeviOS/Assets.xcassets/CeviLogo.imageset` ist das echte Cevi-Logo als Vektor (`CeviLogo.svg`, transparent, Farben `#323394` und `#C41333`). Es stammt aus `ic_logo.xml` der Android-App. Die App zeigt es überall, wo eine Stufe kein eigenes Logo hat. Das App-Symbol und damit das Bild in Mitteilungen liegt in `AppIcon`, `AppIcon-Dev` und `AppIcon-Int`.
