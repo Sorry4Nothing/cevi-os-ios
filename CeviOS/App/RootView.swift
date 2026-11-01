@@ -25,9 +25,9 @@ struct RootView: View {
         .overlay {
             if showsBusyOverlay { BusyOverlay() }
         }
-        // With the lock on, the app switcher shows only a cover.
+        // The app switcher shows only a cover while there is a session or the lock is on (SR-41).
         .overlay {
-            if lock.isEnabled, scenePhase != .active {
+            if lock.isEnabled || state.hasSession, scenePhase != .active {
                 ZStack {
                     Color.ceviSurface.ignoresSafeArea()
                     Text("Cevi OS").font(.title(.display)).foregroundStyle(Color.ceviOnSurface)
