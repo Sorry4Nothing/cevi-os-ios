@@ -32,7 +32,7 @@ Startargumente:
 | `-UITestFailure outdated` | jede Anfrage mit Status 426: App veraltet |
 | `-UITestFailure empty` | leere Programmliste |
 | `-UITestSignedIn <name>` | Start mit gespeicherter Sitzung dieser Persona |
-| `-UITestLocked YES` | Sperrbildschirm einmal zeigen; «Entsperren» entsperrt |
+| `-UITestLocked YES` | Sperre einschalten, Sperrbildschirm einmal zeigen; «Entsperren» entsperrt |
 | `-AppleInterfaceStyle Dark` | Dunkelmodus |
 | `-UIPreferredContentSizeCategoryName UICTContentSizeCategoryAccessibilityXXXL` | grösste Schrift (AX5) |
 

@@ -12,7 +12,6 @@ struct ProfileView: View {
     @State private var action = ActionState()
     /// Toggle values that were changed here and are not yet confirmed by a reloaded profile.
     @State private var pending: [String: Bool] = [:]
-    @State private var parentsLock = true
     @State private var phone = ""
     @State private var isPickingPhoto = false
     @State private var photo: PhotosPickerItem?
@@ -43,10 +42,10 @@ struct ProfileView: View {
                 }
 
                 Section {
-                    // Leaders cannot switch the lock off, so the row is hidden for them.
-                    if !profile.isLeader {
-                        Toggle(isOn: $parentsLock) {
-                            row("Mit Face ID entsperren", symbol: "faceid")
+                    // Without Face ID or Touch ID there is nothing to lock, so the row is hidden.
+                    if lock.isAvailable {
+                        Toggle(isOn: Binding(get: { lock.isEnabled }, set: { lock.setEnabled($0) })) {
+                            row(lock.toggleTitle, symbol: lock.symbol)
                         }
                         .tint(Color.ceviSwitchOn)
                     }
@@ -59,12 +58,7 @@ struct ProfileView: View {
                 } header: {
                     sectionHeader("App")
                 } footer: {
-                    VStack(alignment: .leading, spacing: Spacing.s2) {
-                        if !profile.isLeader {
-                            Text("Mit Face ID öffnet sich die App nur für dich. Ohne Face ID fragt sie nach deinem Gerätecode.")
-                        }
-                        Text("Auf Anfrage löscht die Leitung Daten.")
-                    }
+                    Text("Auf Anfrage löscht die Leitung Daten.")
                 }
 
                 if profile.isUnitLeader {
@@ -85,10 +79,8 @@ struct ProfileView: View {
             .refreshable { await state.reloadProfile() }
         }
         .onAppear {
-            parentsLock = lock.parentsLockEnabled
             phone = profile.phone ?? ""
         }
-        .onChange(of: parentsLock) { _, new in lock.parentsLockEnabled = new }
         .onChange(of: profile) { pending = [:] }
         .photosPicker(isPresented: $isPickingPhoto, selection: $photo, matching: .images)
         .onChange(of: photo) { _, item in

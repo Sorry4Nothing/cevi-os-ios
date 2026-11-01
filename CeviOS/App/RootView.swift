@@ -6,14 +6,28 @@ struct RootView: View {
     @Environment(AppState.self) private var state
     @Environment(AppLock.self) private var lock
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
         Group {
             if state.appOutdated {
                 AppOutdatedView(appStoreURL: configuration.appStoreURL)
+            } else if state.hasSession, lock.requiresUnlock {
+                // Cold start and after 30 s in the background: nothing loads before the unlock.
+                LockView()
             } else {
                 content
                     .task { await state.start() }
+            }
+        }
+        // With the lock on, the app switcher shows only a cover.
+        .overlay {
+            if lock.isEnabled, scenePhase != .active {
+                ZStack {
+                    Color.ceviSurface.ignoresSafeArea()
+                    Text("Cevi OS").font(.title(.display)).foregroundStyle(Color.ceviOnSurface)
+                }
+                .accessibilityHidden(true)
             }
         }
         .tint(.ceviAccent)
@@ -37,20 +51,6 @@ struct RootView: View {
         case .privacy(let profile):
             PrivacyView(name: profile.ceviName ?? profile.name, childNames: profile.children.map(\.firstName))
         case .ready(let profile):
-            protected(profile)
-        }
-    }
-
-    @ViewBuilder
-    private func protected(_ profile: Profile) -> some View {
-        if !lock.isRequired(for: profile) || !lock.isLocked {
-            MainView(profile: profile)
-        } else if AppLock.deviceCodeSet {
-            LockView()
-        } else if profile.isLeader {
-            DeviceCodeMissingView()
-        } else {
-            // Without a device code there is nothing to lock for parents.
             MainView(profile: profile)
         }
     }

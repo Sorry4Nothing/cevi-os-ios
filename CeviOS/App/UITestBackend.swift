@@ -10,7 +10,7 @@ import SwiftUI
 ///   first request; server: first program list 500; unauthorized: first program detail 401; outdated: every request 426;
 ///   empty: no programs).
 /// - `-UITestSignedIn <username>`: cold start with a stored session of that persona (goes through `get-session`).
-/// - `-UITestLocked YES`: shows the lock screen once; «Entsperren» unlocks without Face ID.
+/// - `-UITestLocked YES`: switches the app lock on and shows the lock screen once; «Entsperren» unlocks without Face ID.
 /// - `-AppleInterfaceStyle Dark`: dark mode; iOS apps do not apply this argument by themselves.
 nonisolated enum UITestLaunch {
     static var isActive: Bool { ProcessInfo.processInfo.arguments.contains("-UITestBackend") }

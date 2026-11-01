@@ -11,7 +11,7 @@ struct CeviOSApp: App {
         #if DEBUG
         if UITestLaunch.isActive {
             _state = State(initialValue: UITestLaunch.appState())
-            _lock = State(initialValue: AppLock(defaults: .standard, isLocked: UITestLaunch.startsLocked))
+            _lock = State(initialValue: AppLock(uiTestLocked: UITestLaunch.startsLocked))
             return
         }
         #endif
@@ -35,10 +35,19 @@ struct CeviOSApp: App {
                 .environment(state)
                 .environment(lock)
                 .environment(push)
-                .task { push.attach(state) }
-                .onChange(of: scenePhase) { _, new in lock.scenePhase(new) }
-                .onChange(of: state.phase) { _, new in
-                    if new == .signIn { lock.reset() }
+                .task {
+                    push.attach(state)
+                    lock.biometryChanged = { [state] in await state.signOutAfterBiometryChange() }
+                }
+                .onChange(of: scenePhase) { _, new in
+                    if lock.scenePhase(new, hasSession: state.hasSession) { state.lock() }
+                }
+                .onChange(of: state.phase, initial: true) { _, new in
+                    // The password unlocks. `.ready` is only reached unlocked; there a lost key is created anew.
+                    switch new {
+                    case .signIn, .ready: lock.signedInWithPassword()
+                    default: break
+                    }
                 }
         }
     }

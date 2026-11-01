@@ -51,38 +51,108 @@ struct ProfileTests {
     }
 }
 
+@MainActor
 struct AppLockTests {
     private let start = Date(timeIntervalSince1970: 1_000_000)
 
-    @Test func lockIsDueAfterFiveMinutes() {
-        #expect(AppLock.lockDue(backgroundSince: start, now: start.addingTimeInterval(300)))
-        #expect(AppLock.lockDue(backgroundSince: start, now: start.addingTimeInterval(3600)))
+    private func makeLock(enabled: Bool = true) throws -> (AppLock, FakeBiometricCredential) {
+        let defaults = try #require(UserDefaults(suiteName: "test.\(UUID().uuidString)"))
+        let credential = FakeBiometricCredential()
+        let lock = AppLock(defaults: defaults, credential: credential)
+        if enabled { lock.setEnabled(true) }
+        return (lock, credential)
     }
 
-    @Test func notBefore() {
-        #expect(!AppLock.lockDue(backgroundSince: start, now: start.addingTimeInterval(299)))
+    @Test func lockIsDueAfterThirtySeconds() {
+        #expect(AppLock.lockDue(backgroundSince: start, now: start.addingTimeInterval(30)))
+        #expect(!AppLock.lockDue(backgroundSince: start, now: start.addingTimeInterval(29)))
         #expect(!AppLock.lockDue(backgroundSince: nil, now: start))
     }
 
-    @MainActor @Test func coldStartIsLockedAndSceneChangeLocksAfterTimeout() throws {
+    @Test func offByDefaultAndColdStartIsLocked() throws {
+        let (lock, _) = try makeLock(enabled: false)
+        #expect(!lock.isEnabled)
+        #expect(!lock.requiresUnlock)
         let defaults = try #require(UserDefaults(suiteName: "test.\(UUID().uuidString)"))
-        let lock = AppLock(defaults: defaults)
-        #expect(lock.isLocked)
-        lock.scenePhase(.background, now: start)
-        lock.scenePhase(.active, now: start.addingTimeInterval(10))
-        #expect(lock.isLocked) // Cold start: only unlock() lifts the lock.
+        defaults.set(true, forKey: "biometricLockEnabled")
+        #expect(AppLock(defaults: defaults, credential: FakeBiometricCredential()).requiresUnlock)
     }
 
-    @MainActor @Test func parentsCanDisableTheLockLeadersCannot() throws {
+    @Test func toggleCreatesAndDeletesTheKey() throws {
+        let (lock, credential) = try makeLock()
+        #expect(credential.exists)
+        #expect(!lock.requiresUnlock)
+        lock.setEnabled(false)
+        #expect(!credential.exists)
+        #expect(!lock.isEnabled)
+    }
+
+    @Test func withoutBiometricsNothingLocks() throws {
+        let (lock, credential) = try makeLock()
+        credential.biometryType = .none
+        #expect(!lock.isAvailable)
+        lock.scenePhase(.background, hasSession: true, now: start)
+        lock.scenePhase(.active, hasSession: true, now: start.addingTimeInterval(60))
+        #expect(!lock.requiresUnlock)
+    }
+
+    @Test func locksAfterThirtySecondsInBackgroundWithSession() throws {
+        let (lock, _) = try makeLock()
+        lock.scenePhase(.background, hasSession: true, now: start)
+        #expect(!lock.scenePhase(.active, hasSession: true, now: start.addingTimeInterval(29)))
+        #expect(!lock.requiresUnlock)
+        lock.scenePhase(.background, hasSession: true, now: start)
+        #expect(lock.scenePhase(.active, hasSession: true, now: start.addingTimeInterval(30)))
+        #expect(lock.requiresUnlock)
+    }
+
+    @Test func withoutSessionNothingIsAsked() throws {
+        let (lock, _) = try makeLock()
+        lock.scenePhase(.background, hasSession: false, now: start)
+        #expect(!lock.scenePhase(.active, hasSession: false, now: start.addingTimeInterval(600)))
+    }
+
+    @Test func unlockSuccessAndFailure() async throws {
+        let (lock, credential) = try makeLock()
+        lock.scenePhase(.background, hasSession: true, now: start)
+        lock.scenePhase(.active, hasSession: true, now: start.addingTimeInterval(60))
+        credential.result = .failed
+        await lock.unlock()
+        #expect(lock.requiresUnlock)
+        #expect(lock.failed)
+        credential.result = .success
+        await lock.unlock()
+        #expect(!lock.requiresUnlock)
+        #expect(!lock.failed)
+    }
+
+    @Test func invalidatedKeySignsOutAndIsRecreatedAfterPassword() async throws {
+        let (lock, credential) = try makeLock()
+        lock.scenePhase(.background, hasSession: true, now: start)
+        lock.scenePhase(.active, hasSession: true, now: start.addingTimeInterval(60))
+        var signedOut = false
+        lock.biometryChanged = { signedOut = true }
+        credential.result = .invalidated
+        await lock.unlock()
+        #expect(signedOut)
+        #expect(!credential.exists)
+        #expect(lock.isEnabled) // The toggle stays on.
+        lock.signedInWithPassword()
+        #expect(credential.exists)
+        #expect(!lock.requiresUnlock)
+    }
+
+    @Test func passwordSignInCountsAsUnlocked() throws {
         let defaults = try #require(UserDefaults(suiteName: "test.\(UUID().uuidString)"))
-        let lock = AppLock(defaults: defaults)
-        let parent = try Samples.profile()
-        let leader = try Samples.profile(roles: #"[{"stufeId":"22222222-2222-2222-2222-222222222222","typ":"leitung"}]"#)
-        #expect(lock.parentsLockEnabled)
-        #expect(lock.isRequired(for: parent))
-        lock.parentsLockEnabled = false
-        #expect(!lock.isRequired(for: parent))
-        #expect(lock.isRequired(for: leader))
+        defaults.set(true, forKey: "biometricLockEnabled")
+        let lock = AppLock(defaults: defaults, credential: FakeBiometricCredential())
+        #expect(lock.requiresUnlock)
+        lock.signedInWithPassword()
+        #expect(!lock.requiresUnlock)
+    }
+
+    @Test func biometryChangedNotice() {
+        #expect(AuthMessages.biometryChanged == "Deine Biometrie hat sich geändert. Bitte melde dich mit dem Passwort an.")
     }
 }
 

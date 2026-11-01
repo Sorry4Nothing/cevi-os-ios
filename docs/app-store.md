@@ -6,7 +6,7 @@ Alles hier ist ohne Zugangsdaten, echte Namen oder Adressen. Die Basis-Adresse d
 
 - **Privacy Manifest:** `CeviOS/PrivacyInfo.xcprivacy`. Kein Tracking, keine Tracking-Domains. Erhobene Daten (alle mit Zweck «App-Funktionalität», mit der Person verknüpft, nicht zum Tracking): Name, Benutzer-ID, Telefonnummer (nur Stufenleitung, freiwillig), Foto (Profilbild, freiwillig), Inhalte (Chat-Nachrichten), Geräte-ID (Push-Token). Genutzte API mit Begründung: UserDefaults (`CA92.1`: Einstellungen der App selbst).
 - **Verschlüsselung:** `ITSAppUsesNonExemptEncryption = NO` (nur HTTPS des Systems). Damit entfällt die Exportfrage bei jedem Build.
-- **Face ID:** Text für `NSFaceIDUsageDescription` ist gesetzt.
+- **Face ID:** Text für `NSFaceIDUsageDescription` ist gesetzt. Die Sperre ist freiwillig (Standard aus), nur mit Face ID oder Touch ID (ohne Gerätecode), greift beim Kaltstart und nach 30 Sekunden im Hintergrund.
 - **Links:** Datenschutz, Support und «Konto löschen» sind in der App erreichbar (Profil, Anmeldung, Willkommen) und öffnen sich im Browser des Systems. Die Seiten liefert der Server: `/datenschutz`, `/support`, `/konto-loeschen`.
 - **Datenschutz:** Beim ersten Start bestätigt die Person, dass sie die Datenschutzerklärung zur Kenntnis genommen hat.
 - **Konto löschen:** Die App löscht keine Konten. Im Profil steht: «Auf Anfrage löscht die Leitung Daten.» Details auf `/konto-loeschen`.

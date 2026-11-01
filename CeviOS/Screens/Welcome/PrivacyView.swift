@@ -3,6 +3,7 @@ import SwiftUI
 /// T03 Willkommen: confirm the privacy statement before the app opens.
 struct PrivacyView: View {
     @Environment(AppState.self) private var state
+    @Environment(AppLock.self) private var lock
     @Environment(\.appConfiguration) private var configuration
     @Environment(\.openURL) private var openURL
     /// Name in the greeting.
@@ -29,6 +30,12 @@ struct PrivacyView: View {
                     feature("Zusagen", text: "Mit einem Tipp Ja oder Nein sagen.", symbol: "checkmark")
                     feature("Chat", text: "Nachrichten an die Stufenleitung und in der Gruppe.",
                             symbol: "bubble.left.and.bubble.right")
+                }
+                // Offered once here, right after the first own password; later only in the profile.
+                if lock.isAvailable {
+                    Toggle(lock.toggleTitle, isOn: Binding(get: { lock.isEnabled }, set: { lock.setEnabled($0) }))
+                        .tint(Color.ceviSwitchOn)
+                        .foregroundStyle(Color.ceviOnSurface)
                 }
                 VStack(alignment: .leading, spacing: Spacing.s1) {
                     Toggle("Ich habe die Datenschutzerklärung gelesen und zur Kenntnis genommen.", isOn: $accepted)
@@ -84,9 +91,9 @@ struct PrivacyView: View {
 }
 
 #Preview("Willkommen") {
-    PrivacyView(name: "Marion", childNames: ["Lena", "Noah"]).environment(AppState())
+    PrivacyView(name: "Marion", childNames: ["Lena", "Noah"]).environment(AppState()).environment(AppLock())
 }
 
 #Preview("Willkommen Nacht") {
-    PrivacyView(name: "Marion", childNames: []).environment(AppState()).preferredColorScheme(.dark)
+    PrivacyView(name: "Marion", childNames: []).environment(AppState()).environment(AppLock()).preferredColorScheme(.dark)
 }

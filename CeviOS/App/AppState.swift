@@ -28,6 +28,8 @@ final class AppState {
     var signInNotice: String?
     /// Push tokens and caches that must be dropped on sign-out hook in here.
     var onSignOut: [@MainActor () async -> Void] = []
+    /// In-memory caches that must leave memory when the app lock engages (the session cookie stays).
+    var onLock: [@MainActor () -> Void] = []
 
     /// `session` is replaced only by the DEBUG UI-test backend (`UITestLaunch`).
     init(
@@ -52,6 +54,7 @@ final class AppState {
         }
         phase = hasCookies ? .loading : .signIn
         onSignOut.append { ProfileImageCache.shared.removeAll() }
+        onLock.append { ProfileImageCache.shared.removeAll() }
     }
 
     func handle(_ event: APIEvent) {
@@ -66,6 +69,27 @@ final class AppState {
         case .changePassword(let p), .privacy(let p), .ready(let p): p
         default: nil
         }
+    }
+
+    /// A session cookie is (presumably) there; only then the app lock asks for biometrics.
+    var hasSession: Bool {
+        switch phase {
+        case .signIn, .configurationMissing: false
+        default: true
+        }
+    }
+
+    /// App lock engaged: drop the profile and caches, keep the cookie. After unlocking, `start()` reloads.
+    func lock() {
+        guard hasSession else { return }
+        phase = .loading
+        for task in onLock { task() }
+    }
+
+    /// The biometric set changed: end the session and tell why on the sign-in screen.
+    func signOutAfterBiometryChange() async {
+        await signOut()
+        signInNotice = AuthMessages.biometryChanged
     }
 
     /// Cold start with a cookie: extend the session, then load the profile.

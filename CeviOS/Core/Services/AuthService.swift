@@ -70,4 +70,9 @@ nonisolated enum AuthMessages {
     static var adminOnly: String {
         String(localized: "Admins melden sich im Admin-Bereich an. Die App ist für Eltern und Leitende.")
     }
+
+    /// Shown after the app lock key was invalidated by a new Face ID or Touch ID enrollment.
+    static var biometryChanged: String {
+        String(localized: "Deine Biometrie hat sich geändert. Bitte melde dich mit dem Passwort an.")
+    }
 }
