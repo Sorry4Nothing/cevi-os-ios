@@ -69,7 +69,8 @@ Die Abläufe haben im App-Code gefunden und behoben:
 - Zustände (Ja, Nein, Offen, Abgesagt, Wird geprüft, Ungelesen, Fehler) tragen SF Symbol und Wort.
 - Tippflächen mindestens 44 pt, Hauptschaltflächen 52 pt, Felder 50 pt.
 - Schriften skalieren mit Dynamic Type (Archivo über `relativeTo`, sonst Textstile). Zeilen stapeln sich bei grossen Schriftgrössen.
-- «Bewegung reduzieren»: Skelett-Puls und Übergänge fallen weg.
+- «Bewegung reduzieren»: Skelett-Puls und Übergänge fallen weg (Überblenden der Tabs und der Anmeldeschritte, 0,26 s). Beim Abmelden gibt es nie einen Übergang.
+- Dauert eine Aktion, die du ausgelöst hast, länger als 250 ms, liegt eine abgedunkelte Ebene mit Ladeanzeige über der ganzen App. Sie fängt alle Berührungen ab, nimmt den Fokus aus Textfeldern und VoiceOver sagt «Einen Moment …» an. Hintergrundarbeit (Aktualisieren, Bilder, ältere Nachrichten) blockiert nie.
 - Profilbilder sind Zierde und für VoiceOver verborgen. Der Name trägt die Information.
 - Überschriften sind als solche markiert, Karten und Chat-Zeilen sind zu einem Element zusammengefasst.
 

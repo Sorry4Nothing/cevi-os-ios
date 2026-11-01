@@ -10,7 +10,7 @@ struct SignOutButton: View {
             .alert("Abmelden?", isPresented: $isConfirming) {
                 Button("Abbrechen", role: .cancel) {}
                 Button("Abmelden", role: .destructive) {
-                    Task { await state.signOut() }
+                    Task { await state.busy.track { await state.signOut() } }
                 }
             } message: {
                 Text("Danach brauchst du wieder Benutzername und Passwort.")

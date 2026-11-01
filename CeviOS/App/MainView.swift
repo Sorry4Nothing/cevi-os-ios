@@ -9,6 +9,8 @@ struct MainView: View {
     @State private var selectedTab: MainTab = .programs
     @State private var programPath: [UUID] = []
     @State private var chatPath: [UUID] = []
+    @State private var tabOpacity = 1.0
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     enum MainTab: Hashable { case programs, chat, profile }
     let profile: Profile
@@ -19,16 +21,16 @@ struct MainView: View {
     var body: some View {
         TabView(selection: $selectedTab) {
             Tab("Programme", systemImage: "calendar", value: MainTab.programs) {
-                ProgramListView(path: $programPath)
+                ProgramListView(path: $programPath).opacity(tabOpacity)
             }
             if hasChat {
                 Tab("Chat", systemImage: "bubble.left.and.bubble.right", value: MainTab.chat) {
-                    ChatListView(model: chatList, profile: profile, path: $chatPath)
+                    ChatListView(model: chatList, profile: profile, path: $chatPath).opacity(tabOpacity)
                 }
                 .badge(chatList.totalUnread)
             }
             Tab("Profil", systemImage: "person.crop.circle", value: MainTab.profile) {
-                ProfileView(profile: profile)
+                ProfileView(profile: profile).opacity(tabOpacity)
             }
         }
         // Chat list (and the badge) stay current while the app is in the foreground.
@@ -41,6 +43,13 @@ struct MainView: View {
             PushExplanationView()
         }
         .onChange(of: state.pendingTarget, initial: true) { _, target in open(target) }
+        // TabView switches without animation; fade the new tab in. Not with "Reduce Motion".
+        .onChange(of: selectedTab) {
+            guard !reduceMotion else { return }
+            tabOpacity = 0
+            // Next turn of the run loop, so the 0 is rendered before fading to 1.
+            Task { withAnimation(.easeInOut(duration: 0.26)) { tabOpacity = 1 } }
+        }
     }
 
     /// Opens the target of a tapped push.

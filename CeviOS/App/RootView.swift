@@ -20,6 +20,11 @@ struct RootView: View {
                     .task { await state.start() }
             }
         }
+        // Disabling resigns the focused text field; the overlay swallows touches. Never over the start screen.
+        .disabled(showsBusyOverlay)
+        .overlay {
+            if showsBusyOverlay { BusyOverlay() }
+        }
         // With the lock on, the app switcher shows only a cover.
         .overlay {
             if lock.isEnabled, scenePhase != .active {
@@ -31,8 +36,12 @@ struct RootView: View {
             }
         }
         .tint(.ceviAccent)
-        // Soft cross-fade between start, sign-in and the app. Not with "Reduce Motion".
-        .animation(reduceMotion ? nil : .easeInOut(duration: 0.25), value: state.phase)
+        // Soft cross-fade between start, sign-in steps and the app. Not with "Reduce Motion" and not on sign-out.
+        .animation(reduceMotion || state.phase == .signIn ? nil : .easeInOut(duration: 0.26), value: state.phase)
+    }
+
+    private var showsBusyOverlay: Bool {
+        state.busy.isOverlayVisible && state.phase != .loading
     }
 
     @ViewBuilder

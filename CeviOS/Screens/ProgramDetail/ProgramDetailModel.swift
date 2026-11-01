@@ -41,7 +41,7 @@ final class ProgramDetailModel {
         answerError = nil
         defer { savingOwn = false }
         do {
-            try await client.setOwnRegistration(programId: programId, answer: answer)
+            try await BusyState.shared.track { try await client.setOwnRegistration(programId: programId, answer: answer) }
             // The selected state changes on the focused button without a new element to focus; say that it worked.
             AccessibilityNotification.Announcement(String(localized: "Gespeichert")).post()
             await load(programId: programId, client: client)
@@ -60,7 +60,7 @@ final class ProgramDetailModel {
         answerError = nil
         defer { saving.remove(child.id) }
         do {
-            try await client.setParticipation(programId: programId, childId: child.id, answer: answer)
+            try await BusyState.shared.track { try await client.setParticipation(programId: programId, childId: child.id, answer: answer) }
             // The selected state changes on the focused button without a new element to focus; say that it worked.
             AccessibilityNotification.Announcement(String(localized: "Gespeichert")).post()
             await load(programId: programId, client: client)

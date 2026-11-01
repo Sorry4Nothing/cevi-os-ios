@@ -136,7 +136,9 @@ struct ChatView: View {
                         }
                     }
                 } label: {
-                    Image(systemName: "paperplane.fill")
+                    Group {
+                        if model.isSending { ProgressView().tint(Color.ceviOnPrimary) } else { Image(systemName: "paperplane.fill") }
+                    }
                         .foregroundStyle(Color.ceviOnPrimary)
                         .frame(minWidth: Size.button, minHeight: Size.touchTarget)
                         .background(Color.ceviPrimary, in: .capsule)

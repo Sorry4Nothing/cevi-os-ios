@@ -43,8 +43,10 @@ struct ProgramDetailView: View {
         directChatError = nil
         guard let client = appState.client else { return }
         do {
-            let id = try await client.openDirectChat(unitId: unit.id)
-            directChat = try await client.chats().first { $0.id == id }
+            directChat = try await BusyState.shared.track {
+                let id = try await client.openDirectChat(unitId: unit.id)
+                return try await client.chats().first { $0.id == id }
+            }
         } catch let error as APIError {
             directChatError = error.displayText
         } catch {

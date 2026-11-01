@@ -17,6 +17,8 @@ final class AppState {
 
     /// `nil` while the base URL of the environment is missing or invalid.
     let client: APIClient?
+    /// User-triggered actions in flight; drives the app-wide busy overlay.
+    let busy = BusyState.shared
     private(set) var phase: Phase = .loading
     /// The server demands a newer app version; everything else is blocked.
     var appOutdated = false

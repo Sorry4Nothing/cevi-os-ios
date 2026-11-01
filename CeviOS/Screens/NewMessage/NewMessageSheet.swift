@@ -74,9 +74,12 @@ struct NewMessageSheet: View {
         openingUnitId = unitId
         defer { openingUnitId = nil }
         do {
-            let id = try await client.openDirectChat(unitId: unitId)
-            // The destination looks the chat up in the list, so the new chat must be loaded first.
-            await model.load(client: client)
+            let id = try await BusyState.shared.track {
+                let id = try await client.openDirectChat(unitId: unitId)
+                // The destination looks the chat up in the list, so the new chat must be loaded first.
+                await model.load(client: client)
+                return id
+            }
             open(id)
         } catch let apiError as APIError {
             error = apiError.displayText

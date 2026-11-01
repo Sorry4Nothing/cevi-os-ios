@@ -12,7 +12,7 @@ struct LockView: View {
             message: lock.failed ? "Das Entsperren hat nicht geklappt." : nil,
             tone: lock.failed ? .error : .neutral,
             primary: StateView.Action(title: "Entsperren", symbol: lock.symbol) { Task { await lock.unlock() } },
-            secondary: StateView.Action(title: "Mit Passwort anmelden") { Task { await state.signOut() } }
+            secondary: StateView.Action(title: "Mit Passwort anmelden") { Task { await state.busy.track { await state.signOut() } } }
         )
         .task { await lock.unlock() }
     }

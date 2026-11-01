@@ -63,7 +63,7 @@ final class ChatModel {
         sendError = nil
         defer { isSending = false }
         do {
-            try await client.sendMessage(chatId: chatId, text: text, programId: programId)
+            try await BusyState.shared.track { try await client.sendMessage(chatId: chatId, text: text, programId: programId) }
         } catch let apiError as APIError {
             sendError = ChatRules.sendError(apiError)
             return false
