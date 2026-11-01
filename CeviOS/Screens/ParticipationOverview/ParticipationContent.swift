@@ -10,6 +10,8 @@ struct ParticipationContent: View {
     private struct Row: Identifiable {
         let id: UUID
         let name: String
+        var subtitle: String?
+        var imagePath: String?
         let answer: OverviewAnswer
     }
 
@@ -36,7 +38,7 @@ struct ParticipationContent: View {
                 } else {
                     VStack(spacing: 0) {
                         ForEach(rows) { row in
-                            AnswerRow(name: row.name, answer: row.answer)
+                            AnswerRow(name: row.name, subtitle: row.subtitle, imagePath: row.imagePath, answer: row.answer)
                             if row.id != rows.last?.id { Divider() }
                         }
                     }
@@ -57,7 +59,8 @@ struct ParticipationContent: View {
         let rows = switch group {
         case .children: overview.children.map { Row(id: $0.id, name: "\($0.firstName) \($0.lastName)", answer: $0.answer) }
         case .leaders: overview.leaders.map { leader in
-            Row(id: leader.id, name: leader.ceviName.map { "\(leader.name) (\($0))" } ?? leader.name, answer: leader.answer)
+            let names = PersonName.titled(name: leader.name, ceviName: leader.ceviName)
+            return Row(id: leader.id, name: names.title, subtitle: names.subtitle, imagePath: leader.imageURL, answer: leader.answer)
         }
         }
         return ParticipationOrder.sorted(rows, answer: \.answer, name: \.name)
@@ -73,9 +76,9 @@ struct ParticipationContent: View {
       {"id":"00000000-0000-0000-0000-000000000003","vorname":"Elin","nachname":"Frei","stufeId":"00000000-0000-0000-0000-0000000000aa","status":"offen"},
       {"id":"00000000-0000-0000-0000-000000000004","vorname":"Noah","nachname":"Keller","stufeId":"00000000-0000-0000-0000-0000000000aa","status":"ja"},
       {"id":"00000000-0000-0000-0000-000000000005","vorname":"Tim","nachname":"Baumann","stufeId":"00000000-0000-0000-0000-0000000000aa","status":"offen"}],
-     "leitende":[{"id":"00000000-0000-0000-0000-000000000006","name":"Robin Muster","ceviName":"Fuchs","stufeId":"00000000-0000-0000-0000-0000000000aa","rolle":"leitung","status":"ja"}]}
+     "leitende":[{"id":"00000000-0000-0000-0000-000000000006","name":"Jan Muster","ceviName":"Fuchs","stufeId":"00000000-0000-0000-0000-0000000000aa","rolle":"leitung","status":"ja"}]}
     """
     // swiftlint:disable:next force_try
     let overview = try! JSONDecoder.api.decode(ParticipationOverview.self, from: Data(json.utf8))
-    NavigationStack { ParticipationContent(overview: overview).ceviScreenBackground() }
+    NavigationStack { ParticipationContent(overview: overview).ceviScreenBackground() }.environment(AppState())
 }

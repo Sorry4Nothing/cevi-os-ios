@@ -10,8 +10,8 @@ nonisolated struct ChatPerson: Decodable, Hashable, Identifiable, Sendable {
     let name: String
     let ceviName: String?
 
-    /// "Name (Cevi name)" if there is a Cevi name.
-    var displayName: String { ceviName.map { "\(name) (\($0))" } ?? name }
+    /// Name in chats: the Cevi name, without one the full name.
+    var shortName: String { PersonName.short(name: name, ceviName: ceviName) }
 }
 
 nonisolated struct ChatUnit: Decodable, Hashable, Identifiable, Sendable {
@@ -68,7 +68,8 @@ nonisolated struct ChatAuthor: Decodable, Equatable, Identifiable, Sendable {
 
     enum CodingKeys: String, CodingKey { case id, name, ceviName, imageURL = "bildUrl", isUnitLeader = "stufenleitung" }
 
-    var displayName: String { ceviName.map { "\(name) (\($0))" } ?? name }
+    /// Name in chats: the Cevi name, without one the full name.
+    var shortName: String { PersonName.short(name: name, ceviName: ceviName) }
 }
 
 nonisolated struct ChatMessage: Decodable, Equatable, Identifiable, Sendable {

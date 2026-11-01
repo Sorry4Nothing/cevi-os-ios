@@ -46,3 +46,7 @@ Der Fragebogen in App Store Connect fragt nach nutzergenerierten Inhalten und Ch
 ## Was noch von der Abteilung oder vom Inhaber kommen muss
 
 Siehe die Liste am Ende des Pull Requests zu Issue #10.
+
+## Offen: Cevi-Logo
+
+TODO: `CeviOS/Assets.xcassets/CeviLogo.imageset` enthält nur einen neutralen Platzhalter (SF Symbol `person.3.fill` in `ceviSecondary`). Das echte Cevi-Logo (PNG oder PDF mit Transparenz) muss noch geliefert und dort ersetzt werden. Die App zeigt es überall, wo eine Stufe kein eigenes Logo hat.

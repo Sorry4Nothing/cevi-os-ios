@@ -49,7 +49,7 @@ struct ChatTests {
         """
         let list = try JSONDecoder.api.decode(ChatList.self, from: Data(json.utf8))
         #expect(list.chats.map(\.kind) == [.group, .direct])
-        #expect(list.chats[0].lastMessage?.author.displayName == "L (Wolke)")
+        #expect(list.chats[0].lastMessage?.author.shortName == "Wolke")
         #expect(ChatRules.totalUnread(list.chats) == 5)
     }
 

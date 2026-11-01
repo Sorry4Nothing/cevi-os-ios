@@ -7,6 +7,8 @@ struct ProgramDetailView: View {
     @State private var directChat: ChatSummary?
     @State private var directChatError: String?
     @Environment(\.dynamicTypeSize) private var typeSize
+    @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.openURL) private var openURL
 
     var body: some View {
         Group {
@@ -21,7 +23,16 @@ struct ProgramDetailView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .ceviScreenBackground()
         .navigationBarTitleDisplayMode(.inline)
-        .task { await model.load(programId: programId, client: appState.client) }
+        // Status and contacts stay current while the detail is open in the foreground.
+        .task(id: scenePhase) {
+            guard scenePhase == .active else { return }
+            await model.load(programId: programId, client: appState.client)
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(15))
+                guard !Task.isCancelled else { return }
+                await model.refresh(programId: programId, client: appState.client)
+            }
+        }
         .navigationDestination(item: $directChat) { chat in
             if let profile = appState.profile { ChatView(chat: chat, profile: profile) }
         }
@@ -74,6 +85,9 @@ struct ProgramDetailView: View {
 
     private func header(_ program: Program) -> some View {
         VStack(alignment: .leading, spacing: Spacing.s1) {
+            HStack(spacing: Spacing.s2) {
+                ForEach(program.units.isEmpty ? [nil] : program.units.map { Optional($0.id) }, id: \.self) { UnitLogo(unitId: $0) }
+            }
             Text(program.title)
                 .font(.title(.title1))
                 .foregroundStyle(Color.ceviOnSurface)
@@ -276,23 +290,8 @@ struct ProgramDetailView: View {
             if model.contacts.isEmpty {
                 Text("Stufenleitung").font(.body.weight(.semibold)).foregroundStyle(Color.ceviOnSurface)
             } else {
-                ForEach(model.contacts) { contact in
-                    HStack(spacing: Spacing.s3) {
-                        VStack(alignment: .leading, spacing: 0) {
-                            Text(contact.name).font(.body.weight(.semibold)).foregroundStyle(Color.ceviOnSurface)
-                            if let ceviName = contact.ceviName {
-                                Text(ceviName).font(.footnote).foregroundStyle(Color.ceviOnSurfaceVariant)
-                            }
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .accessibilityElement(children: .combine)
-                        if let phone = contact.phone, let url = URL(string: "tel:" + phone.filter { $0.isNumber || $0 == "+" }) {
-                            Link(destination: url) { circleIcon("phone.fill") }
-                                .accessibilityLabel(Text("\(contact.name) anrufen, \(phone)"))
-                                .accessibilityInputLabels([Text("Anrufen"), Text("\(contact.name) anrufen")])
-                        }
-                    }
-                }
+                // Server order, not re-sorted.
+                ForEach(model.contacts) { contact in contactRow(contact) }
             }
             ForEach(chatUnits(program)) { unit in
                 Button { Task { await openDirectChat(unit: unit) } } label: {
@@ -312,6 +311,43 @@ struct ProgramDetailView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .ceviCard()
+    }
+
+    private func contactRow(_ contact: Contact) -> some View {
+        let names = PersonName.titled(name: contact.name, ceviName: contact.ceviName)
+        let phoneURL = contact.phone.flatMap { phone in
+            URL(string: "tel:" + phone.filter { $0.isASCII && ($0.isNumber || $0 == "+") })
+        }
+        return HStack(spacing: Spacing.s3) {
+            ProfileAvatar(path: contact.imageURL, initials: String(names.title.prefix(1)))
+            VStack(alignment: .leading, spacing: 0) {
+                Text(names.title).font(.body.weight(.semibold)).foregroundStyle(Color.ceviOnSurface)
+                if let subtitle = names.subtitle {
+                    Text(subtitle).font(.footnote).foregroundStyle(Color.ceviOnSurfaceVariant)
+                }
+                if let phone = contact.phone, let phoneURL {
+                    Button(phone) { openURL(phoneURL) }
+                        .font(.footnote)
+                        .foregroundStyle(Color.ceviAccent)
+                        .frame(minHeight: Size.touchTarget)
+                        .accessibilityLabel(Text("\(names.title) anrufen, \(phone)"))
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            if let phone = contact.phone, let phoneURL {
+                Button { openURL(phoneURL) } label: {
+                    Label("Anrufen", systemImage: "phone.fill")
+                        .font(.body.weight(.semibold))
+                        .padding(.horizontal, Spacing.s3)
+                        .frame(minHeight: Size.touchTarget)
+                        .background(Color.ceviSecondaryContainer, in: .capsule)
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(Color.ceviAccent)
+                .accessibilityLabel(Text("\(names.title) anrufen, \(phone)"))
+                .accessibilityInputLabels([Text("Anrufen"), Text("\(names.title) anrufen")])
+            }
+        }
     }
 
     private func circleIcon(_ symbol: String) -> some View {

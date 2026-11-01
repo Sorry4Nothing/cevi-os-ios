@@ -60,7 +60,7 @@ final class AppFlowTests: XCTestCase {
         chats.assertUnread("Gruppenchat Jungschar", count: 2)
         let group = chats.open("Gruppenchat Jungschar")
         try group.auditAccessibility()
-        group.assertShows("Bitte Regenjacke mitnehmen.", "Jan Muster (Biber) (Stufenleitung)")
+        group.assertShows("Bitte Regenjacke mitnehmen.", "Biber (Stufenleitung)")
         group.loadOlder(expecting: "Info 1:")
         group.send(message: "Lena bringt Zvieri für alle mit.")
         group.back()
@@ -158,7 +158,7 @@ final class AppFlowTests: XCTestCase {
         overview.assertShows("Sortiert: offen zuerst")
         overview.showLeaders()
         overview.assertCounts(yes: 1, no: 0, open: 0)
-        overview.assertRow("Jan Muster (Biber)", answer: "Ja")
+        overview.assertRow("Biber", answer: "Ja")
         try overview.auditAccessibility()
         overview.back()
 

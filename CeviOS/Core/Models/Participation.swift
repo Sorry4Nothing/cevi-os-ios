@@ -31,12 +31,14 @@ nonisolated struct ParticipationLeader: Decodable, Equatable, Identifiable, Send
     let id: UUID
     let name: String
     let ceviName: String?
+    /// Profile image path; optional because not every server version sends it.
+    let imageURL: String?
     let unitId: UUID
     let role: RoleType
     let answer: OverviewAnswer
 
     enum CodingKeys: String, CodingKey {
-        case id, name, ceviName, unitId = "stufeId", role = "rolle", answer = "status"
+        case id, name, ceviName, imageURL = "bildUrl", unitId = "stufeId", role = "rolle", answer = "status"
     }
 }
 

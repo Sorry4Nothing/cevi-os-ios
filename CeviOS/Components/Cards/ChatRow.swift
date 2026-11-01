@@ -6,13 +6,14 @@ struct ChatRow: View {
 
     private var title: String { ChatTitle.title(for: chat, profile: profile) }
     private var preview: String? {
-        chat.lastMessage.map { "\($0.isOwn ? String(localized: "Du") : $0.author.displayName): \($0.text)" }
+        chat.lastMessage.map { "\($0.isOwn ? String(localized: "Du") : $0.author.shortName): \($0.text)" }
     }
     private var stamp: String? { chat.lastMessage.map { ChatDate.listStamp($0.createdAt) } }
     private var isUnread: Bool { chat.unread > 0 }
 
     var body: some View {
         HStack(alignment: .center, spacing: Spacing.s3) {
+            UnitLogo(unitId: chat.unit.id)
             VStack(alignment: .leading, spacing: Spacing.s1) {
                 Text(title)
                     .font(.body.weight(isUnread ? .bold : .semibold))

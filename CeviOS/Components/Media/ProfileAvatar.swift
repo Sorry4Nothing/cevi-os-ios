@@ -28,9 +28,6 @@ struct ProfileAvatar: View {
 
     private func load() async {
         guard let path else { image = nil; return }
-        if let cached = ProfileImageCache.shared[path] { image = cached; return }
-        guard let data = try? await state.client?.data(path: path), let loaded = ProfileImage.cgImage(from: data) else { return }
-        ProfileImageCache.shared[path] = loaded
-        image = loaded
+        image = await ProfileImageCache.shared.image(path: path, client: state.client)
     }
 }

@@ -108,10 +108,13 @@ struct ProfileView: View {
 
     private var identity: some View {
         VStack(alignment: .leading, spacing: Spacing.s1) {
-            Text(profile.ceviName.map { "\(profile.name) (\($0))" } ?? profile.name)
+            Text(profile.name)
                 .font(.title(.title2))
                 .foregroundStyle(Color.ceviOnSurface)
                 .accessibilityAddTraits(.isHeader)
+            if let ceviName = PersonName.ceviName(profile.ceviName) {
+                Text("Cevi-Name: \(ceviName)").font(.subheadline).foregroundStyle(Color.ceviOnSurfaceVariant)
+            }
             ForEach(roleLines, id: \.self) { line in
                 Text(line).font(.subheadline).foregroundStyle(Color.ceviOnSurfaceVariant)
             }
@@ -267,7 +270,7 @@ struct ProfileView: View {
 
 #Preview("Profil") {
     let json = """
-    {"id":"11111111-1111-1111-1111-111111111111","name":"Marion Keller","ceviName":null,"benutzername":"m.keller",
+    {"id":"11111111-1111-1111-1111-111111111111","name":"Eva Beispiel","ceviName":null,"benutzername":"e.beispiel",
      "mussPasswortAendern":false,"datenschutzGelesenAm":"2026-10-01T10:00:00.000Z","telefon":null,"bildUrl":null,
      "pushChat":true,"pushProgramme":true,"admin":false,"zweiterFaktor":false,"rollen":[],"stufen":[],
      "kinder":[{"id":"22222222-2222-2222-2222-222222222222","vorname":"Lena","nachname":"Keller","stufeId":"33333333-3333-3333-3333-333333333333"},

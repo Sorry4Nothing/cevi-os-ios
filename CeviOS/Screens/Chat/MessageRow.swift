@@ -16,12 +16,12 @@ struct MessageRow: View {
     }
 
     private var senderLabel: String {
-        let name = message.author.ceviName ?? message.author.name
+        let name = message.author.shortName
         return message.author.isUnitLeader ? String(localized: "\(name) · SL") : name
     }
 
     private var senderAccessibility: String {
-        message.author.displayName + (message.author.isUnitLeader ? String(localized: " (Stufenleitung)") : "")
+        message.author.shortName + (message.author.isUnitLeader ? String(localized: " (Stufenleitung)") : "")
     }
 
     var body: some View {
@@ -66,8 +66,8 @@ struct MessageRow: View {
 }
 
 #Preview("Nachrichten") {
-    let leader = ChatAuthor(id: UUID(), name: "Sarah Muster", ceviName: "Sarah", imageURL: nil, isUnitLeader: true)
-    let me = ChatAuthor(id: UUID(), name: "Robin Lehmann", ceviName: nil, imageURL: nil, isUnitLeader: false)
+    let leader = ChatAuthor(id: UUID(), name: "Sarah Muster", ceviName: "Wolke", imageURL: nil, isUnitLeader: true)
+    let me = ChatAuthor(id: UUID(), name: "Lea Beispiel", ceviName: nil, imageURL: nil, isUnitLeader: false)
     ScrollView {
         VStack(spacing: Spacing.s3) {
             MessageRow(message: ChatMessage(id: UUID(), text: "Hoi zäme, Noah kommt am Samstag etwas später, etwa 14:30.",

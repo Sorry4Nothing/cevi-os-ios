@@ -301,8 +301,8 @@ private nonisolated struct World {
         }
         let me = account(username)
         let route = Array(parts.dropFirst(2))
-        // Image routes: no pictures in the UI tests.
-        if route.contains("bild") { return .notFound }
+        // Image routes (profile images, unit logos): no pictures in the UI tests; the app shows initials and the Cevi logo.
+        if route.contains("bild") || route.last == "logo" { return .notFound }
         switch (request.method, route.first) {
         case ("GET", "ich"): return .json(200, profile(me))
         case ("POST", "ich") where route.last == "datenschutz":

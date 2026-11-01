@@ -24,6 +24,16 @@ struct ChatView: View {
         .ceviScreenBackground()
         .navigationTitle(ChatTitle.title(for: chat, profile: profile))
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                HStack(spacing: Spacing.s2) {
+                    UnitLogo(unitId: chat.unit.id, size: Size.avatar * 0.75)
+                    Text(ChatTitle.title(for: chat, profile: profile)).font(.headline).lineLimit(1)
+                }
+                .accessibilityElement(children: .combine)
+                .accessibilityAddTraits(.isHeader)
+            }
+        }
         // Pushes for this chat stay hidden while it is open.
         .onAppear { appState.openChatId = chat.id }
         .onDisappear { if appState.openChatId == chat.id { appState.openChatId = nil } }
@@ -33,7 +43,7 @@ struct ChatView: View {
         }
     }
 
-    private var leaderNames: String { chat.unitLeaders.map(\.displayName).joined(separator: ", ") }
+    private var leaderNames: String { chat.unitLeaders.map(\.shortName).joined(separator: ", ") }
 
     private var directNotice: some View {
         VStack(alignment: .leading, spacing: Spacing.s1) {

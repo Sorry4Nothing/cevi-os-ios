@@ -43,7 +43,7 @@ enum AccessibilityAudit {
         // Program card line: complete on the default-size screenshots of the flow run (Nov 2026).
         "Ganztägig ·",
         // Chat list (dark mode, screenshot of the failed audit, Nov 2026): the footnote and the preview wrap and are complete.
-        "Neue Nachricht an die Stufenleitung:", "Jan Muster (Biber):",
+        "Neue Nachricht an die Stufenleitung:", "Biber:",
         // Program detail, default size (screenshot of the failed audit, Nov 2026): the place is complete on one line.
         "Gemeindehaus Beispielstadt",
     ]

@@ -5,6 +5,18 @@ struct ProgramRow: View {
     let day: Date
 
     var body: some View {
+        HStack(alignment: .top, spacing: Spacing.s3) {
+            UnitLogo(unitId: program.units.first?.id)
+            content
+        }
+        .multilineTextAlignment(.leading)
+        .frame(maxWidth: .infinity, minHeight: Size.touchTarget, alignment: .leading)
+        .ceviCard()
+        .contentShape(Radius.shape(Radius.md))
+        .accessibilityElement(children: .combine)
+    }
+
+    private var content: some View {
         VStack(alignment: .leading, spacing: Spacing.s1) {
             Text(([ProgramFormat.time(of: program, on: day)] + program.units.map(\.name)).filter { !$0.isEmpty }.joined(separator: " · "))
                 .font(.footnote.weight(.semibold))
@@ -25,10 +37,5 @@ struct ProgramRow: View {
                     .font(.subheadline.weight(.semibold))
             }
         }
-        .multilineTextAlignment(.leading)
-        .frame(maxWidth: .infinity, minHeight: Size.touchTarget, alignment: .leading)
-        .ceviCard()
-        .contentShape(Radius.shape(Radius.md))
-        .accessibilityElement(children: .combine)
     }
 }

@@ -28,6 +28,13 @@ final class ProgramDetailModel {
         contacts = (try? await client.contacts(programId: programId)) ?? []
     }
 
+    /// Silent refresh while the detail is open: no loading state, errors keep what is shown.
+    func refresh(programId: UUID, client: APIClient?) async {
+        guard let client, let fresh = try? await client.program(id: programId) else { return }
+        program = fresh
+        if let contacts = try? await client.contacts(programId: programId) { self.contacts = contacts }
+    }
+
     func setOwnRegistration(_ answer: Answer, programId: UUID, client: APIClient?) async {
         guard let client, !savingOwn else { return }
         savingOwn = true

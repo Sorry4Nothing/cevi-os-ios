@@ -30,6 +30,9 @@ final class AppState {
     var onSignOut: [@MainActor () async -> Void] = []
     /// In-memory caches that must leave memory when the app lock engages (the session cookie stays).
     var onLock: [@MainActor () -> Void] = []
+    /// `GET /stufen`, loaded once per session for the unit logos. Dropped on sign-out and lock.
+    private(set) var units: [UnitInfo]?
+    private var isLoadingUnits = false
 
     /// `session` is replaced only by the DEBUG UI-test backend (`UITestLaunch`).
     init(
@@ -53,8 +56,27 @@ final class AppState {
             Task { @MainActor in self?.handle(event) }
         }
         phase = hasCookies ? .loading : .signIn
-        onSignOut.append { ProfileImageCache.shared.removeAll() }
-        onLock.append { ProfileImageCache.shared.removeAll() }
+        onSignOut.append { [weak self] in
+            ProfileImageCache.shared.removeAll()
+            self?.units = nil
+        }
+        onLock.append { [weak self] in
+            ProfileImageCache.shared.removeAll()
+            self?.units = nil
+        }
+    }
+
+    /// Logo path of a unit, `nil` without own logo or before the units are loaded.
+    func logoPath(unitId: UUID) -> String? {
+        units?.first { $0.id == unitId }?.logoURL
+    }
+
+    /// Loads the units once per session. A failure leaves them `nil`, so the next caller tries again.
+    func loadUnitsIfNeeded() async {
+        guard units == nil, !isLoadingUnits, let client else { return }
+        isLoadingUnits = true
+        defer { isLoadingUnits = false }
+        units = try? await client.units()
     }
 
     func handle(_ event: APIEvent) {

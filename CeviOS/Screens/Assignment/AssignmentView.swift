@@ -49,10 +49,15 @@ struct AssignmentView: View {
             .listRowBackground(Color.ceviSurfaceContainerLow)
             Section {
                 ForEach(permissions.assignableUnits(from: allUnits)) { unit in
-                    Toggle(unit.name, isOn: Binding(
+                    Toggle(isOn: Binding(
                         get: { selectedUnits.contains(unit.id) },
                         set: { isOn in if isOn { selectedUnits.insert(unit.id) } else { selectedUnits.remove(unit.id) } }
-                    ))
+                    )) {
+                        HStack(spacing: Spacing.s3) {
+                            UnitLogo(unitId: unit.id, size: Size.avatar * 0.75)
+                            Text(unit.name)
+                        }
+                    }
                     .frame(minHeight: 44)
                 }
             } header: {

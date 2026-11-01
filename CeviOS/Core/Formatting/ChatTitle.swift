@@ -8,7 +8,7 @@ nonisolated enum ChatTitle {
             String(localized: "Gruppenchat \(chat.unit.name)")
         case .direct:
             if let parent = chat.parent, profile.isUnitLeader(of: chat.unit.id) {
-                parent.displayName
+                parent.shortName
             } else {
                 String(localized: "Stufenleitung \(chat.unit.name)")
             }

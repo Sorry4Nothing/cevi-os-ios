@@ -131,10 +131,13 @@ actor APIClient {
         throw error
     }
 
-    /// GET of a server-provided path that may carry a query (e.g. `bildUrl`), authenticated like every other call.
-    func data(path: String) async throws -> Data {
-        guard let components = URLComponents(string: path), components.host == nil else { throw APIError.network }
-        return try await send("GET", components.path, query: components.queryItems ?? [])
+    /// GET of a server-provided image path (`bildUrl`, `logoUrl`). Only `ImagePath` addresses on the own base URL,
+    /// at most `ImagePath.maxBytes`.
+    func image(path: String) async throws -> Data {
+        guard ImagePath.isValid(path), let components = URLComponents(string: path) else { throw APIError.network }
+        let data = try await send("GET", components.path, query: components.queryItems ?? [])
+        guard data.count <= ImagePath.maxBytes else { throw APIError.network }
+        return data
     }
 
     /// Like `send`, with a decoded response.
