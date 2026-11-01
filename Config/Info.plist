@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>APIBaseURL</key>
+	<string>$(API_BASE_URL)</string>
+	<key>AppStoreURL</key>
+	<string>$(APP_STORE_URL)</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Archivo.ttf</string>
+	</array>
+	<key>UILaunchScreen</key>
+	<dict>
+		<key>UIColorName</key>
+		<string>cevi-surface</string>
+		<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+</dict>
+</dict>
+</plist>

@@ -1,0 +1,783 @@
+{
+  "sourceLanguage" : "de",
+  "strings" : {
+    "" : {
+
+    },
+    " (Stufenleitung)" : {
+
+    },
+    "%@" : {
+
+    },
+    "%@ · Gesendet" : {
+
+    },
+    "%@ · SL" : {
+
+    },
+    "%@ anrufen, %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ anrufen, %2$@"
+          }
+        }
+      }
+    },
+    "%@ bis %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ bis %2$@"
+          }
+        }
+      }
+    },
+    "%@ kommt" : {
+
+    },
+    "%@ kommt nicht" : {
+
+    },
+    "%@, %@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@, %2$@"
+          }
+        }
+      }
+    },
+    "%@, ganztägig" : {
+
+    },
+    "%lld" : {
+
+    },
+    "%lld Ja, %lld Nein, %lld offen von %lld" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld Ja, %2$lld Nein, %3$lld offen von %4$lld"
+          }
+        }
+      }
+    },
+    "%lld ungelesen" : {
+
+    },
+    "%lld von %lld Anlässen da" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld von %2$lld Anlässen da"
+          }
+        }
+      }
+    },
+    "%lld von %lld Zeichen" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld von %2$lld Zeichen"
+          }
+        }
+      }
+    },
+    "%lld/%lld" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld/%2$lld"
+          }
+        }
+      }
+    },
+    "ab %@" : {
+
+    },
+    "Abbrechen" : {
+
+    },
+    "Abgesagt" : {
+
+    },
+    "Abmelden" : {
+
+    },
+    "Abmelden?" : {
+
+    },
+    "Administration" : {
+
+    },
+    "Aktualisieren" : {
+
+    },
+    "Alle Anlässe deiner Stufe auf einen Blick." : {
+
+    },
+    "Alle Anlässe von %@ auf einen Blick." : {
+
+    },
+    "Als Leitung siehst du Daten von Kindern. Dafür braucht dein iPhone einen Geräte-Code. Ohne ihn zeigt Cevi OS nichts an." : {
+
+    },
+    "Ältere Nachrichten laden" : {
+
+    },
+    "An welche Stufenleitung möchtest du schreiben? Die Nachricht lesen alle Leitenden dieser Stufe." : {
+
+    },
+    "Anmelden" : {
+
+    },
+    "Anmeldungen" : {
+
+    },
+    "Anwesend: %lld von %lld%@" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Anwesend: %1$lld von %2$lld%3$@"
+          }
+        }
+      }
+    },
+    "Anwesenheit" : {
+
+    },
+    "App" : {
+
+    },
+    "Bei Eltern: die Namen eurer Kinder und ihre Stufe" : {
+
+    },
+    "Benachrichtigungen" : {
+
+    },
+    "Benutzername" : {
+
+    },
+    "Benutzername %@" : {
+
+    },
+    "Bestätigen" : {
+
+    },
+    "Bild auswählen" : {
+
+    },
+    "Bild entfernen" : {
+
+    },
+    "bis %@" : {
+
+    },
+    "Bitte Benutzername und Passwort eingeben." : {
+
+    },
+    "Bitte die App aktualisieren" : {
+
+    },
+    "Bitte die App aktualisieren." : {
+
+    },
+    "Bitte kurz warten." : {
+
+    },
+    "Bitte melde dich neu an" : {
+
+    },
+    "Bitte noch einmal anmelden." : {
+
+    },
+    "Bitte nur das Nötigste schreiben, keine Diagnosen." : {
+
+    },
+    "Cevi OS" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cevi OS"
+          }
+        }
+      }
+    },
+    "Cevi OS entsperren" : {
+
+    },
+    "Cevi OS ist gesperrt" : {
+
+    },
+    "Cevi OS kann dir melden, wenn es neue Chat-Nachrichten oder Änderungen bei Programmen gibt. Die Mitteilung nennt nie den Text einer Nachricht oder Namen von Kindern. Du kannst das jederzeit in den Einstellungen ändern." : {
+
+    },
+    "Cevi Stäfa-Hombrechtikon" : {
+
+    },
+    "Chat" : {
+
+    },
+    "Code" : {
+
+    },
+    "Da" : {
+
+    },
+    "Dafür fehlt dir die Berechtigung." : {
+
+    },
+    "Danach brauchst du wieder Benutzername und Passwort." : {
+
+    },
+    "Das aktuelle Passwort stimmt nicht." : {
+
+    },
+    "Das Bild ist zu gross." : {
+
+    },
+    "Das Entsperren hat nicht geklappt." : {
+
+    },
+    "Das gibt es nicht mehr oder du siehst es nicht." : {
+
+    },
+    "Das liegt nicht an dir. Versuche es in ein paar Minuten nochmals." : {
+
+    },
+    "Das neue Passwort darf höchstens 128 Zeichen haben." : {
+
+    },
+    "Das neue Passwort muss mindestens 12 Zeichen haben." : {
+
+    },
+    "Das Programm hat schon begonnen. Die Anmeldung lässt sich nicht mehr ändern." : {
+
+    },
+    "Datenschutz" : {
+
+    },
+    "Datenschutzerklärung lesen" : {
+
+    },
+    "Dein Konto löscht die Abteilung. Schreib dafür an die Abteilungsleitung." : {
+
+    },
+    "Deine Chat-Nachrichten und dein Profilbild" : {
+
+    },
+    "Deine Nachricht geht an die ganze Stufenleitung: **%@**" : {
+
+    },
+    "Deine Zusagen zu Programmen" : {
+
+    },
+    "Deinen Namen, Benutzernamen und deine Rolle" : {
+
+    },
+    "Der Code stimmt nicht." : {
+
+    },
+    "Die Anmeldung ist nicht mehr möglich." : {
+
+    },
+    "Die Anmeldung ist nicht mehr möglich. Das Programm ist abgesagt oder hat schon begonnen." : {
+
+    },
+    "Die Anwesenheit lässt sich erst nach Beginn des Programms und bis 14 Tage danach erfassen." : {
+
+    },
+    "Die beiden neuen Passwörter sind nicht gleich." : {
+
+    },
+    "Die Verbindung zum Server ist nicht eingerichtet." : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Verbindung zum Server ist nicht eingerichtet."
+          }
+        }
+      }
+    },
+    "Diese Nummer sehen alle Eltern der Stufe, und sie können sie speichern. Leer lassen entfernt sie." : {
+
+    },
+    "Diese Seite ist nur für die Stufenleitung. Wenn du denkst, das ist ein Fehler, frag deine Stufenleitung." : {
+
+    },
+    "Diese Version von Cevi OS wird nicht mehr unterstützt." : {
+
+    },
+    "Dieses Bild kann die App nicht verwenden. Bitte ein anderes wählen." : {
+
+    },
+    "Dieses Passwort stammt aus einem bekannten Datenleck. Bitte ein anderes wählen." : {
+
+    },
+    "Dieses Programm gibt es nicht mehr oder du siehst es nicht." : {
+
+    },
+    "Dieses Programm wird von der Leitung geprüft. Eine Anmeldung ist im Moment nicht möglich." : {
+
+    },
+    "Du" : {
+
+    },
+    "Du darfst für dieses Kind nicht antworten." : {
+
+    },
+    "Du hast ein Startpasswort von der Abteilung bekommen. Wähle jetzt ein eigenes, das nur du kennst." : {
+
+    },
+    "Du kannst nur Stufen ändern, in denen du Stufenleitung bist." : {
+
+    },
+    "Du warst länger nicht aktiv. Zu deiner Sicherheit haben wir dich abgemeldet." : {
+
+    },
+    "Du wirst auf allen Geräten abgemeldet. Danach brauchst du wieder Benutzername und Passwort." : {
+
+    },
+    "Eigenes Passwort wählen" : {
+
+    },
+    "Eltern" : {
+
+    },
+    "Elternteil · %@" : {
+
+    },
+    "Entsperren" : {
+
+    },
+    "erfüllt" : {
+
+    },
+    "Ersatzcode" : {
+
+    },
+    "Ersatzcode verwenden" : {
+
+    },
+    "Erster Login" : {
+
+    },
+    "Etwas ist schiefgegangen. Bitte später nochmals versuchen." : {
+
+    },
+    "Etwas ist schiefgelaufen" : {
+
+    },
+    "Fehler: %@" : {
+
+    },
+    "Für %@" : {
+
+    },
+    "Ganztägig" : {
+
+    },
+    "Geräte-Code einrichten" : {
+
+    },
+    "Gesendet" : {
+
+    },
+    "Gestern" : {
+
+    },
+    "Gib den 6-stelligen Code aus deiner Authenticator-App ein." : {
+
+    },
+    "Gib einen deiner Ersatzcodes ein (Format xxxxx-xxxxx). Jeder Code gilt nur einmal." : {
+
+    },
+    "Gruppe" : {
+
+    },
+    "Gruppen" : {
+
+    },
+    "Gruppenchat %@" : {
+
+    },
+    "Heute" : {
+
+    },
+    "Ich" : {
+
+    },
+    "Ich habe die Datenschutzerklärung gelesen und bin einverstanden." : {
+
+    },
+    "Im App Store öffnen" : {
+
+    },
+    "In den nächsten Monaten ist nichts geplant." : {
+
+    },
+    "Info" : {
+
+    },
+    "Intern (Admin und Stufenleitung)" : {
+
+    },
+    "Ja" : {
+
+    },
+    "Kein Zugriff" : {
+
+    },
+    "Keine Chats" : {
+
+    },
+    "Keine Nachrichten oder Namen in Mitteilungen" : {
+
+    },
+    "Keine Programme" : {
+
+    },
+    "Keine Verbindung" : {
+
+    },
+    "Keine Verbindung zum Server. Bitte später nochmals versuchen." : {
+
+    },
+    "Keine Weitergabe an andere" : {
+
+    },
+    "Keine Werbung und keine Tracker" : {
+
+    },
+    "Kinder" : {
+
+    },
+    "Kinder · %lld" : {
+
+    },
+    "Kommen deine Kinder?" : {
+
+    },
+    "Kommt" : {
+
+    },
+    "Kommt nicht" : {
+
+    },
+    "Kontaktperson" : {
+
+    },
+    "Konto" : {
+
+    },
+    "Konto löschen" : {
+
+    },
+    "Lädt" : {
+
+    },
+    "Leitende" : {
+
+    },
+    "Leitende · %lld" : {
+
+    },
+    "Leitung" : {
+
+    },
+    "Leitung · %@" : {
+
+    },
+    "Los geht’s" : {
+
+    },
+    "Löschen" : {
+
+    },
+    "Meine Anmeldung als Leitung" : {
+
+    },
+    "Mindestens 12 Zeichen" : {
+
+    },
+    "Mit der Stufenleitung" : {
+
+    },
+    "Mit einem Tipp Ja oder Nein sagen." : {
+
+    },
+    "Mit Face ID entsperren" : {
+
+    },
+    "Mit Face ID öffnet sich die App nur für dich. Ohne Face ID fragt sie nach deinem Gerätecode." : {
+
+    },
+    "Mitlesen: %@" : {
+
+    },
+    "Mitnehmen" : {
+
+    },
+    "Mitteilungen zu Anmeldungen" : {
+
+    },
+    "Mitteilungen zu Programmen" : {
+
+    },
+    "Mitteilungen zum Chat" : {
+
+    },
+    "Nachricht" : {
+
+    },
+    "Nachricht an die Stufenleitung %@" : {
+
+    },
+    "Nachricht schreiben" : {
+
+    },
+    "Nachrichten an die Stufenleitung und in der Gruppe." : {
+
+    },
+    "Nein" : {
+
+    },
+    "Neue Nachricht" : {
+
+    },
+    "Neue Nachricht an die Stufenleitung: Stift oben rechts." : {
+
+    },
+    "Neues Passwort" : {
+
+    },
+    "Nicht da" : {
+
+    },
+    "Nicht erfasst" : {
+
+    },
+    "nicht erfüllt" : {
+
+    },
+    "Nicht gefunden" : {
+
+    },
+    "Nicht jetzt" : {
+
+    },
+    "Noch keine Antwort" : {
+
+    },
+    "Noch keine Programme." : {
+
+    },
+    "Noch niemand eingeteilt." : {
+
+    },
+    "Noch offen" : {
+
+    },
+    "Nochmals versuchen" : {
+
+    },
+    "Nummer speichern" : {
+
+    },
+    "Nur Ziffern, + ( ) / . - und Leerzeichen, 6 bis 30 Zeichen." : {
+
+    },
+    "Offen" : {
+
+    },
+    "Ohne Stufe ist nur «Intern» möglich." : {
+
+    },
+    "Ort" : {
+
+    },
+    "Passwort" : {
+
+    },
+    "Passwort anzeigen" : {
+
+    },
+    "Passwort speichern" : {
+
+    },
+    "Passwort verbergen" : {
+
+    },
+    "Passwort vergessen?" : {
+
+    },
+    "Passwort wiederholen" : {
+
+    },
+    "Profil" : {
+
+    },
+    "Profilbild ändern" : {
+
+    },
+    "Programm" : {
+
+    },
+    "Programme" : {
+
+    },
+    "Programme sehen alle aus der Stufe. Zusagen sieht die Leitung. Nachrichten an die Stufenleitung lesen alle Stufenleitenden dieser Stufe." : {
+
+    },
+    "Programme werden geladen" : {
+
+    },
+    "Prüfe dein Internet und versuche es nochmals." : {
+
+    },
+    "Schliessen" : {
+
+    },
+    "Schluss" : {
+
+    },
+    "Schön, bist du da." : {
+
+    },
+    "Senden" : {
+
+    },
+    "Sichtbar für" : {
+
+    },
+    "Sichtbarkeit" : {
+
+    },
+    "So richtest du ihn ein: Öffne die Einstellungen, tippe auf «Face ID & Code» (oder «Touch ID & Code») und dann auf «Code aktivieren». Danach öffnest du Cevi OS wieder." : {
+
+    },
+    "Sortiert: offen zuerst, dann Ja, dann Nein." : {
+
+    },
+    "Speichern" : {
+
+    },
+    "Stand: 1. November 2026 · Cevi Stäfa-Hombrechtikon" : {
+
+    },
+    "Startpasswort" : {
+
+    },
+    "Stimmt überein" : {
+
+    },
+    "Stufen" : {
+
+    },
+    "Stufen und Sichtbarkeit" : {
+
+    },
+    "Stufenleitung" : {
+
+    },
+    "Stufenleitung · %@" : {
+
+    },
+    "Stufenleitung %@" : {
+
+    },
+    "Support" : {
+
+    },
+    "Telefon für Eltern" : {
+
+    },
+    "Telefonnummer" : {
+
+    },
+    "Treffpunkt" : {
+
+    },
+    "Überall abmelden" : {
+
+    },
+    "Überall abmelden?" : {
+
+    },
+    "Umgebung: %@" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Umgebung: %@"
+          }
+        }
+      }
+    },
+    "Wann" : {
+
+    },
+    "Was wir nicht machen" : {
+
+    },
+    "Was wir speichern" : {
+
+    },
+    "Weiter" : {
+
+    },
+    "Wer was sieht" : {
+
+    },
+    "Willkommen, %@!" : {
+
+    },
+    "Wird geladen …" : {
+
+    },
+    "Wird geprüft" : {
+
+    },
+    "Zu den Programmen" : {
+
+    },
+    "Zu viele Bilder in kurzer Zeit. Bitte später nochmals versuchen." : {
+
+    },
+    "Zusage" : {
+
+    },
+    "Zusage für %@ offen" : {
+
+    },
+    "Zusage: Ja" : {
+
+    },
+    "Zusage: Nein" : {
+
+    },
+    "Zusage: Offen" : {
+
+    },
+    "Zusagen" : {
+
+    },
+    "Zweiter Faktor" : {
+
+    }
+  },
+  "version" : "1.1"
+}

@@ -1,0 +1,19 @@
+# macOS
+.DS_Store
+
+# Xcode
+xcuserdata/
+*.xcuserstate
+DerivedData/
+build/
+*.xcresult
+.swiftpm/
+
+# Zugangsdaten und Konfiguration, die nie ins Repo gehören
+Config/Secrets.xcconfig
+GoogleService-Info.plist
+*.p8
+*.p12
+*.mobileprovision
+.env
+.env.*
