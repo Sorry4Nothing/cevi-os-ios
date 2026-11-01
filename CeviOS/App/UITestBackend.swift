@@ -531,7 +531,8 @@ private nonisolated struct World {
             return .json(200, ["chats": mine.map { summary(chats[$0], me) }])
         }
         if id == "direkt", request.method == "POST" {
-            guard let unitId = request.body["stufeId"] as? String, me.isParent else { return .error(403, "KEIN_ZUGRIFF", "Kein Zugriff.") }
+            // The app sends `UUID.uuidString` (upper case); the fictional ids are lower case.
+            guard let unitId = (request.body["stufeId"] as? String)?.lowercased(), me.isParent else { return .error(403, "KEIN_ZUGRIFF", "Kein Zugriff.") }
             if let existing = chats.first(where: { $0.unit == unitId && $0.parent == me.id }) { return .json(200, ["id": existing.id]) }
             counter += 1
             let chatId = String(format: "00000000-0000-0000-0000-%012x", counter)

@@ -58,7 +58,10 @@ struct NewMessageSheet: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Schliessen", systemImage: "xmark") { dismiss() }
+                        .frame(minWidth: Size.touchTarget, minHeight: Size.touchTarget)
                 }
+                // Without the shared glass the button keeps its own 44 pt frame (iOS 27 sizes the glass at 36 pt).
+                .sharedBackgroundVisibility(.hidden)
             }
         }
     }

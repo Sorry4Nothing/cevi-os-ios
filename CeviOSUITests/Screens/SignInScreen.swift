@@ -13,6 +13,7 @@ struct SignInScreen: Screen {
         fill(usernameField, with: username)
         fill(passwordField, with: password, isSecure: true)
         app.typeText("\n")
+        dismissPasswordSavePrompt(timeout: 3)
     }
 
     func submitEmpty() {
