@@ -15,7 +15,6 @@ struct UnitLogo: View {
             if let image {
                 Image(decorative: image, scale: 1).resizable().scaledToFit()
             } else {
-                // TODO: Replace the CeviLogo asset with the real Cevi logo (see docs/app-store.md).
                 Image(decorative: "CeviLogo").resizable().scaledToFit()
             }
         }
