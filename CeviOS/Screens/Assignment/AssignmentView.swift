@@ -27,16 +27,27 @@ struct AssignmentView: View {
         return allowed ? (true, nil) : (false, String(localized: "Du kannst nur Stufen ändern, in denen du Stufenleitung bist."))
     }
 
+    /// Section title in the design style: footnote, semibold, on-surface-variant (enough contrast on the screen background).
+    private func sectionTitle(_ title: LocalizedStringKey) -> some View {
+        Text(title)
+            .font(.footnote.weight(.semibold))
+            .textCase(.uppercase)
+            .foregroundStyle(Color.ceviOnSurfaceVariant)
+    }
+
     var body: some View {
         Form {
-            Section("Sichtbarkeit") {
+            Section {
                 Picker("Sichtbar für", selection: $visibility) {
                     Text("Intern (Admin und Stufenleitung)").tag(Visibility.internalOnly)
                     Text("Leitende").tag(Visibility.leaders)
                     Text("Eltern").tag(Visibility.parents)
                 }
+            } header: {
+                sectionTitle("Sichtbarkeit")
             }
-            Section("Stufen") {
+            .listRowBackground(Color.ceviSurfaceContainerLow)
+            Section {
                 ForEach(permissions.assignableUnits(from: allUnits)) { unit in
                     Toggle(unit.name, isOn: Binding(
                         get: { selectedUnits.contains(unit.id) },
@@ -44,7 +55,10 @@ struct AssignmentView: View {
                     ))
                     .frame(minHeight: 44)
                 }
+            } header: {
+                sectionTitle("Stufen")
             }
+            .listRowBackground(Color.ceviSurfaceContainerLow)
             if let message = validity.message { Section { ErrorRow(text: message) } }
             if let error = action.error { Section { ErrorRow(text: error) } }
             Section {
@@ -62,6 +76,8 @@ struct AssignmentView: View {
                 .disabled(!validity.ok || action.isRunning)
             }
         }
+        .scrollContentBackground(.hidden)
+        .ceviScreenBackground()
         .navigationTitle("Stufen und Sichtbarkeit")
         .navigationBarTitleDisplayMode(.inline)
         .task {

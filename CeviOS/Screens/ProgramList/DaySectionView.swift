@@ -7,31 +7,31 @@ struct DaySectionView: View {
     @Environment(\.dynamicTypeSize) private var typeSize
 
     var body: some View {
-        if typeSize.isAccessibilitySize {
-            VStack(alignment: .leading, spacing: Spacing.s2) {
-                HStack(alignment: .firstTextBaseline, spacing: Spacing.s2) { weekday; dayNumber }
-                    .accessibilityElement(children: .ignore)
-                    .accessibilityLabel(Text(ProgramFormat.fullDate(section.day)))
-                    .accessibilityAddTraits(.isHeader)
-                cards
-            }
-        } else {
-            HStack(alignment: .top, spacing: Spacing.s3) {
-                VStack(spacing: 0) {
-                    weekday
-                    dayNumber
+        // Layout switch instead of `if`: the texts keep their identity when the text size changes.
+        let isLarge = typeSize.isAccessibilitySize
+        let layout = isLarge
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: Spacing.s2))
+            : AnyLayout(HStackLayout(alignment: .top, spacing: Spacing.s3))
+        let dayLayout = isLarge
+            ? AnyLayout(HStackLayout(alignment: .firstTextBaseline, spacing: Spacing.s2))
+            : AnyLayout(VStackLayout(spacing: 0))
+        layout {
+            dayLayout {
+                weekday
+                dayNumber
+                if !isLarge {
                     Capsule()
                         .fill(Color.ceviOutlineVariant)
                         .frame(width: Size.focusBorder)
                         .padding(.vertical, Spacing.s1)
                         .accessibilityHidden(true)
                 }
-                .fixedSize(horizontal: true, vertical: false)
-                .accessibilityElement(children: .ignore)
-                .accessibilityLabel(Text(ProgramFormat.fullDate(section.day)))
-                .accessibilityAddTraits(.isHeader)
-                cards
             }
+            .fixedSize(horizontal: !isLarge, vertical: false)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(Text(ProgramFormat.fullDate(section.day)))
+            .accessibilityAddTraits(.isHeader)
+            cards
         }
     }
 

@@ -24,6 +24,10 @@ struct ProgramListView: View {
             .navigationDestination(for: UUID.self) { id in ProgramDetailView(programId: id) }
         }
         .task { await model.load(client: appState.client) }
+        // Back from a detail: answers given there show up in the list right away.
+        .onChange(of: path) { _, new in
+            if new.isEmpty { Task { await model.load(client: appState.client) } }
+        }
     }
 
     @ViewBuilder
@@ -34,7 +38,8 @@ struct ProgramListView: View {
             }
         } else {
             ScrollView {
-                LazyVStack(alignment: .leading, spacing: Spacing.s5) {
+                // Not lazy: at most 120 days of programs, and every card stays in the accessibility tree.
+                VStack(alignment: .leading, spacing: Spacing.s5) {
                     if case .failed(let text) = model.state {
                         ErrorRow(text: text)
                     }

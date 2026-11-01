@@ -9,9 +9,9 @@ struct CeviOSApp: App {
 
     init() {
         #if DEBUG
-        if let scenario = UITestScenario.current {
-            _state = State(initialValue: scenario.appState())
-            _lock = State(initialValue: scenario.appLock())
+        if UITestLaunch.isActive {
+            _state = State(initialValue: UITestLaunch.appState())
+            _lock = State(initialValue: AppLock(defaults: .standard, isLocked: UITestLaunch.startsLocked))
             return
         }
         #endif
@@ -23,7 +23,7 @@ struct CeviOSApp: App {
 
     private var root: some View {
         #if DEBUG
-        RootView().preferredColorScheme(UITestScenario.colorScheme)
+        RootView().preferredColorScheme(UITestLaunch.colorScheme)
         #else
         RootView()
         #endif

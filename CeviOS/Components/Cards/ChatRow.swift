@@ -17,11 +17,12 @@ struct ChatRow: View {
                 Text(title)
                     .font(.body.weight(isUnread ? .bold : .semibold))
                     .foregroundStyle(Color.ceviOnSurface)
+                    .fixedSize(horizontal: false, vertical: true)
                 if let preview {
                     Text(preview)
                         .font(.subheadline)
                         .foregroundStyle(isUnread ? Color.ceviOnSurface : Color.ceviOnSurfaceVariant)
-                        .lineLimit(2)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
             }
             Spacer(minLength: Spacing.s2)

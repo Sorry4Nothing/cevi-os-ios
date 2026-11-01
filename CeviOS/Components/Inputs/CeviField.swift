@@ -1,10 +1,13 @@
 import SwiftUI
 
 /// Label above a bordered text field. The field itself carries the accessibility label.
+/// A tap anywhere in the box focuses the field, so the tap area is the whole box, not only the line of text.
 struct CeviField<Field: View>: View {
     let label: LocalizedStringKey
-    var isFocused = false
+    var focus: FocusState<Bool>.Binding?
     @ViewBuilder var field: Field
+
+    private var isFocused: Bool { focus?.wrappedValue ?? false }
 
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.s2) {
@@ -25,6 +28,8 @@ struct CeviField<Field: View>: View {
                         lineWidth: isFocused ? Size.focusBorder : Size.border
                     )
                 }
+                .contentShape(Radius.shape(Radius.sm))
+                .simultaneousGesture(TapGesture().onEnded { focus?.wrappedValue = true })
         }
     }
 }
@@ -37,7 +42,7 @@ struct CeviField<Field: View>: View {
     VStack(spacing: Spacing.s4) {
         Eyebrow("Cevi Stäfa-Hombrechtikon")
         CeviField(label: "Benutzername") { TextField("", text: $text) }
-        CeviField(label: "Passwort", isFocused: true) {
+        CeviField(label: "Passwort", focus: $focused) {
             PasswordField(label: "Passwort", text: $password, isFocused: $focused)
         }
         Toggle("Ich habe die Datenschutzerklärung gelesen und bin einverstanden.", isOn: $accepted)

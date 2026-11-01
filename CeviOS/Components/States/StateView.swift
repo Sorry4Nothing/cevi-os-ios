@@ -38,6 +38,7 @@ struct StateView: View {
                     Text(message)
                         .font(.body)
                         .foregroundStyle(Color.ceviOnSurfaceVariant)
+                        .fixedSize(horizontal: false, vertical: true)
                         .padding(.bottom, Spacing.s3)
                 }
                 VStack(spacing: Spacing.s1) {

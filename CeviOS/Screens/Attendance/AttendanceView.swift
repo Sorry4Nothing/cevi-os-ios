@@ -113,10 +113,10 @@ struct AttendanceView: View {
 
     @ViewBuilder
     private func presenceButtons(_ name: String, _ presence: Presence?, _ person: UUID, _ isChild: Bool, _ event: AttendanceEvent, _ overview: AttendanceOverview) -> some View {
-        presenceButton("Da", name: name, symbol: "checkmark", selected: presence == .present, person: person) {
+        presenceButton(String(localized: "Da"), name: name, symbol: "checkmark", selected: presence == .present, person: person) {
             await set(person, isChild, present: presence == .present ? nil : true, event: event, overview: overview)
         }
-        presenceButton("Nicht da", name: name, symbol: "xmark", selected: presence == .absent, person: person) {
+        presenceButton(String(localized: "Nicht da"), name: name, symbol: "xmark", selected: presence == .absent, person: person) {
             await set(person, isChild, present: presence == .absent ? nil : false, event: event, overview: overview)
         }
     }
@@ -126,7 +126,8 @@ struct AttendanceView: View {
     }
 
     private func presenceButton(
-        _ title: LocalizedStringKey, name: String, symbol: String, selected: Bool, person: UUID, action: @escaping () async -> Void
+        // `String`, not `LocalizedStringKey`: a key interpolated into the label is read as «LocalizedStringKey(…)».
+        _ title: String, name: String, symbol: String, selected: Bool, person: UUID, action: @escaping () async -> Void
     ) -> some View {
         Button { Task { await action() } } label: {
             Label(title, systemImage: selected ? "\(symbol).circle.fill" : "circle")

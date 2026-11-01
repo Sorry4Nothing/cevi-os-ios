@@ -9,12 +9,13 @@ struct AnswerButtons: View {
 
     var body: some View {
         HStack(spacing: Spacing.s2) {
-            button(.yes, "Ja")
-            button(.no, "Nein")
+            button(.yes, String(localized: "Ja"))
+            button(.no, String(localized: "Nein"))
         }
     }
 
-    private func button(_ answer: Answer, _ title: LocalizedStringKey) -> some View {
+    /// `String`, not `LocalizedStringKey`: a key interpolated into the label is read as «LocalizedStringKey(…)».
+    private func button(_ answer: Answer, _ title: String) -> some View {
         let isSelected = selected == answer
         return Button { onSelect(answer) } label: {
             HStack(spacing: Spacing.s1) {

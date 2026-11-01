@@ -58,10 +58,13 @@ struct ChatListView: View {
                 Section { rows(directChats) } header: { SectionTitle(text: "Mit der Stufenleitung") }
             }
             if isParent && directChats.isEmpty {
-                Section {} footer: {
+                // A plain row instead of a section footer: footers do not follow Dynamic Type reliably.
+                Section {
                     Text("Neue Nachricht an die Stufenleitung: Stift oben rechts.")
                         .font(.footnote)
+                        .fixedSize(horizontal: false, vertical: true)
                         .foregroundStyle(Color.ceviOnSurfaceVariant)
+                        .listRowBackground(Color.clear)
                 }
             }
         }

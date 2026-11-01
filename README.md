@@ -30,6 +30,10 @@ Jedes Scheme hat eine eigene Build Configuration mit Werten aus `Config/<Umgebun
 
 Die Unit- und UI-Tests laufen im Scheme Dev (`Product > Test`). Die Icons sind vorerst einfarbige Platzhalter.
 
+## UI-Tests
+
+`CeviOSUITests/` fährt die ganze App gegen ein simuliertes Backend (nur Debug-Builds, erfundene Daten) und prüft auf jedem Bildschirm die Barrierefreiheit: eine Datei pro Bildschirm unter `Screens/`, die Abläufe zentral in `Flows/AppFlowTests.swift`. Aufbau, Startargumente, Abläufe und Lücken: [docs/barrierefreiheit.md](docs/barrierefreiheit.md).
+
 ## Struktur
 
 Regel: ein Ordner pro Seite, wiederverwendbare Bausteine in `Components`. Pro Datei ein Typ.

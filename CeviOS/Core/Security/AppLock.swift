@@ -21,10 +21,14 @@ final class AppLock {
     }
 
     #if DEBUG
-    /// UI-test harness: starts unlocked (or locked) without Face ID.
+    /// UI tests: the automatic unlock on appear is skipped once, so a locked start shows the lock screen.
+    private var holdsLockOnce = false
+
+    /// UI-test backend: starts unlocked (or locked) without Face ID.
     init(defaults: UserDefaults, isLocked: Bool) {
         self.defaults = defaults
         self.isLocked = isLocked
+        holdsLockOnce = isLocked
     }
     #endif
 
@@ -41,8 +45,8 @@ final class AppLock {
     /// Is a device code set? Without it nothing can be locked.
     static var deviceCodeSet: Bool {
         #if DEBUG
-        // The simulator has no device code; the lock scenario still needs the lock screen.
-        if UITestScenario.current == .lock { return true }
+        // The simulator has no device code; the UI tests still need the lock screen.
+        if UITestLaunch.isActive { return true }
         #endif
         return LAContext().canEvaluatePolicy(.deviceOwnerAuthentication, error: nil)
     }
@@ -67,8 +71,16 @@ final class AppLock {
     /// Asks for Face ID, Touch ID or the device code.
     func unlock() async {
         #if DEBUG
-        // The lock scenario shows the lock screen itself; no system authentication sheet over it.
-        if UITestScenario.current == .lock { return }
+        // UI tests: no system authentication sheet. «Entsperren» unlocks; the automatic attempt of a locked start is skipped once.
+        if UITestLaunch.isActive {
+            if holdsLockOnce {
+                holdsLockOnce = false
+            } else {
+                isLocked = false
+                failed = false
+            }
+            return
+        }
         #endif
         failed = false
         let context = LAContext()

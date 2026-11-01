@@ -20,17 +20,22 @@ struct ChangePasswordView: View {
                 .font(.body)
                 .foregroundStyle(Color.ceviOnSurfaceVariant)
                 .fixedSize(horizontal: false, vertical: true)
-            CeviField(label: "Startpasswort", isFocused: currentFocused) {
+            CeviField(label: "Startpasswort", focus: $currentFocused) {
                 PasswordField(label: "Startpasswort", text: $current, isFocused: $currentFocused)
+                    .submitLabel(.next)
+                    .onSubmit { newFocused = true }
             }
             VStack(alignment: .leading, spacing: Spacing.s2) {
-                CeviField(label: "Neues Passwort", isFocused: newFocused) {
+                CeviField(label: "Neues Passwort", focus: $newFocused) {
                     PasswordField(label: "Neues Passwort", text: $new, kind: .new, isFocused: $newFocused)
+                        // The return key moves on: with the keyboard up, the action bar covers the last field.
+                        .submitLabel(.next)
+                        .onSubmit { repeatedFocused = true }
                 }
                 RuleRow(text: "Mindestens 12 Zeichen", isMet: new.count >= 12)
             }
             VStack(alignment: .leading, spacing: Spacing.s2) {
-                CeviField(label: "Passwort wiederholen", isFocused: repeatedFocused) {
+                CeviField(label: "Passwort wiederholen", focus: $repeatedFocused) {
                     PasswordField(label: "Passwort wiederholen", text: $repeated, kind: .new,
                                   isFocused: $repeatedFocused)
                 }

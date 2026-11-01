@@ -19,7 +19,9 @@ struct SecondFactorView: View {
                 : "Gib den 6-stelligen Code aus deiner Authenticator-App ein.")
                 .font(.body)
                 .foregroundStyle(Color.ceviOnSurfaceVariant)
-            CeviField(label: isBackupCode ? "Ersatzcode" : "Code", isFocused: codeFocused) {
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            CeviField(label: isBackupCode ? "Ersatzcode" : "Code", focus: $codeFocused) {
                 TextField("", text: $code)
                     .keyboardType(isBackupCode ? .asciiCapable : .numberPad)
                     .textContentType(.oneTimeCode)

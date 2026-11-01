@@ -117,6 +117,7 @@ struct ProgramDetailView: View {
             if let time { Text(time).font(.title(.title2)).foregroundStyle(Color.ceviOnSurface) }
             if let place { Text(place).font(.subheadline).foregroundStyle(Color.ceviOnSurfaceVariant) }
         }
+        .fixedSize(horizontal: false, vertical: true)
         .frame(maxWidth: .infinity, alignment: .leading)
         .ceviCard()
         .accessibilityElement(children: .combine)
@@ -144,7 +145,7 @@ struct ProgramDetailView: View {
             Image(systemName: symbol).foregroundStyle(Color.ceviAccent).accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 0) {
                 Text(title).font(.footnote).foregroundStyle(Color.ceviOnSurfaceVariant)
-                Text(text).font(.body).foregroundStyle(Color.ceviOnSurface)
+                Text(text).font(.body).foregroundStyle(Color.ceviOnSurface).fixedSize(horizontal: false, vertical: true)
             }
         }
         .accessibilityElement(children: .combine)

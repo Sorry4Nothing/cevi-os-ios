@@ -9,6 +9,7 @@ struct ProgramRow: View {
             Text(([ProgramFormat.time(of: program, on: day)] + program.units.map(\.name)).filter { !$0.isEmpty }.joined(separator: " · "))
                 .font(.footnote.weight(.semibold))
                 .foregroundStyle(Color.ceviAccent)
+                .frame(maxWidth: .infinity, alignment: .leading)
             Text(program.title)
                 .font(.title(.cardTitle))
                 .foregroundStyle(Color.ceviOnSurface)

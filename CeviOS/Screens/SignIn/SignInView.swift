@@ -42,7 +42,7 @@ struct SignInView: View {
 
     private var panel: some View {
         VStack(spacing: Spacing.s4) {
-            CeviField(label: "Benutzername", isFocused: usernameFocused) {
+            CeviField(label: "Benutzername", focus: $usernameFocused) {
                 TextField("", text: $username)
                     .textContentType(.username)
                     .textInputAutocapitalization(.never)
@@ -53,7 +53,7 @@ struct SignInView: View {
                     .frame(minHeight: Size.touchTarget)
                     .accessibilityLabel(Text("Benutzername"))
             }
-            CeviField(label: "Passwort", isFocused: passwordFocused) {
+            CeviField(label: "Passwort", focus: $passwordFocused) {
                 PasswordField(label: "Passwort", text: $password, isFocused: $passwordFocused)
                     .submitLabel(.go)
                     .onSubmit(signIn)

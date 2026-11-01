@@ -28,7 +28,12 @@ final class AppState {
     /// Push tokens and caches that must be dropped on sign-out hook in here.
     var onSignOut: [@MainActor () async -> Void] = []
 
-    init(configuration: AppConfiguration = .current, cookieStore: some CookieStore = KeychainCookieStore()) {
+    /// `session` is replaced only by the DEBUG UI-test backend (`UITestLaunch`).
+    init(
+        configuration: AppConfiguration = .current,
+        cookieStore: some CookieStore = KeychainCookieStore(),
+        session: URLSession = APIClient.makeSession()
+    ) {
         FirstLaunchCleanup.run(cookieStore: cookieStore)
         let hasCookies = !cookieStore.read().isEmpty
 
@@ -40,21 +45,13 @@ final class AppState {
         let version = APIClient.appVersion(from: Bundle.main.infoDictionary ?? [:])
         // The client calls back before `self` is ready; hence a relay whose target is filled in afterwards.
         let relay = EventRelay()
-        client = APIClient(baseURL: baseURL, appVersion: version, cookieStore: cookieStore) { relay.report($0) }
+        client = APIClient(baseURL: baseURL, appVersion: version, cookieStore: cookieStore, session: session) { relay.report($0) }
         relay.target = { [weak self] event in
             Task { @MainActor in self?.handle(event) }
         }
         phase = hasCookies ? .loading : .signIn
         onSignOut.append { ProfileImageCache.shared.removeAll() }
     }
-
-    #if DEBUG
-    /// Previews and the UI-test harness: fixed phase, no keychain, no session check.
-    init(client: APIClient?, phase: Phase) {
-        self.client = client
-        self.phase = phase
-    }
-    #endif
 
     func handle(_ event: APIEvent) {
         switch event {
