@@ -29,6 +29,10 @@ struct ChatScreen: Screen {
 
     func loadOlder(expecting text: String) {
         let olderButton = button("Ältere Nachrichten laden")
+        // At AX5 the 20 loaded messages are many screens tall; fast swipes get to the top before the precise approach.
+        for _ in 0..<40 where !olderButton.exists || !olderButton.isHittable {
+            app.swipeDown(velocity: .fast)
+        }
         scrollUntilHittable(olderButton, fromTop: false).tap()
         assertShows(text)
         waitUntilGone(olderButton)

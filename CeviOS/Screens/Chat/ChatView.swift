@@ -122,6 +122,8 @@ struct ChatView: View {
             HStack(alignment: .bottom, spacing: Spacing.s2) {
                 TextField("Nachricht schreiben", text: $draft, prompt: Text("Nachricht schreiben"), axis: .vertical)
                     .lineLimit(1...5)
+                    // iOS 27 exposes the title only as placeholder; an explicit label keeps the field named for VoiceOver.
+                    .accessibilityLabel("Nachricht schreiben")
                     .padding(.horizontal, Spacing.s4)
                     .padding(.vertical, Spacing.s2)
                     .frame(minHeight: Size.touchTarget)

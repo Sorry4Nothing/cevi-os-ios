@@ -72,14 +72,14 @@ final class AppFlowTests: XCTestCase {
         try direct.auditAccessibility()
         direct.send(message: "Noah kommt am Samstag etwas später.")
         direct.back()
-        chats.waitUntilDisplayed().assertShows("Mit der Stufenleitung")
+        chats.waitUntilDisplayed().assertSection("Mit der Stufenleitung")
 
         tabs.open(.profile)
         let profile = ProfileScreen(app: app).waitUntilDisplayed()
         try profile.auditAccessibility()
         profile.assertShows("Eva Beispiel", "Elternteil · Lena und Noah", "Benachrichtigungen")
         profile.setSwitch("Mitteilungen zum Chat", on: false)
-        profile.setSwitch("Mitteilungen zu Programmen", on: false)
+        profile.setSwitch("Mitteilungen und Erinnerungen", on: false)
         profile.setSwitch("Mitteilungen zum Chat", on: true)
         profile.signOut(username: AppRobot.username(.parent))
     }

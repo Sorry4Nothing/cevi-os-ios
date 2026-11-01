@@ -15,7 +15,20 @@ extension Screen {
     @discardableResult
     func waitUntilDisplayed(timeout: TimeInterval = 15, file: StaticString = #filePath, line: UInt = #line) -> Self {
         XCTAssertTrue(anchor.waitForExistence(timeout: timeout), "\(name) is not displayed", file: file, line: line)
+        dismissPasswordSavePrompt()
         return self
+    }
+
+    /// After a sign-in the system covers the app with the sheet «Passwort sichern?» (iOS 27). It is part of the app's
+    /// hierarchy, so everything behind it is unreachable and the audit finds covered text. «Später» closes it.
+    func dismissPasswordSavePrompt(timeout: TimeInterval = 1) {
+        for title in ["Später", "Not Now"] {
+            let button = app.sheets.buttons[title]
+            if button.waitForExistence(timeout: timeout) {
+                button.tap()
+                return
+            }
+        }
     }
 
     // MARK: Lookup
@@ -149,6 +162,7 @@ extension Screen {
     /// Waits for loading placeholders to go, then runs the audit with the shared false-positive filter.
     func auditAccessibility(file: StaticString = #filePath, line: UInt = #line) throws {
         XCTAssertTrue(anchor.waitForExistence(timeout: 15), "\(name) is not displayed", file: file, line: line)
+        dismissPasswordSavePrompt()
         waitUntilGone(element(containing: "Lädt"), file: file, line: line)
         waitUntilGone(element(containing: "werden geladen"), file: file, line: line)
         try AccessibilityAudit.run(on: app, screen: name, file: file, line: line)

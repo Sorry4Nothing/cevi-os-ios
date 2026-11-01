@@ -27,4 +27,11 @@ struct ChatListScreen: Screen {
         pencil.tap()
         return NewMessageScreen(app: app).waitUntilDisplayed()
     }
+
+    /// A section header; at AX5 the lazy list renders it only once scrolled into view.
+    func assertSection(_ title: String, file: StaticString = #filePath, line: UInt = #line) {
+        let header = element(containing: title)
+        for _ in 0..<15 where !header.exists { scrollStep(revealingAbove: false) }
+        XCTAssertTrue(header.waitForExistence(timeout: 5), "\(name): «\(title)» not shown", file: file, line: line)
+    }
 }
