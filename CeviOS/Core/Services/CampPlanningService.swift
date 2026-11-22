@@ -3,19 +3,19 @@ import Foundation
 /// Writing routes carry the `version` the app last saw. If the row changed since, the server answers 409
 /// `VERSION_KONFLIKT`: read it with `CampRules.versionConflict`.
 extension APIClient {
-    private func rowPath(_ campId: UUID, _ area: String, _ id: UUID? = nil, _ rest: String = "") -> String {
+    func rowPath(_ campId: UUID, _ area: String, _ id: UUID? = nil, _ rest: String = "") -> String {
         var path = campPath(campId) + "/" + area
         if let id { path += "/" + id.uuidString.lowercased() }
         return path + rest
     }
 
-    private func pageQuery(after: UUID?, limit: Int) -> [URLQueryItem] {
+    func pageQuery(after: UUID?, limit: Int) -> [URLQueryItem] {
         var query = [URLQueryItem(name: "limit", value: String(limit))]
         if let after { query.append(URLQueryItem(name: "nach", value: after.uuidString.lowercased())) }
         return query
     }
 
-    private func versionQuery(_ version: Int) -> [URLQueryItem] { [URLQueryItem(name: "version", value: String(version))] }
+    func versionQuery(_ version: Int) -> [URLQueryItem] { [URLQueryItem(name: "version", value: String(version))] }
 
     // MARK: Portfolios (Ressorts)
 

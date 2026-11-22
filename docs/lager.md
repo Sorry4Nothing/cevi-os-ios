@@ -40,6 +40,30 @@ Gebaut, ohne Bildschirme. Alle Schreib-Routen tragen `version` (Zeilenversion); 
 
 Hinweise: Die Aufgaben-Antwort enthält kein `aktionen`-Feld. Welche Knöpfe erscheinen, folgt aus der Rolle und `CampRights.allows` (für das Team nicht lesbar: ein verweigerter Schritt endet in 403).
 
+## Schnitt A2 Sitzungen und Kommunikation: Datenschicht (Issue #63)
+
+Gebaut, ohne Bildschirme. Schreib-Routen tragen `version`; Konflikte wie in A1 (`CampRules.versionConflict`, zum Beispiel `as: CampProtocol.self`). Anonyme Eingänge tragen im Modell nie einen Absender: `CampInboxEntry.sender` ist bei `anonym` immer `nil`, auch wenn der Server einen Namen schickt. Der Rückfragecode (`CampInboxSent.followUpCode`) kommt nur in der Antwort auf das Senden und wird nicht gespeichert. Dateien sind Verweise (`CampFileRef`, ID und Link), keine Bytes.
+
+| Was | Route (unter `/api/v1/lager/{id}`) | Code |
+| --- | --- | --- |
+| Höcks (Liste mit `von`/`bis`, Detail, anlegen, ändern, löschen) | `…/hoecks`, `…/hoecks/{id}` | `CampMeeting*`, `campMeetings` ff. Das Team sieht nur die Kurzform (`CampMeetingView`) |
+| Kalenderdatei | `GET …/hoecks/{id}.ics` | `campMeetingCalendar` (Rohdaten) |
+| Höck-Modus, Anwesende abhaken, Ressort-Runde | `GET …/hoecks/{id}/modus`, `PUT`/`DELETE …/anwesende/{personId}` | `CampMeetingMode`, `markCampMeetingPresent` |
+| Traktanden (anlegen, ändern, löschen, sortieren) | `…/traktanden`, `PUT …/traktanden/reihenfolge` | `CampAgendaItem*`, `CampAgendaOrderBody` |
+| «Auf nächsten Höck» | `GET …/traktanden/naechster`, `POST …/hoecks/{id}/traktanden/uebernehmen` | `campWaitingAgendaItems`, `adoptCampAgendaItems` |
+| Protokolle (Zeile mit Dateiverweis) | `…/protokolle`, `…/protokolle/{id}` (Filter `hoeckId`, `art`, `q`) | `CampProtocol*` |
+| Beschlüsse | `…/beschluesse`, `…/beschluesse/{id}` | `CampResolution*` |
+| Erwähnungen, «Als Aufgabe», Abgleich | `GET …/erwaehnungen`, `PUT …/erwaehnungen/{typ}/{quelleId}`, `PATCH …/erwaehnungen/{id}`, `POST …/als-aufgabe` | `CampMention*` |
+| Pinnwand (Wichtig, Anheften, Zeitfenster, Empfänger, Dateien) | `…/pinnwand`, `…/pinnwand/{id}` (`status=aktiv\|alle`) | `CampNotice*` |
+| Umfragen (anlegen, ändern, löschen, Stimme) | `…/pinnwand/{id}/umfrage`, `…/umfrage/stimme` | `CampPoll*` |
+| Reaktionen | `PUT`/`DELETE …/reaktionen/pinnwand_beitrag/{id}` | `CampReactions`, `setCampReaction` |
+| Eingang (Leitung: lesen, beantworten, zuordnen, löschen) | `…/eingang`, `…/eingang/{id}` | `CampInbox*` |
+| Eingang senden (auch anonym), eigene, Status per Code | `POST …/eingang`, `GET …/eingang/eigene`, `POST …/eingang/status` | `CampInboxSend`, `campOwnInbox`, `campInboxStatus` |
+| Meldung zu Traktandum | `POST …/eingang/{id}/traktandum` | `makeCampInboxAgendaItem` |
+| Aushänge als PDF | `GET …/aushaenge/{art}` | `campHandout` (Rohdaten) |
+
+Hinweise: Ein Protokoll hat in der API keine Abschnitte, nur eine Zeile (Titel, Datum, Art, Höck) mit Verweis auf eine Datei. `…/als-aufgabe` antwortet 201 (neu) oder 200 (gab es schon); die Dienstfunktion liefert nur die Aufgaben-ID. Der Anwesenheits-Haken (`PUT …/anwesende`) trägt keine `version`.
+
 ## Route fehlt (blockiert)
 
 | Gebraucht für | Fehlt | Backend-Issue |
@@ -51,7 +75,9 @@ Hinweise: Die Aufgaben-Antwort enthält kein `aktionen`-Feld. Welche Knöpfe ers
 | A1: Lager-Check «Sind wir bereit?» | keine Route in der Beschreibung | L1 |
 | A1: Vorlagen auflisten (Auswahl für `anwenden`) | nur `/api/v1/admin/vorlagen` (Admin), die App ruft Admin nie auf | L1 |
 | A1: frühere Fassungen einer Aufgabe, Zurückholen | Verlauf kennt nur Art, Version, Zeitpunkt; keine Inhalte | L0e |
-| A2 Sitzungen und Kommunikation | Höcks, Protokolle, Erwähnungen, Pinnwand, Umfragen, Eingang | L2, L3 |
+| A2: Protokoll-Abschnitte (Text im Protokoll) | nur Zeile mit Dateiverweis, kein Inhalt, keine Abschnitte | L2 |
+| A2: Dateien zum Hochladen (Pinnwand, Protokoll) | `dateiIds` setzen vorhandene Dateien voraus, Hochladen: Lager-Dateien | L0g |
+| A2: Reaktionen auf anderes als Pinnwand | `zielTyp` kennt nur `pinnwand_beitrag` | L3 |
 | A3 Einteilung | Teilnehmende, Zimmer, Fahrten, Gruppen, Schichtplan, Diensttausch | L4 |
 | A4 Im Lager | Anwesenheit, Tagesseiten, Einkauf, Packliste, Notfall, Wetter, «Heute» | L5 |
 | A5 Ablage und Querschnitt | Dokumente, Adressbuch, Wissen, Suche | L6 |
