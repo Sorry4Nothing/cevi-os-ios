@@ -11,7 +11,7 @@ final class ActiveCamp {
     /// The camp choice (L1) is open.
     var showsChooser = false
     private(set) var outbox: CampOutbox?
-    @ObservationIgnored private var client: APIClient?
+    @ObservationIgnored private(set) var client: APIClient?
 
     var isOpen: Bool { camp != nil }
     var title: String { camp?.title ?? "" }
@@ -55,4 +55,12 @@ final class ActiveCamp {
         } catch {}
         await refreshQueue()
     }
+
+    #if DEBUG
+    /// For previews: the banner state without a queue.
+    func setPreview(waiting: Int, offline: Bool) {
+        waitingCount = waiting
+        isOffline = offline
+    }
+    #endif
 }

@@ -159,6 +159,42 @@ Gebaut (Boards A8, A9, A10, L1, L37, U1 bis U8):
 
 Nicht gebaut, weil das Ziel fehlt (kein totes Ziel in der Tab-Leiste und im Mehr-Sheet): Tabs Aufgaben und Pinnwand; Mehr-Einträge Hoecks, Anwesenheit, Zimmer und Zelte, Fahrten, Programmgruppen, Diensttausch, Abzählen, Tagesseiten, Einkaufsliste, «Als Team ansehen», Einstellungen, Feedback zur App; U6 als eigener Bildschirm «Änderungen» (Liste der Warteschlange; nur das Banner ist da); U7 «Beide ansehen» (Zusammenführen von Hand).
 
+## Schnitt B1 Start und Aufgaben: Bildschirme (Issue #82)
+
+Gebaut (Boards L2, L3, L5, L7, L8, L9, L10, L35, T1, T3) mit den Zuständen Normal, Leer, Laden, Fehler, Ohne Netz, Lager abgeschlossen, ohne Recht, Konflikt, Eingabefehler, Aktion läuft:
+
+| Was | Code (`Screens/Camp/Start`, `Screens/Camp/Tasks`) |
+| --- | --- |
+| L2 Start Lagerleitung (Countdown, Fortschritt, «Für dich», nächster Hoeck), L3 Start Team (Dienste, Aufgaben, nächster Hoeck) | `CampStartModel`, `CampStartView` (`GET …/start`, `GET …/meine-woche`) |
+| L5 Liste (Liste, Meine, Personen, Ressort; Sortieren, Filter lokal) und T1 Kanban | `CampTasksModel`, `CampTasksView`, `CampTaskRow` |
+| L9 Mehrfachauswahl (Fertig, Status, Frist, Ressort, Löschen; «Rückgängig» für Status) | `CampTasksModel` (je Aufgabe ein Aufruf, es gibt keine Sammelroute) |
+| L7 Aufgabe Detail (Status, Stern, Frist, Ressort, Wiederholung, Checkliste mit Nach oben/unten, Links, Notiz, Verlauf, Löschen) | `CampTaskDetailModel`, `CampTaskDetailView` |
+| L8 Schnelleingabe und L10 Duplikat-Hinweis (Zusammenführen: Aufgabe anlegen, dann `…/zusammenfuehren`) | `CampQuickEntryModel`, `CampQuickEntryView` |
+| L35 Ressort-Seite (Verantwortliche, Notizen) | `CampPortfolioModel`, `CampPortfolioView` |
+| T3 Zeitplan und Kalender (Meilensteine und Fristen, Monatsraster) | `CampScheduleModel`, `CampScheduleView` |
+| Rechte nach Rolle, gemeinsames Schreiben mit Konflikt und Warteschlange | `CampTaskRights`, `CampTaskWriter` (`CampTaskSupport.swift`) |
+
+Hinweise:
+
+- Rechte: Lagerleitung alles. Leitung: anlegen, ändern, Status, nicht löschen und nicht zusammenführen. Team: nur der Status der eigenen Aufgaben. Lesen: nichts. Fehlende Aktion ist ein fehlender Knopf. Das ist eine Annahme aus dem Entwurf und der Beschreibung (die Matrix darf nur die Lagerleitung lesen); der Server entscheidet am Ende.
+- Statusänderung läuft über `CampOutbox` (`aufgabe.aendern`), aber nur als Rückfall bei fehlendem Netz: erst der direkte Aufruf `PUT …/status`. Die Nutzlast `{id, version, status}` ist eine Annahme (die Beschreibung nennt die Felder nicht). Abgelehnte Einträge der Warteschlange zeigt noch kein Bildschirm.
+- Alle anderen Schreibaufrufe gehen direkt über den Dienst, weil die Beschreibung ihre `typ`-Werte nicht nennt.
+- Aufgaben-Tab nur für Lagerleitung und Leitung; Team und Lesen sehen ihre Aufgaben auf dem Start (`meine-woche`). Der Entwurf zeigt für das Team keinen Aufgaben-Tab.
+- Zeitplan und Kanban liegen im Aufgaben-Tab unter dem Menü «Ansicht» (der Entwurf nennt keinen Einstieg). Der Zeitplan liest nur die erste Seite (100) der Aufgaben.
+- Ziehen (Kanban, Checkliste) ist nicht gebaut; die sichtbare Alternative («Verschieben nach», «Nach oben/unten») ist die einzige Bedienung.
+
+Nicht gebaut oder weggelassen, weil die API es nicht hergibt oder das Ziel in einem anderen Schnitt liegt:
+
+- L2: Hinweiskarte «Samstag Gewitter möglich» (Pinnwand), Knöpfe «Notiz», «Protokoll», «Mitteilung», Block «Neu für dich» (Benachrichtigungen mit Text). «7 für dich» ohne Zahl: «Für dich» zeigt die eigenen offenen Aufgaben der nächsten sieben Tage.
+- L3: Zimmer, Fahrt, Gruppe, Ressorts, Packliste, «Seit deinem letzten Besuch», «Feedback an die Lagerleitung» (andere Schnitte). Tab-Leiste: Pinnwand und Anwesenheit fehlen bis zu ihren Schnitten.
+- L5/T1: «Checkliste 2 von 4» in der Liste (die Liste hat keine Zähler, nur das Detail), «Wartet» als eigene Gruppe in der Liste, Wischgeste zum Wechseln der Spalte als echtes Blättern (es gilt ein Wisch auf der Liste und die Chips).
+- L7: Verantwortliche und Unterstützung ändern (keine Mitgliederliste für Nicht-Admins, siehe A3), Links hinzufügen, Zurückholen früherer Fassungen (L0e), «Beide ansehen» im Konflikt. Konflikt bei Checklisten-Punkten: Die Ansicht lädt neu und zeigt den Fehlertext.
+- L8: «Ohne Netz» (Aufgabe wartet): Die Vorschläge brauchen Netz, und die Beschreibung nennt keinen `typ` zum Anlegen.
+- L9: «Person» (keine Mitgliederliste).
+- L35: «Dokumente, 3», «Feedback, 1 neu» (andere Schnitte).
+- T3: Hoeck im Zeitplan und im Kalender, Hinweis «Ruhige Ressorts» (Regel nicht beschrieben); Meilensteine anlegen und verschieben (der Entwurf zeigt es nicht).
+- L5-G: Name der Lagerleitung im Text («Wende dich an Mara») ist nicht bekannt.
+
 ## Offene Fragen zum Entwurf
 
 - L1: «62 Prozent erledigt, 4 überfällig» braucht `GET …/start` je Lager; «Übungslager» (Abschnitt, Chip «Übung») hat kein Feld in der API. Beides fehlt in der App.
