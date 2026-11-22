@@ -12,6 +12,7 @@ struct CampMoreSheet: View {
     /// Entries whose target exists and that the role may open.
     private var rights: CampCommsRights { CampCommsRights(role: active.role, readOnly: active.isReadOnly) }
     private var onSite: CampOnSiteRights { CampOnSiteRights(role: active.role, readOnly: active.isReadOnly) }
+    private var storage: CampStorageRights { CampStorageRights(role: active.role, readOnly: active.isReadOnly) }
 
     var body: some View {
         NavigationStack(path: $path) {
@@ -40,6 +41,11 @@ struct CampMoreSheet: View {
                     NavigationLink(value: CampDestination.packing) { row("Packliste", symbol: "suitcase") }
                     NavigationLink(value: CampDestination.emergency) { row("Notfall", symbol: "cross") }
                     NavigationLink(value: CampDestination.infos) { row("Infos", symbol: "info.circle") }
+                }
+                Section("Ablage") {
+                    NavigationLink(value: CampDestination.documents) { row("Dokumente", symbol: "doc") }
+                    if storage.seesAddressBook { NavigationLink(value: CampDestination.addressBook) { row("Adressbuch", symbol: "person.crop.rectangle") } }
+                    NavigationLink(value: CampDestination.search) { row("Suche", symbol: "magnifyingglass") }
                 }
                 Section("Weiteres") {
                     Button { dismiss(); showAllCamps() } label: { row("Alle Lager", symbol: "tent") }
@@ -73,6 +79,9 @@ struct CampMoreSheet: View {
                 case .packing: CampPackingView()
                 case .emergency: CampEmergencyView()
                 case .infos: CampInfosView()
+                case .documents: CampDocumentsView()
+                case .addressBook: CampAddressBookView()
+                case .search: CampSearchView()
                 case .notices: EmptyView()
                 }
             }

@@ -291,11 +291,38 @@ Abweichungen vom Entwurf:
 
 Nicht gebaut: Tageschef, Notiz und Blöcke bearbeiten, Wetterort setzen, Frist der Anwesenheit setzen, Anwesenheit von Teilnehmenden, Zusammenfassung (Zahlen) der Anwesenheit, Einkäufer wählen, Artikel ändern oder löschen, Punkte der Packliste entfernen oder ändern, Notfall-Kontakte, Kartenlink und Infos anlegen, ändern oder löschen (kein Board dafür), Konfliktbildschirm für diese Boards.
 
+## Schnitt B5 Ablage und Querschnitt: Bildschirme (Issue #90)
+
+Gebaut mit den Zuständen Normal, Leer, Laden, Fehler, Ohne Netz (Stand-Hinweis, wo schon Daten da sind), Fehler beim Speichern, Gesperrt wegen Rolle, Lager abgeschlossen, Textgrösse AX3, Tag und Nacht (Vorschauen):
+
+| Was | Code (`Screens/Camp/Storage`) |
+| --- | --- |
+| L33 Dokumente (Liste, Suche nach Titel und Stichwort, Filter nach Typ, «neu», Verweis auf den Ablageort nur über `openableLink`) | `CampDocumentsModel`, `CampDocumentsView` |
+| L34 Adressbuch (nur Lagerleitung; Telefon und E-Mail nur über `Link`; «Fürs nächste Lager behalten», Hinweis zur Aufräumfrist; «Neuer Kontakt») | `CampAddressBookModel`, `CampAddressBookView` |
+| L36 Suche (tippfehlertolerant durch den Server, gruppiert nach Art, Typ-Filter, Treffer öffnen den Bildschirm der Art, wo es ihn gibt) | `CampSearchModel`, `CampSearchView` |
+| Rechte, Texte, gemeinsame Bausteine | `CampStorageRights`, `CampStorageText`, `CampStorageSupport.swift` |
+
+Navigation: Mehr-Sheet, Abschnitt «Ablage»: «Dokumente», «Adressbuch» (nur Lagerleitung) und «Suche». Ein Push öffnet nichts Neues. Die Boards zeigen im Start und im Mehr kein Suchfeld; deshalb gibt es keines dort.
+
+Datenschutz: Die Adresse des Ablageorts geht nur an das System (`Link`), nie in einen Log und nie in einen Zwischenspeicher; es werden keine Bytes geladen. Nur `https`-Adressen sind öffnbar, alles andere ist eine Zeile ohne Verweis («Kein sicherer Link»). Kontaktdaten stehen in keinem Widget, Log oder Absturzbericht und liegen nur im Arbeitsspeicher.
+
+Abweichungen vom Entwurf:
+
+- L33: «Hochladen» fehlt samt den Zuständen «Aktion läuft» (S, Fortschritt) und «Fehler beim Speichern» (X, Dateityp, 20 MB): die API kennt kein Hochladen, nur Verknüpfungen auf den Ablageort (siehe «Route fehlt»). Das Board «Gesperrt wegen Rolle» (G) sagt «Hochladen kann …» und entfällt damit auch. Der Leertext lautet «Hier erscheinen die Dokumente des Lagers, sobald sie eingetragen sind.» statt «Lade eine Datei hoch …». Der Typ-Filter (Menü oben rechts) und die Zeile «Nur …» sind neu (Wunsch des Auftrags, kein Board).
+- L34: Das Board «Gesperrt wegen Rolle» nennt «Mara» als Ansprechperson; der Text lautet «Wende dich an die Lagerleitung.», der Knopf «Zurück» statt «Zum Start» (das Mehr-Sheet hat keinen Start). Der Schalter steht je Kontakt (das Board zeigt einen unter den Karten); die Aufräumfrist («Wird ab … gelöscht.») steht zusätzlich je Kontakt. Das Formular «Neuer Kontakt» hat Name, Telefon und E-Mail; Funktion, Gruppe und Notiz setzt die App nicht. Bearbeiten und Löschen von Kontakten fehlt (kein Board).
+- L36: «Zuletzt angesehen» fehlt (bräuchte lokalen Speicher, Entscheid offen), «Personen, 0» fehlt (die Suche liefert keine Personen), der Treffer zeigt keine hervorgehobenen Wörter (die Antwort nennt keine Fundstellen) und der Leerzustand schlägt kein Wort vor («Meintest du …»: die API liefert keinen Vorschlag). Vor der Eingabe zeigt der Bildschirm «Im Lager suchen» (kein Board). Aufgaben, Notizen und Protokolle haben keinen eigenen Bildschirm im Mehr-Sheet; diese Treffer sind nicht antippbar.
+- L37: Die Boards zeigen die Einträge von Start, nicht die Ablage; das Mehr-Sheet bekommt den Abschnitt «Ablage».
+
+Nicht gebaut: **L38 Papierkorb** (alle Boards: Normal, Laden, Leer, Fehler, Erfolg und Rückgängig, Aktion läuft). Es gibt keine Route zum Ansehen oder Wiederherstellen (Revisionen, L0e), und das Entwurf-Set hat keinen Zustand «nicht verfügbar». Der Stichwort-Filter (`stichwort`) der Dokumente (die Suche findet Stichworte über `q`), Dokumente anlegen, ändern und löschen, Dateien verknüpfen (Datenschicht ist da, kein Board ausser dem Hochladen).
+
 ## Offene Fragen zum Entwurf
 
 - L1: «62 Prozent erledigt, 4 überfällig» braucht `GET …/start` je Lager; «Übungslager» (Abschnitt, Chip «Übung») hat kein Feld in der API. Beides fehlt in der App.
 - A10: Untertitel «Cevi Beispielstadt» (Abteilungsname) und die Zahl «3 neu» am Lager (ungelesene Benachrichtigungen je Lager) sind nicht angeschlossen; der Umschalter zeigt «Programme».
 - U7: Der Name der Person, die zuletzt geändert hat («Lea hat …»), steht nicht in der Konflikt-Antwort; der Titel kommt vom Aufrufer.
+- L38: Der Papierkorb hat keine Route in der API und im Entwurf keinen Zustand «nicht verfügbar»; die Bildschirme fehlen, bis die Revisionen (L0e) da sind und geklärt ist, ob ein Hinweis nötig ist.
+- L33: «Hochladen» (Fortschritt, Dateityp, 20 MB) setzt Medienspeicher voraus (L0g); der Entwurf kennt keinen Bildschirm «Link hinzufügen» für das Verknüpfen eines Ablageorts.
+- L36: «Personen» und «Zuletzt angesehen» haben keine Quelle (keine Route, kein lokaler Speicher).
 - U4: Die Endzeit der Wartung («bis 22:00») liefert die API nicht; der Text nennt sie nicht.
 
 ## Route fehlt (blockiert)
