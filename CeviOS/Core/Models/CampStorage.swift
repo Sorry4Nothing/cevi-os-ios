@@ -61,9 +61,11 @@ nonisolated struct CampDocumentPage: Decodable, Equatable, Sendable {
 }
 
 /// The `typ` filter of the document list (kind or storage place).
-nonisolated enum CampDocumentTypeFilter: String, Sendable {
+nonisolated enum CampDocumentTypeFilter: String, CaseIterable, Identifiable, Sendable {
     case pdf, word, excel, link, sharepoint
     case image = "bild"
+
+    var id: String { rawValue }
 }
 
 nonisolated struct CampDocumentFilter: Sendable {

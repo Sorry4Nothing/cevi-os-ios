@@ -141,6 +141,24 @@ struct CampServiceTests {
         #expect(request.url?.path == "/api/v1/lager/\(camp.uuidString.lowercased())/benachrichtigungen/gelesen")
     }
 
+    @Test func notificationSettingsAreReadAndSet() async throws {
+        let host = host()
+        StubProtocol.register(host: host) { request in
+            request.httpMethod == "GET"
+                ? (200, [:], Data(#"{"arten":[{"art":"erwaehnung","aktiv":false},{"art":"frist","aktiv":true},{"art":"neue_art","aktiv":true}]}"#.utf8))
+                : (204, [:], Data())
+        }
+        let client = client(host: host)
+        let settings = try await client.campNotificationSettings()
+        #expect(settings.kinds == [.init(kind: .mention, enabled: false), .init(kind: .deadline, enabled: true)])
+        try await client.setCampNotificationSettings([.init(kind: .mention, enabled: true)])
+        let put = try #require(StubProtocol.requests(host: host).last)
+        #expect(put.httpMethod == "PUT" && put.url?.path == "/api/v1/ich/lager-benachrichtigungen")
+        let body = try #require(StubProtocol.body(of: put))
+        let text = String(decoding: body, as: UTF8.self)
+        #expect(text.contains(#""art":"erwaehnung""#) && text.contains(#""aktiv":true"#))
+    }
+
     @Test func pushIsResolvedByTypeAndObject() async throws {
         let host = host()
         let camp = UUID(), object = UUID()

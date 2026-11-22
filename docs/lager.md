@@ -142,6 +142,189 @@ Hinweise:
 - Der Strom hat eine eigene Sitzung (`APIClient.makeSession(streaming: true)`), sonst gleich geschützt. Zeitgrenze: 75 s ohne Daten (der Server schickt alle 25 s einen Herzschlag) statt 30 s je Anfrage. Wiederverbinden macht der Aufrufer: Strom endet nach `ende` oder bei Verbindungsende; dann `campEvents(campId:lastEventId:)` mit dem letzten `upTo` und den Feed ab dort lesen. 429 `ZU_VIELE_VERBINDUNGEN` kommt als `APIError` mit `retryAfter`.
 - Der Strom läuft nur im Vordergrund; der Hintergrund (Push) ist nicht gebaut.
 
+## Schnitt B0 Navigation, Lagerwahl, übergreifende Zustände: Bildschirme (Issue #80)
+
+Gebaut (Boards A8, A9, A10, L1, L37, U1 bis U8):
+
+| Was | Code |
+| --- | --- |
+| Umschalter Programm-/Lager-Ansicht oben links, nur wenn `GET /api/v1/lager` mindestens ein Lager liefert | `CampSwitcher.swift` (`.campSwitcher()`), `CampListModel.showsSwitcher` |
+| Aktives Lager (Rolle, Titel, `isReadOnly`, Warteschlange), nur im Arbeitsspeicher | `ActiveCamp.swift`, in der Umgebung von `MainView` |
+| Lager-Tab-Leiste: Start (vorläufig: Lagerkopf und Banner), Chat (wie bisher), Mehr | `CampTabView.swift` |
+| L1 Lagerwahl (Normal, Laden, Leer, Fehler) | `CampChooserView.swift`, `CampListModel.swift` |
+| L37 Mehr (Sheet): Profil, Alle Lager | `CampMoreSheet.swift` |
+| U1 bis U4 (Zuordnung `APIError` zu Zustand), U6 Banner, U7 Konflikt, U8 Banner | `CampScreenState.swift`, `CampBanners.swift`, `CampConflictView.swift` |
+| U5 Lädt länger (nach 5 s zweite Zeile im Overlay) | `BusyState.isSlow`, `BusyOverlay(slow:)` |
+| Push `lager_*` öffnet das Lager | `CampRouter.swift` (404 beim Auflösen zeigt U3) |
+
+Nicht gebaut, weil das Ziel fehlt (kein totes Ziel in der Tab-Leiste und im Mehr-Sheet): Tabs Aufgaben und Pinnwand; Mehr-Einträge Hoecks, Anwesenheit, Zimmer und Zelte, Fahrten, Programmgruppen, Diensttausch, Abzählen, Tagesseiten, Einkaufsliste, «Als Team ansehen», Einstellungen, Feedback zur App; U6 als eigener Bildschirm «Änderungen» (Liste der Warteschlange; nur das Banner ist da); U7 «Beide ansehen» (Zusammenführen von Hand).
+
+## Schnitt B1 Start und Aufgaben: Bildschirme (Issue #82)
+
+Gebaut (Boards L2, L3, L5, L7, L8, L9, L10, L35, T1, T3) mit den Zuständen Normal, Leer, Laden, Fehler, Ohne Netz, Lager abgeschlossen, ohne Recht, Konflikt, Eingabefehler, Aktion läuft:
+
+| Was | Code (`Screens/Camp/Start`, `Screens/Camp/Tasks`) |
+| --- | --- |
+| L2 Start Lagerleitung (Countdown, Fortschritt, «Für dich», nächster Hoeck), L3 Start Team (Dienste, Aufgaben, nächster Hoeck) | `CampStartModel`, `CampStartView` (`GET …/start`, `GET …/meine-woche`) |
+| L5 Liste (Liste, Meine, Personen, Ressort; Sortieren, Filter lokal) und T1 Kanban | `CampTasksModel`, `CampTasksView`, `CampTaskRow` |
+| L9 Mehrfachauswahl (Fertig, Status, Frist, Ressort, Löschen; «Rückgängig» für Status) | `CampTasksModel` (je Aufgabe ein Aufruf, es gibt keine Sammelroute) |
+| L7 Aufgabe Detail (Status, Stern, Frist, Ressort, Wiederholung, Checkliste mit Nach oben/unten, Links, Notiz, Verlauf, Löschen) | `CampTaskDetailModel`, `CampTaskDetailView` |
+| L8 Schnelleingabe und L10 Duplikat-Hinweis (Zusammenführen: Aufgabe anlegen, dann `…/zusammenfuehren`) | `CampQuickEntryModel`, `CampQuickEntryView` |
+| L35 Ressort-Seite (Verantwortliche, Notizen) | `CampPortfolioModel`, `CampPortfolioView` |
+| T3 Zeitplan und Kalender (Meilensteine und Fristen, Monatsraster) | `CampScheduleModel`, `CampScheduleView` |
+| Rechte nach Rolle, gemeinsames Schreiben mit Konflikt und Warteschlange | `CampTaskRights`, `CampTaskWriter` (`CampTaskSupport.swift`) |
+
+Hinweise:
+
+- Rechte: Lagerleitung alles. Leitung: anlegen, ändern, Status, nicht löschen und nicht zusammenführen. Team: nur der Status der eigenen Aufgaben. Lesen: nichts. Fehlende Aktion ist ein fehlender Knopf. Das ist eine Annahme aus dem Entwurf und der Beschreibung (die Matrix darf nur die Lagerleitung lesen); der Server entscheidet am Ende.
+- Statusänderung läuft über `CampOutbox` (`aufgabe.aendern`), aber nur als Rückfall bei fehlendem Netz: erst der direkte Aufruf `PUT …/status`. Die Nutzlast `{id, version, status}` ist eine Annahme (die Beschreibung nennt die Felder nicht). Abgelehnte Einträge der Warteschlange zeigt noch kein Bildschirm.
+- Alle anderen Schreibaufrufe gehen direkt über den Dienst, weil die Beschreibung ihre `typ`-Werte nicht nennt.
+- Aufgaben-Tab nur für Lagerleitung und Leitung; Team und Lesen sehen ihre Aufgaben auf dem Start (`meine-woche`). Der Entwurf zeigt für das Team keinen Aufgaben-Tab.
+- Zeitplan und Kanban liegen im Aufgaben-Tab unter dem Menü «Ansicht» (der Entwurf nennt keinen Einstieg). Der Zeitplan liest nur die erste Seite (100) der Aufgaben.
+- Ziehen (Kanban, Checkliste) ist nicht gebaut; die sichtbare Alternative («Verschieben nach», «Nach oben/unten») ist die einzige Bedienung.
+
+Nicht gebaut oder weggelassen, weil die API es nicht hergibt oder das Ziel in einem anderen Schnitt liegt:
+
+- L2: Hinweiskarte «Samstag Gewitter möglich» (Pinnwand), Knöpfe «Notiz», «Protokoll», «Mitteilung», Block «Neu für dich» (Benachrichtigungen mit Text). «7 für dich» ohne Zahl: «Für dich» zeigt die eigenen offenen Aufgaben der nächsten sieben Tage.
+- L3: Zimmer, Fahrt, Gruppe, Ressorts, Packliste, «Seit deinem letzten Besuch», «Feedback an die Lagerleitung» (andere Schnitte). Tab-Leiste: Pinnwand und Anwesenheit fehlen bis zu ihren Schnitten.
+- L5/T1: «Checkliste 2 von 4» in der Liste (die Liste hat keine Zähler, nur das Detail), «Wartet» als eigene Gruppe in der Liste, Wischgeste zum Wechseln der Spalte als echtes Blättern (es gilt ein Wisch auf der Liste und die Chips).
+- L7: Verantwortliche und Unterstützung ändern (keine Mitgliederliste für Nicht-Admins, siehe A3), Links hinzufügen, Zurückholen früherer Fassungen (L0e), «Beide ansehen» im Konflikt. Konflikt bei Checklisten-Punkten: Die Ansicht lädt neu und zeigt den Fehlertext.
+- L8: «Ohne Netz» (Aufgabe wartet): Die Vorschläge brauchen Netz, und die Beschreibung nennt keinen `typ` zum Anlegen.
+- L9: «Person» (keine Mitgliederliste).
+- L35: «Dokumente, 3», «Feedback, 1 neu» (andere Schnitte).
+- T3: Hoeck im Zeitplan und im Kalender, Hinweis «Ruhige Ressorts» (Regel nicht beschrieben); Meilensteine anlegen und verschieben (der Entwurf zeigt es nicht).
+- L5-G: Name der Lagerleitung im Text («Wende dich an Mara») ist nicht bekannt.
+
+## Schnitt B2 Sitzungen und Kommunikation: Bildschirme (Issue #84)
+
+Gebaut (Boards L11 bis L19) mit den Zuständen Normal, Leer, Laden, Fehler, Ohne Netz, Lager abgeschlossen, ohne Recht, Konflikt, Eingabefehler, Aktion läuft:
+
+| Was | Code (`Screens/Camp/Meetings`, `Screens/Camp/Communication`) |
+| --- | --- |
+| L11 Hoeck-Liste (Kommend, Vergangen, «Neuer Hoeck», «Wie der letzte») | `CampMeetingsModel`, `CampMeetingsView` |
+| L12 Traktandenliste (Nach oben/unten, «Auf nächsten Höck» mit Rückgängig, wartende übernehmen, bearbeiten) | `CampAgendaModel`, `CampAgendaView` |
+| L13 Protokoll (Zeile speichern, Anwesende, Traktanden mit Entscheid, Beschlüsse, Konflikt) | `CampProtocolModel`, `CampProtocolView` |
+| L14 Hoeck-Modus (Anwesende abhaken, Traktanden besprochen, Ressort-Runde) | `CampMeetingModeModel`, `CampMeetingModeView` |
+| L15 Erwähnungen («Als Aufgabe», «Erledigt») | `CampMentionsModel`, `CampMentionsView` |
+| L16 Pinnwand (Tab; Wichtig, Anheften, Zeitfenster, Dateien als Verweis, Umfrage, Reaktionen) | `CampNoticesModel`, `CampNoticesView` |
+| L17 Mitteilung mit Umfrage (Empfänger nach Rolle, Optionen, Sichtbar bis) | `CampNoticeFormModel`, `CampNoticeFormView` |
+| L18 Eingang (Antworten, Ressort zuweisen, «Als Traktandum» mit Rückgängig, Status, Löschen) | `CampInboxModel`, `CampInboxView` |
+| L19 Benachrichtigungen (Neu, Einstellungen je Art) | `CampNotificationsModel`, `CampNotificationsView` |
+| Rechte nach Rolle, Schreiben mit Konflikt | `CampCommsRights`, `CampCommsWrite` (`CampCommsSupport.swift`) |
+
+Navigation: Pinnwand ist ein Tab; Hoecks, Erwähnungen, Eingang (nur Lagerleitung), Benachrichtigungen liegen im Mehr-Sheet. Ein Push `lager_pinnwand`, `lager_erwaehnung` oder `lager_eingang` öffnet das Ziel (`ActiveCamp.destination`). Datenschicht neu: Schalter der Benachrichtigungen (`GET`/`PUT /api/v1/ich/lager-benachrichtigungen`, `campNotificationSettings`); die Arten `diensttausch_anfrage`, `diensttausch_entscheid`, `adressbuch_aufraeumen` fehlten in `CampNotificationKind` (die Art `diensttausch` gibt es in der API nicht).
+
+Abweichungen vom Entwurf:
+
+- Rechte: Annahme nach den Standardwerten der Matrix (Hoecks, Protokolle, Pinnwand bearbeiten: Lagerleitung und Leitung; Stimmen und Reaktionen: auch Team; Eingang lesen und antworten: nur Lagerleitung). Der Server entscheidet am Ende.
+- L13: Die API hat keine Abschnitte und keinen Protokolltext. Der Bildschirm zeigt die Zeile (Titel, Art, Datum) zum Speichern, dazu Anwesende, Traktanden mit Entscheid und Beschlüsse. Nicht gebaut: «Lea schreibt gerade hier», gesperrter Abschnitt, To-dos, «Als Word», «Für den Kalender» (eine Datei ohne lokalen Speicher), «Beide ansehen». Ein Protokoll lässt sich nicht anlegen (braucht eine Datei, L0g).
+- «Ohne Netz» (Wartet): Für diese Änderungen kennt die Beschreibung keine Warteschlangen-Operationen (L0c). Ein Schreibfehler zeigt «Das hat nicht geklappt. Deine Eingabe ist noch da.»; Lesen zeigt den Stand und den Hinweis «Ohne Netz».
+- L12: Ziehen nicht gebaut (nur Pfeile). «Aus Aufgaben hinzufügen» fehlt.
+- L14: Die Ressort-Runde zeigt Zahlen je Ressort (die API liefert keine Aufgaben darin); die Knöpfe «Erledigt», «Läuft», «+1 Woche», «Verantwortliche ändern» fehlen.
+- L15: «Als Aufgabe» ohne «Rückgängig» (Löschen der Aufgabe braucht deren Version).
+- L16: «18 gesehen» (keine Lesezahl in der API); «Text für WhatsApp kopieren» heisst «Text teilen» (Teilen-Blatt, kein UIKit). Dateien nur als Link anzeigen, nicht hinzufügen (L0g).
+- L17: Empfänger nur nach Rolle (Leitung, Team, Lesende), keine Gruppen oder Personen (keine Mitgliederliste, L4).
+- L18: Die API liefert nur den Tag, daher «anonym, heute» ohne Uhrzeit. Das Senden durch das Team (Feedback, Rückfrage mit Code) ist nicht gebaut; der Entwurf zeigt nur den Eingang der Lagerleitung.
+- L19: Zeilen tragen keinen Text und keine Namen; der Text kommt aus der Art («Jemand hat dich erwähnt.»). Tippen auf eine Zeile öffnet das Ziel nicht (nur «Gelesen»). Einstellungen: ein Schalter je bekannter Art; der Entwurf zeigt den Reiter nicht, die Liste folgt der API.
+- Kein Zeilenzähler «3» am Pinnwand-Tab (kein Lagerzähler für die Pinnwand).
+
+## Schnitt B3 Einteilung: Bildschirme (Issue #86)
+
+Gebaut mit den Zuständen Normal, Leer, Laden, Fehler, Ohne Netz (Hinweis «Ohne Netz» mit Stand), Fehler beim Speichern, ohne Recht («Nur lesen.»), Lager abgeschlossen, Textgrösse AX3, Tag und Nacht (Vorschauen):
+
+| Was | Code (`Screens/Camp/Roster`) |
+| --- | --- |
+| L20 Zimmer und Zelte (Belegung, «Nicht eingeteilt», «Person zuweisen», «Herausnehmen», Überbelegung als Wort) | `CampRoomsModel`, `CampRoomsView` |
+| L21 Fahrten (Hin-/Rückfahrt, Mitfahrende einteilen und herausnehmen, «Fahrplan öffnen» nur für `https`) | `CampTripsModel`, `CampTripsView` |
+| L22 Programmgruppen («Automatisch mischen»: Vorschau, «Neu mischen», «Übernehmen» mit demselben `seed`) | `CampGroupsModel`, `CampGroupsView` |
+| L24 Diensttausch (entscheiden, zurückziehen, «Tausch anfragen») | `CampSwapsModel`, `CampSwapsView` |
+| L25 Abzählliste (gemeinsame Haken, Filter, Rückmeldung bei gleichzeitigem Abhaken, Zurücksetzen mit Rückgängig) | `CampCountModel`, `CampCountView` |
+| T2 Schichtplan (Liste je Tag, «Person wählen», «Leere Dienste füllen» als Vorschlag, «Verteilung», «Dienst anlegen»; VoiceOver liest je Dienst einen ganzen Satz aus `CampShiftText`) | `CampShiftsModel`, `CampShiftsView` |
+| Rechte nach Rolle, gemeinsame Bausteine | `CampRosterRights`, `CampRosterModel`, `CampPersonPicker` (`CampRosterSupport.swift`) |
+
+Navigation: Alle sechs Einträge liegen im Mehr-Sheet (Abschnitt «Einteilung»); der Entwurf zeigt sie unter «Mehr», nicht als Tab. Ein Push `lager_einteilung` öffnet den Diensttausch (die Benachrichtigungen der Einteilung sind Tauschanfragen und -entscheide; `CampRouter`).
+
+Abweichungen vom Entwurf:
+
+- Rechte (Annahme, der Server entscheidet am Ende): Einteilen in Zimmer, Fahrten, Gruppen und Tausch entscheiden nur die Lagerleitung; Schichten bearbeitet auch die Leitung; Abhaken: Lagerleitung, Leitung, Team; Zurücksetzen: Lagerleitung, Leitung. Fehlende Aktion ist ein fehlender Knopf.
+- Namen: Wo die API nur `personId` liefert, steht «Person». Der Diensttausch löst Namen über die Schichten des Schichtplans auf. «Person wählen» (Schichten) bietet nur Personen aus der Statistik des Plans und die Leitenden der Gruppen an (Mitgliederliste fehlt, B1). Offene Anfragen ohne Gegenüber lassen sich nicht annehmen (man müsste die übernehmende Person wählen), nur ablehnen.
+- Ohne Netz: «Wartet» an einzelnen Zeilen fehlt, die Warteschlange kennt für diese Änderungen keine Operationen (L0c). Es erscheinen Warteschlangen-Banner und Stand-Hinweis.
+- L24 «Rückgängig» nach Annehmen fehlt (die API kennt keine Rücknahme einer Entscheidung). L25 «Rückgängig» nach Zurücksetzen setzt die vorher gesetzten Haken wieder.
+- L25: Filter «Leitung» ist die Art Team; die weiteren Chips sind die Programmgruppen (der Entwurf nennt «Wölfe», «Adler»). Die Stufe ist kein Filter.
+- L22: «Vorschau: gemischt» ohne «nach Stufe» (die API nennt das Kriterium nicht).
+- T2: Ziehen nicht gebaut (Board T2-D); die Alternative «Person wählen» ist die einzige Einteilung. Der Vorschlag gilt für alle Lagertage und hat die Schalter «Nur Anwesende» und «Auch Teilnehmende» (Optionen der API).
+- Neu ohne Board: «Tausch anfragen» (eigener Dienst, Notiz), «Verteilung» (Statistik), «Dienst anlegen» wie im Leerzustand des Entwurfs.
+
+Nicht gebaut: Anlegen, Bearbeiten und Löschen von Zimmern, Zelten, Fahrten und Gruppen (kein Board im Entwurf; die Texte der Leerzustände nennen es trotzdem), Zuordnung einzelner Teilnehmender zu Gruppen, Abwählen, Import der Teilnehmenden, Konfliktbildschirm für diese Boards (Konflikt zeigt «Jemand hat das gerade geändert» und lädt neu), Board L23 (heisst jetzt T2).
+
+## Schnitt B4 Im Lager: Bildschirme (Issue #88)
+
+Gebaut mit den Zuständen Normal, Leer, Laden, Fehler, Ohne Netz, Aktion läuft, Fehler beim Speichern, Rückgängig, Anfrage nötig, ohne Recht, Lager abgeschlossen, Textgrösse AX3, Tag und Nacht (Vorschauen):
+
+| Was | Code (`Screens/Camp/OnSite`) |
+| --- | --- |
+| L4 Heute (Dienst mit Zeit, «Wichtig heute», eigene To-dos abhaken, Knopf «Notfall») | `CampTodayModel`, `CampTodayView` |
+| L26 Anwesenheit (Tag wählen, «Ganzer Tag da», Da/Frei je Abschnitt im Menü, Anfrage bei gesetztem Feld oder nach der Frist, Entscheid der Lagerleitung) | `CampAttendanceModel`, `CampAttendanceView` |
+| L27 Tagesseite (Tageschef, Wetter, Wichtig, Ideen, Programmbild, Notiz, To-dos, «In den nächsten Tag schieben») und Liste der Tage | `CampDayPageModel`, `CampDayPageView` |
+| L28 Einkaufsliste (nach Abteilung, «Nur was ich einkaufe», Abhaken mit Rückgängig, «Artikel hinzufügen» mit Vorschlägen) | `CampShoppingModel`, `CampShoppingView` |
+| L29 Packliste (abhaken, eigene Punkte, Punkt hinzufügen) | `CampPackingModel`, `CampPackingView` |
+| L30 Notfall (Rettung 144 und 1414, Kontakte, Route; ohne Netz der zuletzt geladene Stand aus dem Arbeitsspeicher) | `CampEmergencyModel`, `CampEmergencyView`, `ActiveCamp.emergencySnapshot` |
+| L32 Infos (Abschnitte, Links, «Sortieren» mit «Nach oben»/«Nach unten») | `CampInfosModel`, `CampInfosView` |
+| Wetterwarnung auf L2 («Samstag Gewitter möglich.») und «Heute»-Karte im Start-Tab | `CampStartModel.weatherWarning`, `CampStartView` |
+| Rechte nach Rolle, gemeinsame Bausteine | `CampOnSiteRights`, `CampTodoModel`, `CampOnSiteSupport.swift` |
+
+Navigation: «Heute» ist die erste Karte im Start-Tab, solange das Lager läuft. «Anwesenheit» ist für das Team ein Tab (wie im Board L3), für die Lagerleitung ein Eintrag im Mehr-Sheet. «Tagesseiten», «Einkaufsliste» (nur Lagerleitung und Leitung), «Packliste», «Notfall» und «Infos» stehen im Mehr-Sheet (Abschnitt «Im Lager»). Ein Push `lager_anwesenheit` öffnet die Anwesenheit (`CampRouter`, `ActiveCamp.destination`).
+
+Datenschutz: Kindernamen und Telefonnummern stehen in keinem Log. Anrufen und Route öffnen nur über `Link` mit `phoneURL` und `routeURL`. Der Notfall-Stand liegt nur im Arbeitsspeicher und wird beim Verlassen des Lagers verworfen. Das Wetter kennt nur den Ort.
+
+Abweichungen vom Entwurf:
+
+- Rechte (Annahme, der Server entscheidet am Ende): Matrix lesen und für alle setzen, Anfragen entscheiden, Packliste-Vorlage schreiben und Infos sortieren nur die Lagerleitung; Anwesenheit setzt auch Leitung und Team für sich selbst; Einkaufsliste sehen und ändern Lagerleitung und Leitung (die API antwortet dem Team mit 403); Packliste abhaken alle ausser «Lesen».
+- L4: «Dein Dienst» führt in den Schichtplan; die Zeit kommt aus dem Tagesabschnitt (`zeit`), ohne Zeitplan steht nur der Dienstname. Zusätzlich «Tagesseite» als Link. Das Board zeigt kein Wetter, L4 auch nicht.
+- L26: Namen der Matrix kommen aus der Abzählliste (Art Team), sonst «Person». Teilnehmende stehen nicht in der Matrix. Die Boards zeigen keine Anfragen der Lagerleitung; sie stehen als Karten «Anfrage» mit «Annehmen»/«Ablehnen» über der Matrix. Das Board «Versionskonflikt» ist der Dialog «Anfrage an die Lagerleitung nötig» (Text: «…schon etwas eingetragen»); ein echter 409 `VERSION_KONFLIKT` lädt die Liste neu. «Wartet» an Zellen fehlt (keine Operation in der Warteschlange, L0c), wie in B3.
+- L27: Der Block «Tagesprogramm» (Uhrzeiten) und «Fotos vom Tag, 14 Bilder» haben keine Quelle in der API; gezeigt werden Tageschef, Wetter, Wichtig, Ideen, Programmbilder (als Link), Notiz und To-dos. Der Leerzustand sagt nicht «Trage … ein» (Bearbeiten ist nicht gebaut). «Wartet» gilt nur fürs Abhaken.
+- L28: Abteilungsnamen wie im Board («Früchte und Gemüse», «Trockenes», «Milch»; `CampShoppingGroup.title` angepasst). «Wartet» an Artikeln und die Schaltfläche oben rechts fehlen. Der Hinweis «Reis, 12 kg vorhanden» kommt aus der geladenen Liste, die Vorschläge vom Server.
+- L29: «Vorlage übernehmen» fehlt (keine Route für Vorlagen, L1). Die Lagerleitung fügt der Vorlage Punkte hinzu, alle anderen fügen eigene Punkte hinzu. «Wartet» fehlt.
+- L30: Der Text ohne Netz lautet «Das ist der zuletzt geladene Stand. Anrufen geht trotzdem.» (nicht «auf dem Gerät gespeichert»: es gibt noch keinen lokalen Speicher). Ohne bisherigen Stand und ohne Netz zeigt der Bildschirm den Fehlerzustand, nicht die Nummern. Zusätzlich «Wichtig im Notfall» (Infos mit Merkmal «Notfall»). Die Nummern 144 und 1414 stehen fest im Code (öffentliche Notrufnummern).
+- L32: «Gesperrt wegen Rolle»: Der Hinweis erscheint für alle ausser Lagerleitung und Leitung. Ziehen ist nicht gebaut, nur «Nach oben»/«Nach unten» (Knopf «Sortieren»). «Wartet» fehlt.
+- L2: Die Wetterwarnung zeigt nur den ersten Satz des Boards; «Plane das Waldspiel mit Ausweichort.» hat keine Quelle.
+
+Nicht gebaut: Tageschef, Notiz und Blöcke bearbeiten, Wetterort setzen, Frist der Anwesenheit setzen, Anwesenheit von Teilnehmenden, Zusammenfassung (Zahlen) der Anwesenheit, Einkäufer wählen, Artikel ändern oder löschen, Punkte der Packliste entfernen oder ändern, Notfall-Kontakte, Kartenlink und Infos anlegen, ändern oder löschen (kein Board dafür), Konfliktbildschirm für diese Boards.
+
+## Schnitt B5 Ablage und Querschnitt: Bildschirme (Issue #90)
+
+Gebaut mit den Zuständen Normal, Leer, Laden, Fehler, Ohne Netz (Stand-Hinweis, wo schon Daten da sind), Fehler beim Speichern, Gesperrt wegen Rolle, Lager abgeschlossen, Textgrösse AX3, Tag und Nacht (Vorschauen):
+
+| Was | Code (`Screens/Camp/Storage`) |
+| --- | --- |
+| L33 Dokumente (Liste, Suche nach Titel und Stichwort, Filter nach Typ, «neu», Verweis auf den Ablageort nur über `openableLink`) | `CampDocumentsModel`, `CampDocumentsView` |
+| L34 Adressbuch (nur Lagerleitung; Telefon und E-Mail nur über `Link`; «Fürs nächste Lager behalten», Hinweis zur Aufräumfrist; «Neuer Kontakt») | `CampAddressBookModel`, `CampAddressBookView` |
+| L36 Suche (tippfehlertolerant durch den Server, gruppiert nach Art, Typ-Filter, Treffer öffnen den Bildschirm der Art, wo es ihn gibt) | `CampSearchModel`, `CampSearchView` |
+| Rechte, Texte, gemeinsame Bausteine | `CampStorageRights`, `CampStorageText`, `CampStorageSupport.swift` |
+
+Navigation: Mehr-Sheet, Abschnitt «Ablage»: «Dokumente», «Adressbuch» (nur Lagerleitung) und «Suche». Ein Push öffnet nichts Neues. Die Boards zeigen im Start und im Mehr kein Suchfeld; deshalb gibt es keines dort.
+
+Datenschutz: Die Adresse des Ablageorts geht nur an das System (`Link`), nie in einen Log und nie in einen Zwischenspeicher; es werden keine Bytes geladen. Nur `https`-Adressen sind öffnbar, alles andere ist eine Zeile ohne Verweis («Kein sicherer Link»). Kontaktdaten stehen in keinem Widget, Log oder Absturzbericht und liegen nur im Arbeitsspeicher.
+
+Abweichungen vom Entwurf:
+
+- L33: «Hochladen» fehlt samt den Zuständen «Aktion läuft» (S, Fortschritt) und «Fehler beim Speichern» (X, Dateityp, 20 MB): die API kennt kein Hochladen, nur Verknüpfungen auf den Ablageort (siehe «Route fehlt»). Das Board «Gesperrt wegen Rolle» (G) sagt «Hochladen kann …» und entfällt damit auch. Der Leertext lautet «Hier erscheinen die Dokumente des Lagers, sobald sie eingetragen sind.» statt «Lade eine Datei hoch …». Der Typ-Filter (Menü oben rechts) und die Zeile «Nur …» sind neu (Wunsch des Auftrags, kein Board).
+- L34: Das Board «Gesperrt wegen Rolle» nennt «Mara» als Ansprechperson; der Text lautet «Wende dich an die Lagerleitung.», der Knopf «Zurück» statt «Zum Start» (das Mehr-Sheet hat keinen Start). Der Schalter steht je Kontakt (das Board zeigt einen unter den Karten); die Aufräumfrist («Wird ab … gelöscht.») steht zusätzlich je Kontakt. Das Formular «Neuer Kontakt» hat Name, Telefon und E-Mail; Funktion, Gruppe und Notiz setzt die App nicht. Bearbeiten und Löschen von Kontakten fehlt (kein Board).
+- L36: «Zuletzt angesehen» fehlt (bräuchte lokalen Speicher, Entscheid offen), «Personen, 0» fehlt (die Suche liefert keine Personen), der Treffer zeigt keine hervorgehobenen Wörter (die Antwort nennt keine Fundstellen) und der Leerzustand schlägt kein Wort vor («Meintest du …»: die API liefert keinen Vorschlag). Vor der Eingabe zeigt der Bildschirm «Im Lager suchen» (kein Board). Aufgaben, Notizen und Protokolle haben keinen eigenen Bildschirm im Mehr-Sheet; diese Treffer sind nicht antippbar.
+- L37: Die Boards zeigen die Einträge von Start, nicht die Ablage; das Mehr-Sheet bekommt den Abschnitt «Ablage».
+
+Nicht gebaut: **L38 Papierkorb** (alle Boards: Normal, Laden, Leer, Fehler, Erfolg und Rückgängig, Aktion läuft). Es gibt keine Route zum Ansehen oder Wiederherstellen (Revisionen, L0e), und das Entwurf-Set hat keinen Zustand «nicht verfügbar». Der Stichwort-Filter (`stichwort`) der Dokumente (die Suche findet Stichworte über `q`), Dokumente anlegen, ändern und löschen, Dateien verknüpfen (Datenschicht ist da, kein Board ausser dem Hochladen).
+
+## Offene Fragen zum Entwurf
+
+- L1: «62 Prozent erledigt, 4 überfällig» braucht `GET …/start` je Lager; «Übungslager» (Abschnitt, Chip «Übung») hat kein Feld in der API. Beides fehlt in der App.
+- A10: Untertitel «Cevi Beispielstadt» (Abteilungsname) und die Zahl «3 neu» am Lager (ungelesene Benachrichtigungen je Lager) sind nicht angeschlossen; der Umschalter zeigt «Programme».
+- U7: Der Name der Person, die zuletzt geändert hat («Lea hat …»), steht nicht in der Konflikt-Antwort; der Titel kommt vom Aufrufer.
+- L38: Der Papierkorb hat keine Route in der API und im Entwurf keinen Zustand «nicht verfügbar»; die Bildschirme fehlen, bis die Revisionen (L0e) da sind und geklärt ist, ob ein Hinweis nötig ist.
+- L33: «Hochladen» (Fortschritt, Dateityp, 20 MB) setzt Medienspeicher voraus (L0g); der Entwurf kennt keinen Bildschirm «Link hinzufügen» für das Verknüpfen eines Ablageorts.
+- L36: «Personen» und «Zuletzt angesehen» haben keine Quelle (keine Route, kein lokaler Speicher).
+- U4: Die Endzeit der Wartung («bis 22:00») liefert die API nicht; der Text nennt sie nicht.
+
 ## Route fehlt (blockiert)
 
 | Gebraucht für | Fehlt | Backend-Issue |
@@ -158,6 +341,7 @@ Hinweise:
 | A3: Namen der Mitglieder (Schichtplan, Diensttausch, Gruppen-Auswahl) | Liste der Lagermitglieder für Nicht-Admins; `…/lager/{id}/mitglieder` gibt es nur unter `/api/v1/admin` (die App ruft Admin nie auf). Schichten tragen `name`, ein Tausch nur `personId`s | L4 |
 | A3: Tauschanfrage mit Namen, Zimmer-Namen der Teilnehmenden im Team | Tausch liefert keine Namen und keine Schicht-Details; Fahrer nur als `fahrer.name` | L4 |
 | A4: Namen der Anwesenheits-Matrix, des Tageschefs im Team und der Einkäufer-Auswahl | Matrix nennt nur IDs (Mitglieder und Teilnehmende löst die App über Listen auf); Mitglieder-Liste fehlt für Nicht-Admins | L4 |
+| B3: Namen in Diensttausch, Schichtauswahl und Zimmer-/Fahrtenauswahl des Teams | wie A3: Mitgliederliste für Nicht-Admins fehlt; die App zeigt «Person», wo nur `personId` kommt | L4 |
 | A5: Wissen früherer Lager übernehmen | keine Route in der Beschreibung | L6 |
 | A5: Papierkorb ansehen, Wiederherstellen, Verlauf (ausser `…/aufgaben/{id}/verlauf`) | keine Routen (Löschen ist weich, aber nicht abrufbar) | L0e |
 | A5: Exporte als Word und Excel | nur Aushänge als PDF (`…/aushaenge/{art}`) | L7 |

@@ -35,6 +35,17 @@ extension APIClient {
         try await send("POST", campPath(campId) + "/benachrichtigungen/gelesen", body: CampMarkReadBody(ids: ids))
     }
 
+    /// The own switches per kind of notification; they count for all camps of the person.
+    func campNotificationSettings() async throws -> CampNotificationSettings {
+        try await load("GET", "/api/v1/ich/lager-benachrichtigungen")
+    }
+
+    /// Sets the named kinds; the others stay as they are.
+    func setCampNotificationSettings(_ kinds: [CampNotificationSetting]) async throws {
+        let body = CampNotificationSettingsBody(arten: kinds.map { .init(art: $0.kind.rawValue, aktiv: $0.enabled) })
+        try await send("PUT", "/api/v1/ich/lager-benachrichtigungen", body: body)
+    }
+
     /// In which camp the object of a push lies. 404 if the person was not notified or is no member any more.
     func resolveCampPush(type: CampPushType, objectId: UUID) async throws -> CampPushResolution {
         try await load("GET", "/api/v1/lager/aufloesen/\(type.rawValue)/\(objectId.uuidString.lowercased())")
@@ -60,6 +71,8 @@ extension APIClient {
 nonisolated enum CampRules {
     static let closedCode = "LAGER_GESCHLOSSEN"
     static let versionConflictCode = "VERSION_KONFLIKT"
+    /// Maintenance: the camp module answers 503, with this code if the server names it.
+    static let maintenanceCode = "WARTUNG"
     /// Codes of an operation answered `abgelehnt` by `POST …/aenderungen`.
     static let rejectionCodes = ["OPERATION_UNBEKANNT", "UNGUELTIGE_EINGABE", "KEINE_BERECHTIGUNG", "NICHT_GEFUNDEN", "KONFLIKT"]
     /// 429 of the event stream (header `Retry-After`).
