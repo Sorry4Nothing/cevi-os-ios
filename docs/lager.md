@@ -195,6 +195,39 @@ Nicht gebaut oder weggelassen, weil die API es nicht hergibt oder das Ziel in ei
 - T3: Hoeck im Zeitplan und im Kalender, Hinweis «Ruhige Ressorts» (Regel nicht beschrieben); Meilensteine anlegen und verschieben (der Entwurf zeigt es nicht).
 - L5-G: Name der Lagerleitung im Text («Wende dich an Mara») ist nicht bekannt.
 
+## Schnitt B2 Sitzungen und Kommunikation: Bildschirme (Issue #84)
+
+Gebaut (Boards L11 bis L19) mit den Zuständen Normal, Leer, Laden, Fehler, Ohne Netz, Lager abgeschlossen, ohne Recht, Konflikt, Eingabefehler, Aktion läuft:
+
+| Was | Code (`Screens/Camp/Meetings`, `Screens/Camp/Communication`) |
+| --- | --- |
+| L11 Hoeck-Liste (Kommend, Vergangen, «Neuer Hoeck», «Wie der letzte») | `CampMeetingsModel`, `CampMeetingsView` |
+| L12 Traktandenliste (Nach oben/unten, «Auf nächsten Höck» mit Rückgängig, wartende übernehmen, bearbeiten) | `CampAgendaModel`, `CampAgendaView` |
+| L13 Protokoll (Zeile speichern, Anwesende, Traktanden mit Entscheid, Beschlüsse, Konflikt) | `CampProtocolModel`, `CampProtocolView` |
+| L14 Hoeck-Modus (Anwesende abhaken, Traktanden besprochen, Ressort-Runde) | `CampMeetingModeModel`, `CampMeetingModeView` |
+| L15 Erwähnungen («Als Aufgabe», «Erledigt») | `CampMentionsModel`, `CampMentionsView` |
+| L16 Pinnwand (Tab; Wichtig, Anheften, Zeitfenster, Dateien als Verweis, Umfrage, Reaktionen) | `CampNoticesModel`, `CampNoticesView` |
+| L17 Mitteilung mit Umfrage (Empfänger nach Rolle, Optionen, Sichtbar bis) | `CampNoticeFormModel`, `CampNoticeFormView` |
+| L18 Eingang (Antworten, Ressort zuweisen, «Als Traktandum» mit Rückgängig, Status, Löschen) | `CampInboxModel`, `CampInboxView` |
+| L19 Benachrichtigungen (Neu, Einstellungen je Art) | `CampNotificationsModel`, `CampNotificationsView` |
+| Rechte nach Rolle, Schreiben mit Konflikt | `CampCommsRights`, `CampCommsWrite` (`CampCommsSupport.swift`) |
+
+Navigation: Pinnwand ist ein Tab; Hoecks, Erwähnungen, Eingang (nur Lagerleitung), Benachrichtigungen liegen im Mehr-Sheet. Ein Push `lager_pinnwand`, `lager_erwaehnung` oder `lager_eingang` öffnet das Ziel (`ActiveCamp.destination`). Datenschicht neu: Schalter der Benachrichtigungen (`GET`/`PUT /api/v1/ich/lager-benachrichtigungen`, `campNotificationSettings`); die Arten `diensttausch_anfrage`, `diensttausch_entscheid`, `adressbuch_aufraeumen` fehlten in `CampNotificationKind` (die Art `diensttausch` gibt es in der API nicht).
+
+Abweichungen vom Entwurf:
+
+- Rechte: Annahme nach den Standardwerten der Matrix (Hoecks, Protokolle, Pinnwand bearbeiten: Lagerleitung und Leitung; Stimmen und Reaktionen: auch Team; Eingang lesen und antworten: nur Lagerleitung). Der Server entscheidet am Ende.
+- L13: Die API hat keine Abschnitte und keinen Protokolltext. Der Bildschirm zeigt die Zeile (Titel, Art, Datum) zum Speichern, dazu Anwesende, Traktanden mit Entscheid und Beschlüsse. Nicht gebaut: «Lea schreibt gerade hier», gesperrter Abschnitt, To-dos, «Als Word», «Für den Kalender» (eine Datei ohne lokalen Speicher), «Beide ansehen». Ein Protokoll lässt sich nicht anlegen (braucht eine Datei, L0g).
+- «Ohne Netz» (Wartet): Für diese Änderungen kennt die Beschreibung keine Warteschlangen-Operationen (L0c). Ein Schreibfehler zeigt «Das hat nicht geklappt. Deine Eingabe ist noch da.»; Lesen zeigt den Stand und den Hinweis «Ohne Netz».
+- L12: Ziehen nicht gebaut (nur Pfeile). «Aus Aufgaben hinzufügen» fehlt.
+- L14: Die Ressort-Runde zeigt Zahlen je Ressort (die API liefert keine Aufgaben darin); die Knöpfe «Erledigt», «Läuft», «+1 Woche», «Verantwortliche ändern» fehlen.
+- L15: «Als Aufgabe» ohne «Rückgängig» (Löschen der Aufgabe braucht deren Version).
+- L16: «18 gesehen» (keine Lesezahl in der API); «Text für WhatsApp kopieren» heisst «Text teilen» (Teilen-Blatt, kein UIKit). Dateien nur als Link anzeigen, nicht hinzufügen (L0g).
+- L17: Empfänger nur nach Rolle (Leitung, Team, Lesende), keine Gruppen oder Personen (keine Mitgliederliste, L4).
+- L18: Die API liefert nur den Tag, daher «anonym, heute» ohne Uhrzeit. Das Senden durch das Team (Feedback, Rückfrage mit Code) ist nicht gebaut; der Entwurf zeigt nur den Eingang der Lagerleitung.
+- L19: Zeilen tragen keinen Text und keine Namen; der Text kommt aus der Art («Jemand hat dich erwähnt.»). Tippen auf eine Zeile öffnet das Ziel nicht (nur «Gelesen»). Einstellungen: ein Schalter je bekannter Art; der Entwurf zeigt den Reiter nicht, die Liste folgt der API.
+- Kein Zeilenzähler «3» am Pinnwand-Tab (kein Lagerzähler für die Pinnwand).
+
 ## Offene Fragen zum Entwurf
 
 - L1: «62 Prozent erledigt, 4 überfällig» braucht `GET …/start` je Lager; «Übungslager» (Abschnitt, Chip «Übung») hat kein Feld in der API. Beides fehlt in der App.

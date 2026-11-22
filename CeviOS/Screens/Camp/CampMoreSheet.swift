@@ -5,13 +5,24 @@ struct CampMoreSheet: View {
     let profile: Profile
     let showAllCamps: () -> Void
     @Environment(\.dismiss) private var dismiss
+    @Environment(ActiveCamp.self) private var active
     @State private var showsProfile = false
+    @State private var path: [CampDestination] = []
+
+    /// Entries whose target exists and that the role may open.
+    private var rights: CampCommsRights { CampCommsRights(role: active.role, readOnly: active.isReadOnly) }
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             List {
                 Section {
                     Button { showsProfile = true } label: { row("Profil", symbol: "person.crop.circle") }
+                }
+                Section("Lager") {
+                    NavigationLink(value: CampDestination.meetings) { row("Hoecks", symbol: "calendar") }
+                    NavigationLink(value: CampDestination.mentions) { row("Erwähnungen", symbol: "at") }
+                    if rights.readsInbox { NavigationLink(value: CampDestination.inbox) { row("Eingang", symbol: "tray") } }
+                    NavigationLink(value: CampDestination.notifications) { row("Benachrichtigungen", symbol: "bell") }
                 }
                 Section("Weiteres") {
                     Button { dismiss(); showAllCamps() } label: { row("Alle Lager", symbol: "tent") }
@@ -26,6 +37,19 @@ struct CampMoreSheet: View {
                 ToolbarItem(placement: .topBarLeading) {
                     Button("Schliessen", systemImage: "xmark") { dismiss() }
                 }
+            }
+            .navigationDestination(for: CampDestination.self) { destination in
+                switch destination {
+                case .meetings: CampMeetingsView()
+                case .mentions: CampMentionsView()
+                case .inbox: CampInboxView()
+                case .notifications: CampNotificationsView()
+                case .notices: EmptyView()
+                }
+            }
+            .onAppear {
+                // A tapped push leads straight to its target.
+                if let destination = active.destination, destination != .notices { path = [destination]; active.destination = nil }
             }
             .sheet(isPresented: $showsProfile) { ProfileView(profile: profile) }
         }

@@ -303,13 +303,15 @@ struct ApiContractTests {
         _ = try? await client.createCampContact(campId: id, CampContactCreate(name: "A"))
         _ = try? await client.updateCampContact(campId: id, contactId: other, CampContactPatch(version: 1))
         try? await client.deleteCampContact(campId: id, contactId: other, version: 1)
+        _ = try? await client.campNotificationSettings()
+        try? await client.setCampNotificationSettings([CampNotificationSetting(kind: .mention, enabled: false)])
         _ = try? await client.searchCamp(campId: id, text: "Zelt")
         _ = try? await client.sendCampOperations(campId: id, [CampOperation(type: "aufgabe.aendern", payload: [:])])
         for try await _ in client.campEvents(campId: id, lastEventId: 1) {}
 
         let contract = try Self.contractOperations()
         let calls = StubProtocol.requests(host: host).map { "\($0.httpMethod ?? "GET") \(Self.normalize($0.url?.path ?? ""))" }
-        #expect(calls.count >= 243)
+        #expect(calls.count >= 245)
         let missing = Set(calls).subtracting(contract)
         #expect(missing.isEmpty, "Not in the API description: \(missing.sorted())")
     }

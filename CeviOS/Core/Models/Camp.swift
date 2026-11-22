@@ -128,8 +128,10 @@ nonisolated enum CampNotificationKind: String, Decodable, Sendable {
     case deadline = "frist"
     case importantNotice = "pinnwand_wichtig"
     case feedbackReply = "eingang_antwort"
-    case shiftSwap = "diensttausch"
+    case shiftSwapRequest = "diensttausch_anfrage"
+    case shiftSwapDecision = "diensttausch_entscheid"
     case attendanceRequest = "anwesenheit_anfrage"
+    case addressBookCleanup = "adressbuch_aufraeumen"
     case unknown
 
     init(from decoder: Decoder) throws {
@@ -170,6 +172,33 @@ nonisolated struct CampUnreadCount: Decodable, Sendable {
 nonisolated struct CampMarkReadBody: Encodable, Sendable {
     /// `nil`: all unread entries of the person in this camp.
     let ids: [UUID]?
+}
+
+/// The switch per kind of `GET`/`PUT /api/v1/ich/lager-benachrichtigungen`. The kinds the app does not know are skipped.
+nonisolated struct CampNotificationSetting: Equatable, Sendable {
+    let kind: CampNotificationKind
+    var enabled: Bool
+}
+
+nonisolated struct CampNotificationSettings: Decodable, Equatable, Sendable {
+    let kinds: [CampNotificationSetting]
+
+    private struct Entry: Decodable { let art: String; let aktiv: Bool }
+    private enum CodingKeys: String, CodingKey { case kinds = "arten" }
+
+    init(kinds: [CampNotificationSetting]) { self.kinds = kinds }
+
+    init(from decoder: Decoder) throws {
+        let entries = try decoder.container(keyedBy: CodingKeys.self).decode([Entry].self, forKey: .kinds)
+        kinds = entries.compactMap { entry in
+            CampNotificationKind(rawValue: entry.art).flatMap { $0 == .unknown ? nil : CampNotificationSetting(kind: $0, enabled: entry.aktiv) }
+        }
+    }
+}
+
+nonisolated struct CampNotificationSettingsBody: Encodable, Sendable {
+    struct Entry: Encodable, Sendable { let art: String; let aktiv: Bool }
+    let arten: [Entry]
 }
 
 // MARK: Push

@@ -1,5 +1,12 @@
 import SwiftUI
 
+/// Where a tapped push leads inside the camp (`CampRouter`); the tab bar or the «Mehr» sheet consumes it.
+nonisolated enum CampDestination: Hashable, Sendable {
+    case notices, mentions, inbox
+    /// Only in the «Mehr» sheet (no push leads there).
+    case meetings, notifications
+}
+
 /// The camp the person works in now, kept in memory only. With a camp the app shows the camp view, without it the program view.
 @MainActor @Observable
 final class ActiveCamp {
@@ -10,6 +17,8 @@ final class ActiveCamp {
     private(set) var isOffline = false
     /// The camp choice (L1) is open.
     var showsChooser = false
+    /// Set by a tapped push, cleared by the screen that opens it.
+    var destination: CampDestination?
     private(set) var outbox: CampOutbox?
     @ObservationIgnored private(set) var client: APIClient?
 
@@ -26,6 +35,7 @@ final class ActiveCamp {
         outbox = client.map { CampOutbox(campId: camp.id, client: $0) }
         waitingCount = 0
         isOffline = false
+        destination = nil
     }
 
     func open(_ entry: CampListEntry, client: APIClient?) { open(camp: entry.camp, role: entry.role, client: client) }
