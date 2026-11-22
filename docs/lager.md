@@ -84,6 +84,30 @@ Gebaut, ohne Bildschirme. Schreib-Routen tragen `version`; Konflikte wie in A1 (
 
 Hinweise: Die Schichten-Route (`PUT …/schichten`) liefert einen Zustand ohne `version`. Antworten mit `oneOf` (Zimmer: Voll/Team) werden am Feld `plaetze` unterschieden. Der Teilnehmenden-Eintrag kennt den Cevi-Namen nur in der Vollansicht; im Schichtplan zeigt `name` bei Teilnehmenden nie den Cevi-Namen.
 
+## Schnitt A4 Im Lager: Datenschicht (Issue #67)
+
+Gebaut, ohne Bildschirme und ohne lokalen Speicher. Alle neuen Modelle sind `Codable` (auch `CampTask`, `CampShift`, `CampDuty`, `CampMeetingView` und weitere, die «Heute» enthält), damit ein späterer Zwischenspeicher sie so ablegen kann, wie sie vom Server kommen (`JSONEncoder.api` und `JSONDecoder.api` sind Gegenstücke). Das Notfall-Fenster ist eine Antwort (`campEmergency`): Adresse, Kontakte mit Telefon, Info-Abschnitte mit Merkmal «Notfall». Die Route zur Lageradresse liefert `CampEmergencyAddress.routeURL` (gespeicherter Kartenlink, sonst Apple Karten mit dem Adresstext). Telefonnummern und Adressen gehören nur in diese Modelle und in Bildschirme der Mitglieder. Das Wetter kennt nur den Ort des Lagers (Breite, Länge), keine Personendaten.
+
+Anwesenheit: Das Team trägt offene Felder bis zur Frist direkt ein (`setOwnCampAttendance`, «ganzer Tag» mit `CampAttendanceField.wholeDay`). Ist ein Feld schon gesetzt oder die Frist vorbei, schreibt der Server nichts und antwortet 409 `ANFRAGE_NOETIG`; `CampRules.attendanceBlocked` liefert die Felder mit Grund, dann folgt die Anfrage (`requestCampAttendanceChange`). Die Lagerleitung entscheidet getrennt (`decideCampAttendanceRequests`, Annehmen setzt das Feld) und überschreibt Felder jederzeit (`setCampAttendance`).
+
+| Was | Route (unter `/api/v1/lager/{id}`) | Code |
+| --- | --- | --- |
+| Matrix (Seiten, Filter Lagertage), Zusammenfassung | `GET …/anwesenheit`, `…/anwesenheit/zusammenfassung` | `CampAttendancePage`, `CampAttendanceSummary` |
+| Lagerleitung trägt ein, Frist | `PUT …/anwesenheit`, `PUT …/anwesenheit/frist` | `setCampAttendance`, `setCampAttendanceDeadline` |
+| Eigene Anwesenheit und Anfragen, eintragen | `GET`/`PUT …/anwesenheit/eigene` | `CampOwnAttendance`, `setOwnCampAttendance` |
+| Anfragen: stellen, auflisten, entscheiden | `POST`/`GET …/anwesenheit/anfragen`, `POST …/anfragen/entscheid` | `CampAttendanceRequest*`, `decideCampAttendanceRequests` |
+| Tagesseiten (Tageschef, Notiz), Tag lesen mit Blöcken, Wetter, To-dos | `GET …/tagesseiten`, `GET`/`POST`/`PATCH …/tagesseiten/{lagertagId}` | `CampDayPage*`, `CampDayPageDetail` (To-dos des Tages sind die Aufgaben mit Frist an dem Tag) |
+| Blöcke (Wichtig, Idee, Programmbild) | `POST …/bloecke`, `PATCH`/`DELETE …/bloecke/{id}` | `CampDayBlock*` |
+| Wetter lesen, Ort setzen | `GET …/wetter`, `PUT …/wetter/ort` | `CampWeather`, `setCampWeatherPlace` |
+| Heute, Meine Woche | `GET …/heute`, `GET …/meine-woche` | `CampToday`, `CampMyWeek` (Teile `nil` ohne Leserecht, 403 ohne lesbaren Teil) |
+| Einkauf (Filter `einkaeufer`=`ich` oder ID, `erledigt`), zusammengezählt, Vorschläge | `…/einkauf`, `…/einkauf/zusammen`, `…/einkauf/vorschlaege`, `…/einkauf/{id}` | `CampShopping*`, `CampShoppingPage.byGroup` (nach Warengruppe) |
+| Packliste: Vorlage, Zustand abhaken, eigene Punkte | `…/packliste`, `…/packliste/punkte`, `PUT …/punkte/{id}/zustand`, `…/packliste/eigene` | `CampPackingList`, `setCampPackingState`, `CampOwnPackingPoint*` |
+| Notfall-Fenster, Kartenlink, Kontakte | `GET …/notfall`, `PUT …/notfall/karte`, `…/notfall/kontakte` | `CampEmergency`, `CampEmergencyContact*`, `setCampMapLink` |
+| Infos (Abschnitte, Reihenfolge) | `…/infos`, `…/infos/{id}`, `PUT …/infos/reihenfolge` | `CampInfo*` |
+| Start der Lagerleitung | `GET …/start` | schon in A1 (`CampStart`) |
+
+Hinweise: Die Antworten tragen kein `aktionen`-Feld; Zeilen mit `version` richten die Knöpfe nach der Rolle (403 sonst). Die Einkaufs-Zeile «zusammen» nennt ihre Artikel mit `id` und `version`. Eigene Packlisten-Punkte tragen keine `version`. Die Konflikt-Antworten `KEINE_ANFRAGE_NOETIG` (Felder), `ANFRAGE_OFFEN` (Felder) und `BEREITS_ENTSCHIEDEN` (IDs) haben in der Beschreibung keine Form für ihre Zusatzfelder; die App liest nur den Fehlercode (`CampRules`).
+
 ## Route fehlt (blockiert)
 
 | Gebraucht für | Fehlt | Backend-Issue |
@@ -100,7 +124,7 @@ Hinweise: Die Schichten-Route (`PUT …/schichten`) liefert einen Zustand ohne `
 | A2: Reaktionen auf anderes als Pinnwand | `zielTyp` kennt nur `pinnwand_beitrag` | L3 |
 | A3: Namen der Mitglieder (Schichtplan, Diensttausch, Gruppen-Auswahl) | Liste der Lagermitglieder für Nicht-Admins; `…/lager/{id}/mitglieder` gibt es nur unter `/api/v1/admin` (die App ruft Admin nie auf). Schichten tragen `name`, ein Tausch nur `personId`s | L4 |
 | A3: Tauschanfrage mit Namen, Zimmer-Namen der Teilnehmenden im Team | Tausch liefert keine Namen und keine Schicht-Details; Fahrer nur als `fahrer.name` | L4 |
-| A4 Im Lager | Anwesenheit, Tagesseiten, Einkauf, Packliste, Notfall, Wetter, «Heute» | L5 |
+| A4: Namen der Anwesenheits-Matrix, des Tageschefs im Team und der Einkäufer-Auswahl | Matrix nennt nur IDs (Mitglieder und Teilnehmende löst die App über Listen auf); Mitglieder-Liste fehlt für Nicht-Admins | L4 |
 | A5 Ablage und Querschnitt | Dokumente, Adressbuch, Wissen, Suche | L6 |
 
 Nicht ableitbar: Welche Rechte die eigene Rolle hat. Die Matrix darf nur die Lagerleitung lesen. Die Aufgaben-Routen sollen laut Auftrag die erlaubten Aktionen in der Antwort liefern (fehlt die Aktion, fehlt der Knopf).

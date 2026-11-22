@@ -5,7 +5,7 @@ import Foundation
 // MARK: Shift plan (Schichtplan)
 
 /// A duty (for example kitchen). It belongs to a day section and applies on every camp day.
-nonisolated struct CampDuty: Decodable, Equatable, Identifiable, Sendable {
+nonisolated struct CampDuty: Codable, Equatable, Identifiable, Sendable {
     let id: UUID
     let version: Int
     let name: String
@@ -24,7 +24,7 @@ nonisolated struct CampDuty: Decodable, Equatable, Identifiable, Sendable {
 }
 
 /// One person on one duty on one day. Exactly one of `personId` and `participantId` is set.
-nonisolated struct CampShift: Decodable, Equatable, Identifiable, Sendable {
+nonisolated struct CampShift: Codable, Equatable, Identifiable, Sendable {
     let id: UUID
     let version: Int
     let dutyId: UUID

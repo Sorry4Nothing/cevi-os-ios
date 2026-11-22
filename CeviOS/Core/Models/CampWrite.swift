@@ -41,7 +41,7 @@ nonisolated enum CampField<Value: Encodable & Sendable>: Encodable, Sendable {
 }
 
 /// A person as the server resolves it on reading (names are looked up, not stored in the row).
-nonisolated struct CampPersonRef: Decodable, Equatable, Identifiable, Sendable {
+nonisolated struct CampPersonRef: Codable, Equatable, Identifiable, Sendable {
     let id: UUID
     let name: String?
     let ceviName: String?
@@ -62,5 +62,22 @@ nonisolated struct CampVersionConflict<Row: Decodable & Sendable>: Decodable, Se
         message = try container.decode(String.self, forKey: .message)
         current = try? container.decode(Row.self, forKey: .current)
         differing = try container.decode([String].self, forKey: .differing)
+    }
+}
+
+/// A string enum the server may extend later: an unknown value decodes to `fallback` (the case `unknown`) instead of failing.
+/// Encoding writes the raw value, so `unknown` is never meant to be sent.
+nonisolated protocol CampTolerantEnum: RawRepresentable, Codable, Sendable where RawValue == String {
+    static var fallback: Self { get }
+}
+
+nonisolated extension CampTolerantEnum {
+    init(from decoder: any Decoder) throws {
+        self = Self(rawValue: try decoder.singleValueContainer().decode(String.self)) ?? .fallback
+    }
+
+    func encode(to encoder: any Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(rawValue)
     }
 }

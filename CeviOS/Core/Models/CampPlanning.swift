@@ -146,7 +146,7 @@ nonisolated enum CampTaskRepeat: String, Codable, Sendable {
     case monthly = "m1"
 }
 
-nonisolated struct CampTaskResponsible: Decodable, Equatable, Identifiable, Sendable {
+nonisolated struct CampTaskResponsible: Codable, Equatable, Identifiable, Sendable {
     let id: UUID
     let name: String?
     let ceviName: String?
@@ -156,7 +156,7 @@ nonisolated struct CampTaskResponsible: Decodable, Equatable, Identifiable, Send
     enum CodingKeys: String, CodingKey { case id, name, ceviName, automatic = "automatisch" }
 }
 
-nonisolated struct CampTaskPortfolioRef: Decodable, Equatable, Identifiable, Sendable {
+nonisolated struct CampTaskPortfolioRef: Codable, Equatable, Identifiable, Sendable {
     let id: UUID
     let code: String
     let name: String
@@ -164,7 +164,7 @@ nonisolated struct CampTaskPortfolioRef: Decodable, Equatable, Identifiable, Sen
     enum CodingKeys: String, CodingKey { case id, name, code = "kuerzel" }
 }
 
-nonisolated struct CampTask: Decodable, Equatable, Identifiable, Sendable {
+nonisolated struct CampTask: Codable, Equatable, Identifiable, Sendable {
     let id: UUID
     let version: Int
     let title: String

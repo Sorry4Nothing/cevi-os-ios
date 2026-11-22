@@ -67,6 +67,17 @@ nonisolated enum CampRules {
     static let portfolioCycleCode = "RESSORT_ZYKLUS"
     static let notAMemberCode = "KEIN_MITGLIED"
     static let limitReachedCode = "LIMIT_ERREICHT"
+    static let participantUnknownCode = "TEILNEHMER_UNBEKANNT"
+    /// 409 on the own attendance: the fields need a request (see `attendanceBlocked`).
+    static let attendanceRequestNeededCode = "ANFRAGE_NOETIG"
+    /// 409 on a request: the field can be set directly, or a request for it is already waiting.
+    static let noAttendanceRequestNeededCode = "KEINE_ANFRAGE_NOETIG"
+    static let attendanceRequestOpenCode = "ANFRAGE_OFFEN"
+    /// 409 on a decision: a request was decided before.
+    static let alreadyDecidedCode = "BEREITS_ENTSCHIEDEN"
+    /// 409 on creating a day page: the day has one already.
+    static let dayPageExistsCode = "SEITE_VORHANDEN"
+    static let phoneMissingCode = "TELEFON_FEHLT"
 
     /// Shown for 409 `LAGER_GESCHLOSSEN`; other errors show the server text.
     static func writeError(_ error: APIError) -> String {
@@ -78,5 +89,12 @@ nonisolated enum CampRules {
     static func versionConflict<Row: Decodable & Sendable>(_ error: APIError, as row: Row.Type) -> CampVersionConflict<Row>? {
         guard error.kind == .conflict, error.code == versionConflictCode, let body = error.conflictBody else { return nil }
         return try? JSONDecoder.api.decode(CampVersionConflict<Row>.self, from: body)
+    }
+
+    /// The blocked fields of a 409 `ANFRAGE_NOETIG`: nothing was written, the app sends a request for these fields instead.
+    /// `nil` for any other error.
+    static func attendanceBlocked(_ error: APIError) -> [CampAttendanceBlocked]? {
+        guard error.kind == .conflict, error.code == attendanceRequestNeededCode, let body = error.conflictBody else { return nil }
+        return try? JSONDecoder.api.decode(CampAttendanceBlockedBody.self, from: body).blocked
     }
 }

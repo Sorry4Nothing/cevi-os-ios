@@ -3,7 +3,7 @@ import Foundation
 // MARK: Files (references only, never bytes)
 
 /// A link to a file at the storage place of the department. The app never loads the content through the API.
-nonisolated struct CampFileRef: Decodable, Equatable, Identifiable, Sendable {
+nonisolated struct CampFileRef: Codable, Equatable, Identifiable, Sendable {
     let id: UUID
     let version: Int
     let displayName: String
@@ -85,7 +85,7 @@ nonisolated struct CampMeeting: Decodable, Equatable, Identifiable, Sendable {
     }
 }
 
-nonisolated struct CampMeetingSummary: Decodable, Equatable, Identifiable, Sendable {
+nonisolated struct CampMeetingSummary: Codable, Equatable, Identifiable, Sendable {
     let id: UUID
     let version: Int
     let kind: CampMeetingKind
@@ -106,7 +106,7 @@ nonisolated struct CampMeetingSummary: Decodable, Equatable, Identifiable, Senda
 }
 
 /// A team meeting as the team sees it: only date, time, title and place.
-nonisolated struct CampMeetingTeamView: Decodable, Equatable, Identifiable, Sendable {
+nonisolated struct CampMeetingTeamView: Codable, Equatable, Identifiable, Sendable {
     let id: UUID
     let version: Int
     let date: Date
@@ -399,4 +399,13 @@ nonisolated struct CampResolutionPatch: Encodable, Sendable {
     var meetingId: CampField<UUID>?
 
     enum CodingKeys: String, CodingKey { case version, text, protocolId = "protokollId", meetingId = "hoeckId" }
+}
+
+extension CampMeetingView: Encodable where Full: Encodable {
+    func encode(to encoder: any Encoder) throws {
+        switch self {
+        case .full(let value): try value.encode(to: encoder)
+        case .team(let value): try value.encode(to: encoder)
+        }
+    }
 }
