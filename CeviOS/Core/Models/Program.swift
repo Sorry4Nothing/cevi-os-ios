@@ -46,10 +46,7 @@ nonisolated struct Program: Decodable, Equatable, Identifiable, Sendable {
     let end: Date?
     let dayFrom: Date?
     let dayTo: Date?
-    let location: String?
     let units: [UnitRef]
-    /// Only filled with leader view.
-    let description: String?
     let children: [ProgramChild]
 
     // Detail only
@@ -65,7 +62,7 @@ nonisolated struct Program: Decodable, Equatable, Identifiable, Sendable {
     enum CodingKeys: String, CodingKey {
         case id, units = "stufen", visibility = "sichtbarkeit", status, start = "beginn", end = "ende"
         case title = "titel", isAllDay = "ganztaegig", dayFrom = "tagVon", dayTo = "tagBis"
-        case location = "googleOrt", description = "googleBeschreibung", children = "kinder"
+        case children = "kinder"
         case meetingPoint = "treffpunkt", closingPlace = "schlussOrt", closingTime = "schlussZeit"
         case bring = "mitnehmen", isRegistrationOpen = "teilnahmeOffen", ownRegistration = "eigeneAnmeldung"
     }

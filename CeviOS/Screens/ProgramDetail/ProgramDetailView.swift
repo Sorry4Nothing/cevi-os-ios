@@ -141,15 +141,11 @@ struct ProgramDetailView: View {
 
     @ViewBuilder
     private func infoCard(_ program: Program) -> some View {
-        let location = program.location.flatMap { $0.isEmpty ? nil : $0 }
-        let description = program.description.flatMap { $0.isEmpty ? nil : $0 }
         let when = scheduleText(program)
-        if location != nil || program.bring != nil || description != nil || when != nil {
+        if program.bring != nil || when != nil {
             VStack(alignment: .leading, spacing: Spacing.s3) {
                 if let when { infoRow("Wann", text: when, symbol: "calendar") }
-                if let location { infoRow("Ort", text: location, symbol: "mappin.and.ellipse") }
                 if let bring = program.bring { infoRow("Mitnehmen", text: bring, symbol: "backpack") }
-                if let description { infoRow("Info", text: description, symbol: "info.circle") }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .ceviCard()

@@ -207,6 +207,21 @@ paths:
             image/svg+xml:
               schema:
                 type: string
+  /admin/kalender.js:
+    get:
+      operationId: getAdminKalenderSkript
+      summary: Skript der Verwaltung – Bereich Kalender
+      tags:
+        - Allgemein
+      security: []
+      description: Statische Datei der Verwaltung (siehe `GET /admin`), ohne Anmeldung.
+      responses:
+        "200":
+          description: Datei (`text/javascript; charset=UTF-8`).
+          content:
+            text/javascript:
+              schema:
+                type: string
   /admin/kinder.js:
     get:
       operationId: getAdminKinderSkript
@@ -271,6 +286,21 @@ paths:
     get:
       operationId: getAdminSystemSkript
       summary: Skript der Verwaltung – Bereich System
+      tags:
+        - Allgemein
+      security: []
+      description: Statische Datei der Verwaltung (siehe `GET /admin`), ohne Anmeldung.
+      responses:
+        "200":
+          description: Datei (`text/javascript; charset=UTF-8`).
+          content:
+            text/javascript:
+              schema:
+                type: string
+  /admin/tags.js:
+    get:
+      operationId: getAdminTagsSkript
+      summary: Skript der Verwaltung – Bereich Tags
       tags:
         - Allgemein
       security: []
@@ -1146,6 +1176,65 @@ paths:
           $ref: "#/components/responses/NichtGefunden404"
         "426":
           $ref: "#/components/responses/AppVeraltet426"
+  /api/v1/medien/{id}:
+    get:
+      operationId: mediumLesen
+      summary: Bild oder PDF aus dem Medienspeicher lesen
+      tags:
+        - Medien
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+        - $ref: "#/components/parameters/MediumId"
+      description: |
+        Liefert die Datei eines Mediums. Der Server liest sie aus dem Medienspeicher und gibt sie selbst aus; es gibt
+        keine Adresse des Speichers und keinen öffentlichen Bucket.
+
+        **Sichtbarkeit.** Ein Medium mit Sichtbarkeit `oeffentlich` ist ohne Anmeldung abrufbar (auch ohne Sitzung, für
+        gesperrte Konten und andere Abteilungen). Ein Medium mit Sichtbarkeit `angemeldet` liefert der Server nur mit
+        Sitzung und nur der Abteilung des Mediums; für andere Abteilungen und unbekannte IDs ist die Antwort 404, nie 403.
+        Die Sichtbarkeit nach Tags gibt es für Medien noch nicht; das Modul dafür (#333) steht bereit, ist aber noch an kein Objekt angeschlossen.
+
+        **Kopfzeilen.** `Content-Type` ist `image/webp` oder `application/pdf`; `X-Content-Type-Options: nosniff` und
+        `Content-Security-Policy: sandbox; frame-ancestors 'none'` stehen immer. Ein PDF trägt
+        `Content-Disposition: attachment` (es öffnet sich nie in der Seite), ein Bild `inline`. `Cache-Control` ist
+        `public, max-age=300` für öffentliche und `private, no-store` für angemeldete Medien.
+
+        **Rollen.** Öffentlich: alle. Angemeldet: alle Personen der Abteilung, ausser bei offenem Pflichtwechsel des
+        Passworts (403). Statuscodes: 200, 400, 401, 403, 404, 426, 500 (Medienspeicher nicht erreichbar, ohne Details),
+        501 (ohne eingerichteten Medienspeicher).
+      security:
+        - sitzung: []
+        - {}
+      responses:
+        "200":
+          description: Die Datei.
+          content:
+            image/webp:
+              schema:
+                type: string
+                format: binary
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        "400":
+          $ref: "#/components/responses/UngueltigeEingabe400"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "404":
+          $ref: "#/components/responses/NichtGefunden404"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "500":
+          description: Der Medienspeicher hat versagt; ohne Details (code `INTERNER_FEHLER`).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Fehler"
+        "501":
+          description: Der Server hat keinen Medienspeicher eingerichtet.
   /api/v1/stufen/{id}/kontakte:
     get:
       operationId: stufeKontakteLesen
@@ -1451,14 +1540,11 @@ paths:
 
         Wer aufrufen darf: jede angemeldete Person. Sichtbar ist ein Programm so:
         - Administratorinnen und Administratoren sowie Stufenleitungen (SL) sehen jedes Programm der Abteilung,
-          auch «intern» und ohne Stufenzuordnung.
+          auch ohne Stufenzuordnung; «intern» (für niemanden sichtbar) nur mit `alle=1` und nur für Administratorinnen und Administratoren.
         - Leitende sehen Programme mit Sichtbarkeit «leitende» oder «eltern», die einer ihrer Stufen zugeordnet sind.
         - Eltern sehen Programme mit Sichtbarkeit «eltern», die einer Stufe zugeordnet sind, in der ein aktives
           eigenes Kind ist.
         - Wer beides ist, sieht die Vereinigung.
-
-        `googleBeschreibung` ist nur mit Leitungssicht gefüllt (Admin/SL: alle Programme der Abteilung; Leitende:
-        Programme ihrer Stufen mit Sichtbarkeit «leitende» oder «eltern»), sonst `null`.
 
         Statuscodes: 200 Erfolg; 400 `von` oder `bis` fehlt, ist kein gültiges Datum `JJJJ-MM-TT`, beginnt mit Jahr
         0000 oder es gibt unbekannte Query-Parameter; 401 keine gültige Sitzung (auch deaktiviertes Konto);
@@ -1482,6 +1568,14 @@ paths:
             type: string
             format: date
             example: 2027-03-31
+        - name: alle
+          in: query
+          required: false
+          description: Mit `1` liefert die Liste auch ausgeblendete Programme (Sichtbarkeit «intern»). Wirkt nur für Administratorinnen und Administratoren.
+          schema:
+            type: string
+            enum:
+              - "1"
       responses:
         "200":
           description: Sichtbare Programme im Fenster, möglicherweise leer.
@@ -1616,11 +1710,11 @@ paths:
         - Leitende und Eltern nie, auch nicht bei einem Aufruf ohne Änderung (403).
 
         Regeln für den Body: `stufen` enthält nur Stufen der eigenen Abteilung (fremde oder unbekannte IDs sind
-        400, nicht 404; eine SL bekommt dafür 403, weil die Rechteprüfung zuerst läuft). Ohne Stufen ist nur die
-        Sichtbarkeit «intern» erlaubt, sonst 400.
+        400, nicht 404; eine SL bekommt dafür 403, weil die Rechteprüfung zuerst läuft). Ohne Stufen gilt das
+        Programm für alle Stufen. Eine SL darf Programme ohne Stufe nicht ändern (403).
 
         Reihenfolge der Prüfung: Eingabeform (400), Sichtbarkeit des Programms (404), Recht (403), Stufen der
-        Abteilung und Regel «ohne Stufe nur intern» (400).
+        Abteilung (400).
         Statuscodes: 204 gespeichert, kein Body; 400 ungültige Eingabe; 401 keine gültige Sitzung; 403 kein Recht
         zur Zuordnung oder Konto muss zuerst das Passwort ändern; 404 Programm unbekannt oder nicht sichtbar;
         426 App-Version zu alt; 429 zu viele Anfragen.
@@ -2736,6 +2830,164 @@ paths:
           $ref: "#/components/responses/AppVeraltet426"
         "429":
           $ref: "#/components/responses/ZuVieleAnfragen429"
+  /api/v1/admin/medien:
+    get:
+      operationId: listeAdminMedien
+      summary: Medien der Abteilung auflisten
+      description: |
+        Nur Admins. Die jüngsten 200 Medien der eigenen Abteilung, neueste zuerst; ohne Seitenwechsel.
+
+        Statuscodes: 200, 401, 403, 426.
+      tags:
+        - Verwaltung
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+      responses:
+        "200":
+          description: Die Medien.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MedienListe"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+    post:
+      operationId: legeAdminMediumAn
+      summary: Bild oder PDF hochladen
+      description: |
+        Nur Admins (mit zweitem Faktor). Lädt ein Bild oder ein PDF in den Medienspeicher der eigenen Abteilung.
+
+        **Body.** Die Datei selbst als Bytes, kein JSON und kein Multipart. Erlaubt sind JPEG, PNG, WebP und PDF; der Typ
+        ergibt sich aus den ersten Bytes (`%PDF-` für PDF), nie aus Dateiendung, `Content-Type` oder Query. SVG, GIF und
+        alles andere sind 415. Ein Bild darf höchstens 10 MiB gross sein (vor dem Verkleinern) und höchstens 16 Millionen
+        Pixel haben, ein PDF höchstens 20 MiB. Die Metadaten stehen in der Query; einen Dateinamen gibt es nicht.
+
+        **Alt-Text.** Ein Bild braucht entweder `altText` (1 bis 500 Zeichen) oder `dekorativ=true`, nie beides und nie
+        keines (400, code `ALT_TEXT`). Bei einem PDF ist `altText` eine freiwillige Beschreibung, `dekorativ=true` ist 400.
+
+        **Verarbeitung.** Ein Bild dreht der Server nach der EXIF-Angabe, verkleinert es auf höchstens 2048 Pixel je Seite
+        (Seitenverhältnis und Transparenz bleiben, kleinere Bilder werden nicht vergrössert) und speichert es als WebP ohne
+        Metadaten (kein EXIF, kein Aufnahmeort). Das Original bleibt nicht erhalten. Ein PDF bleibt unverändert.
+
+        **Begrenzung.** Pro Person höchstens 10 Uploads in 10 Minuten (429); auch abgelehnte zählen.
+
+        Statuscodes: 201, 400, 401, 403, 413, 415 (code `MEDIEN_FORMAT`), 426, 429, 500 (Medienspeicher nicht erreichbar;
+        es bleibt weder eine Zeile noch ein Objekt zurück), 501 (ohne eingerichteten Medienspeicher).
+      tags:
+        - Verwaltung
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+        - name: sichtbarkeit
+          in: query
+          required: true
+          description: Wer das Medium sehen darf. Vorerst nur `oeffentlich` (jeder, ohne Anmeldung) und `angemeldet` (die Abteilung); Tags gibt es für Medien noch nicht (das Modul #333 ist noch an kein Objekt angeschlossen).
+          schema:
+            type: string
+            enum:
+              - oeffentlich
+              - angemeldet
+        - name: altText
+          in: query
+          required: false
+          description: Alternativtext, 1 bis 500 Zeichen nach dem Entfernen von Leerraum am Rand. Bei Bildern Pflicht, ausser bei `dekorativ=true`.
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 500
+        - name: dekorativ
+          in: query
+          required: false
+          description: Nur bei Bildern, ausdrückliche Markierung «dekorativ»; dann ohne `altText`.
+          schema:
+            type: string
+            enum:
+              - "true"
+      requestBody:
+        required: true
+        content:
+          image/jpeg:
+            schema:
+              type: string
+              format: binary
+          image/png:
+            schema:
+              type: string
+              format: binary
+          image/webp:
+            schema:
+              type: string
+              format: binary
+          application/pdf:
+            schema:
+              type: string
+              format: binary
+      responses:
+        "201":
+          description: Gespeichert.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Medium"
+        "400":
+          $ref: "#/components/responses/UngueltigeEingabe400"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "413":
+          description: Ein Bild ist grösser als 10 MiB oder ein PDF grösser als 20 MiB.
+        "415":
+          description: Kein JPEG, PNG, WebP oder PDF, kein lesbares Bild oder zu viele Pixel (code `MEDIEN_FORMAT`).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Fehler"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+        "500":
+          description: Der Medienspeicher oder die Datenbank hat versagt; ohne Details (code `INTERNER_FEHLER`).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Fehler"
+        "501":
+          description: Der Server hat keinen Medienspeicher eingerichtet.
+  /api/v1/admin/medien/{id}:
+    delete:
+      operationId: loescheAdminMedium
+      summary: Medium löschen
+      description: |
+        Nur Admins, nur Medien der eigenen Abteilung. Löscht erst die Zeile, dann die Datei im Medienspeicher. Scheitert
+        der Speicher danach, bleibt die Antwort 204: Die Datei ist nicht mehr abrufbar, und der Server meldet die Waise im Log
+        (code `WAISE`). Das Audit-Log hält Hochladen und Löschen fest, ohne Inhalt.
+
+        Statuscodes: 204, 400, 401, 403, 404 (unbekannt oder andere Abteilung), 426, 501.
+      tags:
+        - Verwaltung
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+        - $ref: "#/components/parameters/MediumId"
+      responses:
+        "204":
+          description: Gelöscht; kein Body.
+        "400":
+          $ref: "#/components/responses/UngueltigeEingabe400"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "404":
+          $ref: "#/components/responses/NichtGefunden404"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "501":
+          description: Der Server hat keinen Medienspeicher eingerichtet.
   /api/v1/admin/kinder:
     get:
       operationId: listeAdminKinder
@@ -3054,6 +3306,347 @@ paths:
       responses:
         "204":
           description: Gelöscht.
+        "400":
+          $ref: "#/components/responses/UngueltigeEingabe400"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "404":
+          $ref: "#/components/responses/NichtGefunden404"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+  /api/v1/admin/tags:
+    get:
+      operationId: listeAdminTags
+      summary: Tags der Abteilung
+      description: |
+        Nur Admins. Liefert alle Tags der eigenen Abteilung mit der Zahl der Personen, die sie tragen, sortiert nach Typ und Name.
+
+        Statuscodes: 200 bei Erfolg. 403 für Nicht-Admins (und für Admins ohne zweiten Faktor, Code `ZWEITER_FAKTOR_FEHLT`).
+      tags:
+        - Verwaltung
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+      responses:
+        "200":
+          description: Tags der Abteilung.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminTagListe"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+    post:
+      operationId: legeAdminTagAn
+      summary: Tag anlegen
+      description: |
+        Nur Admins. Legt einen Tag in der eigenen Abteilung an. Der Typ (`stufe`, `funktion`, `team`, `lager`) bleibt danach fest. Der Name ist in der Abteilung eindeutig, über alle Typen und ohne Gross-/Kleinschreibung. Das Kürzel ist optional und leer, wenn es fehlt. Das Anlegen steht im Audit-Log (nur der Typ, nie der Name). Ein Tag vom Typ `stufe` ist eine Stufe: Er erscheint in `GET /api/v1/stufen` unter derselben ID, und sein Gruppenchat entsteht gleich mit.
+
+        Statuscodes: 201 bei Erfolg. 400 bei ungültiger Eingabe (unbekannte Felder, fehlender Typ, Längen). 403 für Nicht-Admins. 409 mit Code `TAGNAME_VERGEBEN`, wenn der Name schon vergeben ist.
+      tags:
+        - Verwaltung
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminTagAnlegen"
+      responses:
+        "201":
+          description: Tag angelegt.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminAngelegt"
+        "400":
+          $ref: "#/components/responses/UngueltigeEingabe400"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "409":
+          description: Es gibt in der Abteilung schon einen Tag mit diesem Namen (`TAGNAME_VERGEBEN`).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminKonflikt"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+  /api/v1/admin/tags/{id}:
+    get:
+      operationId: holeAdminTag
+      summary: Tag mit Verwendung
+      description: |
+        Nur Admins, nur Tags der eigenen Abteilung. Zeigt den Tag und wo er verwendet wird: `verwendung.personen` zählt die Personen, die ihn tragen, `personen` nennt sie mit Rolle und Priorität. Weitere Verwendungen (Sichtbarkeit, Rechte) kommen mit späteren Issues dazu.
+
+        Reihenfolge der Prüfungen: Pfad (400), dann Tag in der eigenen Abteilung (404), dann Admin-Recht (403).
+
+        Statuscodes: 200 bei Erfolg. 400 bei ungültiger ID. 403 für Nicht-Admins. 404, wenn der Tag unbekannt ist oder zu einer anderen Abteilung gehört.
+      tags:
+        - Verwaltung
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+        - $ref: "#/components/parameters/AdminTagId"
+      responses:
+        "200":
+          description: Der Tag und seine Verwendung.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminTag"
+        "400":
+          $ref: "#/components/responses/UngueltigeEingabe400"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "404":
+          $ref: "#/components/responses/NichtGefunden404"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+    patch:
+      operationId: aendereAdminTag
+      summary: Tag umbenennen
+      description: |
+        Nur Admins, nur Tags der eigenen Abteilung. Ändert Name und Kürzel; der Typ lässt sich nicht ändern (400). Ein leeres Objekt ist ein No-op und liefert 204. Eine Änderung steht im Audit-Log (welche Felder, nie die Werte).
+
+        Statuscodes: 204 bei Erfolg. 400 bei ungültiger Eingabe. 403 für Nicht-Admins. 404, wenn der Tag unbekannt ist oder zu einer anderen Abteilung gehört. 409 mit Code `TAGNAME_VERGEBEN`, wenn der neue Name schon vergeben ist.
+      tags:
+        - Verwaltung
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+        - $ref: "#/components/parameters/AdminTagId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminTagAendern"
+      responses:
+        "204":
+          description: Geändert (auch bei einem No-op).
+        "400":
+          $ref: "#/components/responses/UngueltigeEingabe400"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "404":
+          $ref: "#/components/responses/NichtGefunden404"
+        "409":
+          description: Es gibt in der Abteilung schon einen Tag mit diesem Namen (`TAGNAME_VERGEBEN`).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminKonflikt"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+    delete:
+      operationId: loescheAdminTag
+      summary: Tag löschen
+      description: |
+        Nur Admins, nur Tags der eigenen Abteilung. Löscht den Tag, solange ihn keine Person trägt. Sonst antwortet der Server mit 409 und dem Code `TAG_BELEGT`; `verwendung.personen` nennt, wie viele Personen ihn tragen (`null`, wenn die Zuordnung gleichzeitig entstand). Das Löschen steht im Audit-Log (nur der Typ).
+
+        Statuscodes: 204 bei Erfolg. 400 bei ungültiger ID. 403 für Nicht-Admins. 404, wenn der Tag unbekannt ist oder zu einer anderen Abteilung gehört. 409 `TAG_BELEGT`.
+      tags:
+        - Verwaltung
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+        - $ref: "#/components/parameters/AdminTagId"
+      responses:
+        "204":
+          description: Gelöscht.
+        "400":
+          $ref: "#/components/responses/UngueltigeEingabe400"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "404":
+          $ref: "#/components/responses/NichtGefunden404"
+        "409":
+          description: Der Tag ist noch Personen zugewiesen (`TAG_BELEGT`).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminTagBelegt"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+  /api/v1/admin/tags/{id}/personen/{userId}:
+    put:
+      operationId: weiseAdminTagZu
+      summary: Tag einer Person zuweisen
+      description: |
+        Nur Admins. Weist der Person den Tag zu oder ändert eine bestehende Zuordnung. Ein Schlüssel ohne Wert lässt das Feld, wie es ist (bei einer neuen Zuordnung: leer); `null` leert es. Eine Person trägt einen Tag höchstens einmal. Die Zuordnung steht im Audit-Log (Person und Priorität, nie die Rolle). Tags verleihen für sich keine Rechte: Wer Admin ist, steht in `admins.ts`, nicht in den Tags. Darum setzt diese Route an Tags vom Typ `stufe` die Rollenwerte `leitung` und `stufenleitung` nicht: Sie sind Stufenrollen mit Rechten und gehen nur über `PATCH /api/v1/admin/personen/{id}` (mit Audit-Log und Push). Freie Rollen an Stufen-Tags und alle Rollen an Tags anderer Typen bleiben möglich; bestehende Zuordnungen bleiben unberührt.
+
+        Reihenfolge der Prüfungen: Pfad und Body (400), dann Tag in der eigenen Abteilung (404), dann Admin-Recht (403), dann Stufenrolle an einem Stufen-Tag (400), dann Person in der eigenen Abteilung (404).
+
+        Statuscodes: 204 bei Erfolg. 400 bei ungültiger Eingabe oder bei `leitung` und `stufenleitung` an einem Stufen-Tag. 403 für Nicht-Admins. 404, wenn Tag oder Person unbekannt sind oder zu einer anderen Abteilung gehören.
+      tags:
+        - Verwaltung
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+        - $ref: "#/components/parameters/AdminTagId"
+        - $ref: "#/components/parameters/AdminTagPersonId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminTagZuweisen"
+      responses:
+        "204":
+          description: Zugewiesen oder geändert.
+        "400":
+          $ref: "#/components/responses/UngueltigeEingabe400"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "404":
+          $ref: "#/components/responses/NichtGefunden404"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+    delete:
+      operationId: entzieheAdminTag
+      summary: Tag einer Person entziehen
+      description: |
+        Nur Admins, nur Tags der eigenen Abteilung. Entfernt die Zuordnung; der Entzug steht im Audit-Log.
+
+        Statuscodes: 204 bei Erfolg. 400 bei ungültiger ID. 403 für Nicht-Admins. 404, wenn der Tag unbekannt ist, zu einer anderen Abteilung gehört oder die Person ihn nicht trägt.
+      tags:
+        - Verwaltung
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+        - $ref: "#/components/parameters/AdminTagId"
+        - $ref: "#/components/parameters/AdminTagPersonId"
+      responses:
+        "204":
+          description: Entzogen.
+        "400":
+          $ref: "#/components/responses/UngueltigeEingabe400"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "404":
+          $ref: "#/components/responses/NichtGefunden404"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+  /api/v1/admin/bearbeiter:
+    get:
+      operationId: listeAdminBearbeiter
+      summary: Bearbeitungsrechte der Abteilung
+      description: |
+        Nur Admins. Liefert alle Sonderrechte der eigenen Abteilung. Ein Recht gilt für eine Person (`userId`) oder einen Tag (`tagId`), genau eines von beiden. Ohne `objektId` gilt es für alle Objekte des Typs: Mit dem Typ `seite` ist das die Rolle «Redaktion».
+
+        Wer bearbeiten darf, prüft der Server bei jeder Anfrage: Die Abteilungsleitung darf alles, die Stufenleitung die Objekte ihrer Stufe, alle anderen nur mit einem Recht aus dieser Liste (auf die Person oder auf einen Tag, den sie trägt). Ein Tag verleiht für sich nichts.
+
+        Statuscodes: 200 bei Erfolg. 403 für Nicht-Admins (und für Admins ohne zweiten Faktor, Code `ZWEITER_FAKTOR_FEHLT`).
+      tags:
+        - Verwaltung
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+      responses:
+        "200":
+          description: Rechte der Abteilung.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminBearbeiterListe"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+    post:
+      operationId: setzeAdminBearbeiter
+      summary: Bearbeitungsrecht vergeben
+      description: |
+        Nur Admins. Vergibt ein Recht an eine Person oder einen Tag der eigenen Abteilung. Ohne `objektId` (oder mit `null`) gilt es für alle Objekte des Typs: `objektTyp: seite` ohne `objektId` macht die Person zur Redaktion für alle Seiten. Ein Recht gibt es höchstens einmal. Das Vergeben steht im Audit-Log (Typ, Objekt, Person oder Tag; nie Inhalte).
+
+        Reihenfolge der Prüfungen: Body (400), Admin-Recht (403), Person oder Tag in der eigenen Abteilung (404).
+
+        Statuscodes: 201 bei Erfolg. 400 bei ungültiger Eingabe (unbekannter Typ, weder oder beide von `userId` und `tagId`, unbekannte Felder). 403 für Nicht-Admins. 404, wenn Person oder Tag unbekannt sind oder zu einer anderen Abteilung gehören. 409 mit Code `BEARBEITER_VORHANDEN`, wenn das Recht schon vergeben ist.
+      tags:
+        - Verwaltung
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminBearbeiterSetzen"
+      responses:
+        "201":
+          description: Recht vergeben.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminAngelegt"
+        "400":
+          $ref: "#/components/responses/UngueltigeEingabe400"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "404":
+          $ref: "#/components/responses/NichtGefunden404"
+        "409":
+          description: Das Recht ist schon vergeben (`BEARBEITER_VORHANDEN`).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminKonflikt"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+  /api/v1/admin/bearbeiter/{id}:
+    delete:
+      operationId: entzieheAdminBearbeiter
+      summary: Bearbeitungsrecht entziehen
+      description: |
+        Nur Admins, nur Rechte der eigenen Abteilung. Der Entzug wirkt sofort und steht im Audit-Log.
+
+        Reihenfolge der Prüfungen: Pfad (400), Recht in der eigenen Abteilung (404), dann Admin-Recht (403).
+
+        Statuscodes: 204 bei Erfolg. 400 bei ungültiger ID. 403 für Nicht-Admins. 404, wenn das Recht unbekannt ist oder zu einer anderen Abteilung gehört.
+      tags:
+        - Verwaltung
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+        - $ref: "#/components/parameters/AdminBearbeiterId"
+      responses:
+        "204":
+          description: Entzogen.
         "400":
           $ref: "#/components/responses/UngueltigeEingabe400"
         "401":
@@ -3913,9 +4506,7 @@ components:
         - ende
         - tagVon
         - tagBis
-        - googleOrt
         - stufen
-        - googleBeschreibung
         - kinder
       properties:
         id:
@@ -3936,7 +4527,7 @@ components:
             - intern
             - leitende
             - eltern
-          description: Wer das Programm ausser Admin und SL sieht; «intern» nur Admin und SL, «leitende» zusätzlich die Leitenden der zugeordneten Stufen, «eltern» zusätzlich deren Eltern.
+          description: Wer das Programm sieht. «intern» niemand in der App (Admins holen es mit `alle=1`), «leitende» Admin, SL und die Leitenden der zugeordneten Stufen, «eltern» zusätzlich deren Eltern. Ohne Stufe gilt das Programm für alle Stufen.
         ganztaegig:
           type: boolean
         beginn:
@@ -3963,21 +4554,11 @@ components:
             - "null"
           format: date
           description: Letzter Programmtag, inklusive (Schweizer Kalendertag). `null` bei Programmen mit Uhrzeit.
-        googleOrt:
-          type:
-            - string
-            - "null"
-          description: Ort aus dem Google-Kalender.
         stufen:
           type: array
           description: Zugeordnete Stufen der eigenen Abteilung, aufsteigend nach `id` sortiert. Leer, wenn keine zugeordnet ist.
           items:
             $ref: "#/components/schemas/ProgrammStufeRef"
-        googleBeschreibung:
-          type:
-            - string
-            - "null"
-          description: Beschreibung aus Google; gilt als intern. Nur mit Leitungssicht gefüllt, sonst `null`.
         kinder:
           type: array
           description: Eigene aktive Kinder der Person in zugeordneten Stufen, sortiert nach Vorname, dann `id`. Leer für alle ohne eigene Kinder dort, auch für Admins und Leitende.
@@ -4068,7 +4649,7 @@ components:
           type: array
           maxItems: 50
           uniqueItems: true
-          description: Vollständiger neuer Stand der zugeordneten Stufen (nur Stufen der eigenen Abteilung, keine Doppelten). Leer ist nur mit Sichtbarkeit «intern» erlaubt.
+          description: Vollständiger neuer Stand der zugeordneten Stufen (nur Stufen der eigenen Abteilung, keine Doppelten). Leer heisst, das Programm gilt für alle Stufen.
           items:
             type: string
             format: uuid
@@ -4386,6 +4967,7 @@ components:
             - KEIN_ZWEITER_FAKTOR
             - STUFENNAME_VERGEBEN
             - STUFE_BELEGT
+            - BEARBEITER_VORHANDEN
         message:
           type: string
           example: Der letzte Admin lässt sich nicht entfernen.
@@ -4801,6 +5383,225 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/AdminZeitregel"
+    AdminTagTyp:
+      type: string
+      enum:
+        - stufe
+        - funktion
+        - team
+        - lager
+    AdminTagAnlegen:
+      type: object
+      required:
+        - typ
+        - name
+      additionalProperties: false
+      properties:
+        typ:
+          $ref: "#/components/schemas/AdminTagTyp"
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+          description: Leerraum am Rand wird entfernt. In der Abteilung eindeutig, ohne Gross-/Kleinschreibung, über alle Typen.
+        kuerzel:
+          type: string
+          minLength: 1
+          maxLength: 20
+          description: Optional; leer, wenn es fehlt.
+    AdminTagAendern:
+      type: object
+      additionalProperties: false
+      description: Alle Felder sind optional. Der Typ ist nicht änderbar.
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        kuerzel:
+          type: string
+          minLength: 1
+          maxLength: 20
+    AdminTagZuweisen:
+      type: object
+      additionalProperties: false
+      description: Ohne Schlüssel bleibt das Feld, wie es ist; `null` leert es.
+      properties:
+        rolle:
+          type:
+            - string
+            - "null"
+          minLength: 1
+          maxLength: 50
+          description: Freier Text, zum Beispiel «Stufenleitung». Leerraum am Rand wird entfernt.
+        prioritaet:
+          type:
+            - integer
+            - "null"
+          minimum: 1
+          maximum: 1000
+          description: Reihenfolge innerhalb des Tags; 1 zuerst.
+    AdminTagListe:
+      type: object
+      required:
+        - tags
+      properties:
+        tags:
+          type: array
+          items:
+            type: object
+            required:
+              - id
+              - typ
+              - name
+              - kuerzel
+              - anzahlPersonen
+            properties:
+              id:
+                type: string
+                format: uuid
+              typ:
+                $ref: "#/components/schemas/AdminTagTyp"
+              name:
+                type: string
+              kuerzel:
+                type: string
+              anzahlPersonen:
+                type: integer
+                minimum: 0
+    AdminTag:
+      type: object
+      required:
+        - id
+        - typ
+        - name
+        - kuerzel
+        - verwendung
+        - personen
+      properties:
+        id:
+          type: string
+          format: uuid
+        typ:
+          $ref: "#/components/schemas/AdminTagTyp"
+        name:
+          type: string
+        kuerzel:
+          type: string
+        verwendung:
+          type: object
+          required:
+            - personen
+          properties:
+            personen:
+              type: integer
+              minimum: 0
+        personen:
+          type: array
+          description: Die Personen, die den Tag tragen, nach Priorität (ohne Priorität zuletzt).
+          items:
+            type: object
+            required:
+              - userId
+              - rolle
+              - prioritaet
+            properties:
+              userId:
+                type: string
+                format: uuid
+              rolle:
+                type:
+                  - string
+                  - "null"
+              prioritaet:
+                type:
+                  - integer
+                  - "null"
+    AdminTagBelegt:
+      type: object
+      required:
+        - code
+        - message
+        - verwendung
+      properties:
+        code:
+          type: string
+          examples:
+            - TAG_BELEGT
+        message:
+          type: string
+        verwendung:
+          type: object
+          required:
+            - personen
+          properties:
+            personen:
+              type:
+                - integer
+                - "null"
+              description: Zahl der Personen, die den Tag tragen; `null`, wenn die Zuordnung gleichzeitig entstand.
+    AdminBearbeiterSetzen:
+      type: object
+      required:
+        - objektTyp
+      additionalProperties: false
+      description: Genau eines von `userId` und `tagId`.
+      properties:
+        objektTyp:
+          $ref: "#/components/schemas/AdminBearbeiterObjektTyp"
+        objektId:
+          type:
+            - string
+            - "null"
+          format: uuid
+          description: Das Objekt. Fehlt es oder ist es `null`, gilt das Recht für alle Objekte des Typs («Redaktion»).
+        userId:
+          type: string
+          format: uuid
+        tagId:
+          type: string
+          format: uuid
+    AdminBearbeiterObjektTyp:
+      type: string
+      enum:
+        - seite
+    AdminBearbeiterListe:
+      type: object
+      required:
+        - bearbeiter
+      properties:
+        bearbeiter:
+          type: array
+          items:
+            type: object
+            required:
+              - id
+              - objektTyp
+              - objektId
+              - userId
+              - tagId
+            properties:
+              id:
+                type: string
+                format: uuid
+              objektTyp:
+                $ref: "#/components/schemas/AdminBearbeiterObjektTyp"
+              objektId:
+                type:
+                  - string
+                  - "null"
+                format: uuid
+                description: "`null` heisst: alle Objekte des Typs."
+              userId:
+                type:
+                  - string
+                  - "null"
+                format: uuid
+              tagId:
+                type:
+                  - string
+                  - "null"
+                format: uuid
     AdminAngelegt:
       type: object
       required:
@@ -5015,16 +5816,13 @@ components:
         umgebung:
           type: object
           additionalProperties: false
-          required: [https, produktion, kalenderSchluessel]
+          required: [https, produktion]
           properties:
             https:
               type: boolean
               description: "`BETTER_AUTH_URL` beginnt mit https."
             produktion:
               type: boolean
-            kalenderSchluessel:
-              type: boolean
-              description: Eine Schlüsseldatei für Google ist konfiguriert (nur ob, nicht welche).
     AdminSystemPunkt:
       type: object
       additionalProperties: false
@@ -5428,6 +6226,69 @@ components:
           items:
             type: string
             format: uuid
+    Medium:
+      type: object
+      required:
+        - id
+        - mimeTyp
+        - groesse
+        - breite
+        - hoehe
+        - altText
+        - dekorativ
+        - sichtbarkeit
+        - url
+        - erstelltAm
+      properties:
+        id:
+          type: string
+          format: uuid
+        mimeTyp:
+          type: string
+          description: Bilder sind immer `image/webp`, PDFs `application/pdf`.
+          enum:
+            - image/webp
+            - application/pdf
+        groesse:
+          type: integer
+          description: Bytes der gespeicherten Datei, nach dem Verkleinern.
+        breite:
+          type:
+            - integer
+            - "null"
+          description: Pixel, nur bei Bildern.
+        hoehe:
+          type:
+            - integer
+            - "null"
+          description: Pixel, nur bei Bildern.
+        altText:
+          type:
+            - string
+            - "null"
+          description: "`null` bei dekorativen Bildern und bei PDFs ohne Beschreibung."
+        dekorativ:
+          type: boolean
+        sichtbarkeit:
+          type: string
+          enum:
+            - oeffentlich
+            - angemeldet
+        url:
+          type: string
+          description: Pfad zur Datei (`GET /api/v1/medien/{id}`).
+        erstelltAm:
+          type: string
+          format: date-time
+    MedienListe:
+      type: object
+      required:
+        - medien
+      properties:
+        medien:
+          type: array
+          items:
+            $ref: "#/components/schemas/Medium"
   parameters:
     AppVersion:
       name: X-App-Version
@@ -5504,6 +6365,14 @@ components:
       schema:
         type: string
         format: uuid
+    MediumId:
+      name: id
+      in: path
+      required: true
+      description: ID des Mediums (UUID).
+      schema:
+        type: string
+        format: uuid
     AdminKindId:
       name: id
       in: path
@@ -5517,6 +6386,30 @@ components:
       in: path
       required: true
       description: ID der Erinnerungsregel (UUID).
+      schema:
+        type: string
+        format: uuid
+    AdminBearbeiterId:
+      name: id
+      in: path
+      required: true
+      description: ID des Rechts (UUID).
+      schema:
+        type: string
+        format: uuid
+    AdminTagId:
+      name: id
+      in: path
+      required: true
+      description: ID des Tags (UUID).
+      schema:
+        type: string
+        format: uuid
+    AdminTagPersonId:
+      name: userId
+      in: path
+      required: true
+      description: ID der Person (UUID), in der Abteilung des Admins.
       schema:
         type: string
         format: uuid

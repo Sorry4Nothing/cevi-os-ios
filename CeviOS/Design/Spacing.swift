@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Design tokens of "Cevi OS iOS" (style "Nachthimmel"). Spacing, corner radii, sizes and title fonts live here;
+/// Design tokens of "Cevi OS iOS" (style "Cevi-Marine"). Spacing, corner radii, sizes and title fonts live here;
 /// colors live in the asset catalog (`Color.cevi…`). Nothing of this is repeated in views.
 enum Spacing {
     static let s1: CGFloat = 4

@@ -62,7 +62,7 @@ struct DaySectionView: View {
     let day = DateFormats.calendar.startOfDay(for: .now)
     let program = Program(id: UUID(), title: "Waldweihnacht vorbereiten", status: .active, visibility: .parents, isAllDay: false,
                           start: day.addingTimeInterval(14 * 3600), end: day.addingTimeInterval(17 * 3600), dayFrom: nil, dayTo: nil,
-                          location: "Gemeindehaus", units: [UnitRef(id: UUID(), name: "Jungschar")], description: nil,
+                          units: [UnitRef(id: UUID(), name: "Jungschar")],
                           children: [ProgramChild(id: UUID(), firstName: "Lena", answer: nil),
                                      ProgramChild(id: UUID(), firstName: "Noah", answer: .yes)],
                           meetingPoint: nil, closingPlace: nil, closingTime: nil, bring: nil, isRegistrationOpen: nil, ownRegistration: nil)

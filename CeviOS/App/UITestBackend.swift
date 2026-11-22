@@ -188,8 +188,6 @@ private nonisolated struct World {
         var length = 1
         var startHour = 14
         var endHour = 17
-        var location: String?
-        var description: String?
         var meetingPoint: String?
         var bring: String?
         var answers: [String: String] = [:]
@@ -263,14 +261,14 @@ private nonisolated struct World {
         let kids = Self.kids
         programs = [
             Program(id: Ids.forest, title: "Waldnachmittag", status: "aktiv", visibility: "eltern", units: [Ids.jungschar],
-                    isAllDay: false, day: 3, location: "Waldhütte Beispielwald", description: "Wir bauen ein Floss.",
+                    isAllDay: false, day: 3,
                     meetingPoint: "Bahnhof Beispielstadt", bring: "Regenjacke und Zvieri"),
             Program(id: Ids.candles, title: "Kerzenziehen", status: "abgesagt", visibility: "eltern", units: [Ids.jungschar],
-                    isAllDay: false, day: 10, endHour: 16, location: "Gemeindehaus Beispielstadt", answers: [kids[0].id: "ja"]),
+                    isAllDay: false, day: 10, endHour: 16, answers: [kids[0].id: "ja"]),
             Program(id: Ids.weekend, title: "Herbstweekend", status: "pruefen", visibility: "eltern",
-                    units: [Ids.jungschar, Ids.froeschli], isAllDay: true, day: 20, length: 2, location: "Lagerhaus Beispieltal"),
+                    units: [Ids.jungschar, Ids.froeschli], isAllDay: true, day: 20, length: 2),
             Program(id: Ids.games, title: "Spielnachmittag", status: "aktiv", visibility: "eltern", units: [Ids.jungschar],
-                    isAllDay: false, day: -2, location: "Gemeindehaus Beispielstadt",
+                    isAllDay: false, day: -2,
                     answers: [kids[0].id: "ja", kids[1].id: "nein", kids[2].id: "ja"], leaderAnswers: [Ids.leader: "ja"]),
         ]
         chats = []
@@ -486,7 +484,6 @@ private nonisolated struct World {
         var object: [String: Any] = [
             "id": p.id, "titel": p.title, "status": p.status, "sichtbarkeit": p.visibility, "ganztaegig": p.isAllDay,
             "stufen": p.units.map { ["id": $0, "name": Self.unitNames[$0]?.0 ?? ""] },
-            "googleOrt": orNull(p.location),
             "kinder": kids.map { ["id": $0.id, "vorname": $0.firstName, "status": orNull(p.answers[$0.id])] },
             "treffpunkt": orNull(p.meetingPoint), "schlussOrt": orNull(p.meetingPoint), "mitnehmen": orNull(p.bring),
             "teilnahmeOffen": p.isOpen,
@@ -500,7 +497,6 @@ private nonisolated struct World {
             object["schlussZeit"] = String(format: "%02d:00", p.endHour)
         }
         if p.units.contains(where: me.leads) {
-            object["googleBeschreibung"] = orNull(p.description)
             if me.kind == .leader { object["eigeneAnmeldung"] = p.leaderAnswers[me.id] ?? "offen" }
         }
         return object

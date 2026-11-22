@@ -147,7 +147,7 @@ final class AppFlowTests: XCTestCase {
         try programs.auditAccessibility()
 
         let detail = programs.open("Waldnachmittag")
-        detail.assertShows("Wir bauen ein Floss.", "Leitung")
+        detail.assertShows("Leitung")
         detail.registerAsLeader(yes: true)
         try detail.auditAccessibility()
 
