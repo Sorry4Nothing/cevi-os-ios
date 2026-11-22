@@ -78,6 +78,9 @@ nonisolated enum CampRules {
     /// 409 on creating a day page: the day has one already.
     static let dayPageExistsCode = "SEITE_VORHANDEN"
     static let phoneMissingCode = "TELEFON_FEHLT"
+    /// 400 on a file link: not a valid `https` address, or the host is not on the list of the department.
+    static let linkInvalidCode = "LINK_UNGUELTIG"
+    static let linkHostNotAllowedCode = "LINK_HOST_NICHT_ERLAUBT"
 
     /// Shown for 409 `LAGER_GESCHLOSSEN`; other errors show the server text.
     static func writeError(_ error: APIError) -> String {

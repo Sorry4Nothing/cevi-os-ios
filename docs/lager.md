@@ -108,6 +108,20 @@ Anwesenheit: Das Team trägt offene Felder bis zur Frist direkt ein (`setOwnCamp
 
 Hinweise: Die Antworten tragen kein `aktionen`-Feld; Zeilen mit `version` richten die Knöpfe nach der Rolle (403 sonst). Die Einkaufs-Zeile «zusammen» nennt ihre Artikel mit `id` und `version`. Eigene Packlisten-Punkte tragen keine `version`. Die Konflikt-Antworten `KEINE_ANFRAGE_NOETIG` (Felder), `ANFRAGE_OFFEN` (Felder) und `BEREITS_ENTSCHIEDEN` (IDs) haben in der Beschreibung keine Form für ihre Zusatzfelder; die App liest nur den Fehlercode (`CampRules`).
 
+## Schnitt A5 Ablage und Querschnitt: Datenschicht (Issue #69)
+
+Gebaut, ohne Bildschirme und ohne lokalen Speicher. Dateien sind in dieser API **keine signierten Adressen und keine Bytes**: `…/dateien` speichert nur eine `https`-Verknüpfung auf den Ablageort (SharePoint der Abteilung), der Server ruft sie nie ab. Die App öffnet den Link über das System (`CampFileRef.openableLink`, nur `https`) und lädt nichts selbst; der Link wird nicht protokolliert und nicht zwischengespeichert. Eine Prüfung «gleiche Herkunft wie die Basis-URL» passt hier nicht, der Ablageort liegt per Definition woanders. Das Adressbuch (`CampContact`) trägt Name, Telefon, E-Mail und Notiz Dritter: nie in Widgets, Logs oder Absturzberichten. Die Suche liefert nur Felder des Schemas (Art, ID, Titel, Auszug); die Rollen filtert der Server. Schreib-Routen tragen `version`; Konflikte wie in A1 (`CampRules.versionConflict`); abgelehnte Links: `CampRules.linkInvalidCode`, `linkHostNotAllowedCode`.
+
+| Was | Route (unter `/api/v1/lager/{id}`) | Code |
+| --- | --- | --- |
+| Datei-Verknüpfung anlegen, lesen, löschen | `POST …/dateien`, `GET`/`DELETE …/dateien/{id}` | `CampFileCreate`, `CampFileRef`, `createCampFile`, `campFile`, `deleteCampFile` |
+| Dokumente (Filter `q`, `stichwort`, `typ`; Seiten) | `GET`/`POST …/dokumente`, `GET`/`PATCH`/`DELETE …/dokumente/{id}` | `CampDocument*`, `CampDocumentFilter`, `campDocuments` ff. Dateien anderer Module haben `version` = `nil` |
+| Adressbuch (nur Lagerleitung; `behalten`, `aufraeumenAb`) | `GET`/`POST …/adressbuch`, `GET`/`PATCH`/`DELETE …/adressbuch/{id}` | `CampContact*`, `campContacts` ff. |
+| Suche (Volltext, nach Rolle gefiltert, Filter `typ`) | `GET …/suche` | `CampSearchResult`, `CampSearchType`, `searchCamp` |
+| Aushänge als PDF | `GET …/aushaenge/{art}` | schon in A2 (`campHandout`) |
+
+Hinweise: `APIClient.send` gibt nur den Rumpf zurück, nicht die Kopfzeilen; für den Aushang ist der Dateiname deshalb `<art>.pdf` (so beschreibt ihn die API). Die Dokumentenliste ist eine Sammelabfrage über mehrere Module (`quelle`).
+
 ## Route fehlt (blockiert)
 
 | Gebraucht für | Fehlt | Backend-Issue |
@@ -125,7 +139,10 @@ Hinweise: Die Antworten tragen kein `aktionen`-Feld; Zeilen mit `version` richte
 | A3: Namen der Mitglieder (Schichtplan, Diensttausch, Gruppen-Auswahl) | Liste der Lagermitglieder für Nicht-Admins; `…/lager/{id}/mitglieder` gibt es nur unter `/api/v1/admin` (die App ruft Admin nie auf). Schichten tragen `name`, ein Tausch nur `personId`s | L4 |
 | A3: Tauschanfrage mit Namen, Zimmer-Namen der Teilnehmenden im Team | Tausch liefert keine Namen und keine Schicht-Details; Fahrer nur als `fahrer.name` | L4 |
 | A4: Namen der Anwesenheits-Matrix, des Tageschefs im Team und der Einkäufer-Auswahl | Matrix nennt nur IDs (Mitglieder und Teilnehmende löst die App über Listen auf); Mitglieder-Liste fehlt für Nicht-Admins | L4 |
-| A5 Ablage und Querschnitt | Dokumente, Adressbuch, Wissen, Suche | L6 |
+| A5: Wissen früherer Lager übernehmen | keine Route in der Beschreibung | L6 |
+| A5: Papierkorb ansehen, Wiederherstellen, Verlauf (ausser `…/aufgaben/{id}/verlauf`) | keine Routen (Löschen ist weich, aber nicht abrufbar) | L0e |
+| A5: Exporte als Word und Excel | nur Aushänge als PDF (`…/aushaenge/{art}`) | L7 |
+| A5: Dateien hochladen oder per signierter Adresse laden | nur Verknüpfungen auf den Ablageort, keine Bytes | L0g |
 
 Nicht ableitbar: Welche Rechte die eigene Rolle hat. Die Matrix darf nur die Lagerleitung lesen. Die Aufgaben-Routen sollen laut Auftrag die erlaubten Aktionen in der Antwort liefern (fehlt die Aktion, fehlt der Knopf).
 
