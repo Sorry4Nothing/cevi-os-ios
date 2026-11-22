@@ -1,6 +1,6 @@
 # Design: Entwurf und Umsetzung
 
-Stil «Nachthimmel»: Nacht ist die Hauptrichtung, Tag folgt der Systemeinstellung, kein dynamisches Farbschema. Das Design System gilt vor den einzelnen Bildschirm-Vorlagen. Quellen (nicht im Repo): das Design System «Cevi OS iOS» (`tokens.json`) und die Vorlagen der Bildschirme (Tag und Nacht).
+Stil «Cevi-Marine» (seit 22. November 2026, vorher «Nachthimmel» in Violett): Farben der Website der Abteilung (Marineblau `#003973`, Rot `#D60038`, Text `#555555`). Tag und Nacht folgen der Systemeinstellung, kein dynamisches Farbschema. Das Design System gilt vor den einzelnen Bildschirm-Vorlagen. Quellen (nicht im Repo): das Design System «Cevi OS iOS» (`tokens.json`) und die Vorlagen der Bildschirme (Tag und Nacht).
 
 ## Entschieden
 
@@ -45,3 +45,13 @@ Stil «Nachthimmel»: Nacht ist die Hauptrichtung, Tag folgt der Systemeinstellu
 ## Nachführen
 
 Dieses Dokument ändert sich mit jeder Design-Änderung. Neue Abweichungen gehören in die zweite Tabelle, mit Grund.
+
+## Farbwelt «Cevi-Marine» (22. November 2026)
+
+Die Farben folgen der Notiz «Design-Prompt Farbwelt für bestehende App-Screens» (Obsidian, `Cevi/Cevi OS Erweiterung/`). Das Violett des Stils «Nachthimmel» entfällt. Die Farbsets in `Assets.xcassets` tragen jeweils vier Erscheinungen (Tag, Nacht, je mit Mehr Kontrast).
+
+- **Tag und Nacht:** Werte aus der Tabelle der Notiz (zum Beispiel `surface` `#F2F5F8` / `#001426`, `secondary` `#003973` / `#2E5986`, `accent` `#1A5391` / `#9DC0EA`, `primary` `#D60038`). Schalter an: Tag `#1A5391`, Nacht `#4F82BA` (Design-Abweichung 8).
+- **Mehr Kontrast:** In der Notiz nicht angegeben, deshalb **abgeleitet**: Texte, Ränder und Akzent in Tag dunkler, in Nacht heller als in der Normalfassung. Das Design System «Cevi OS iOS» (Claude Design) kann abweichen. Dann gelten dessen Werte.
+- **Kontrast geprüft (rechnerisch):** Alle Textpaare (`on-surface`, `on-surface-variant`, `primary-text`, `accent`, `on-primary`, `on-secondary`, `on-secondary-muted`, `on-secondary-container`) mindestens 4.5:1, Ränder, Fokusring und Schalter mindestens 3:1, in allen vier Erscheinungen.
+- **Unverändert:** Status-Farben (Erfolg, Fehler, Warnung, Stufe) haben dieselben Werte wie in der Notiz. Das Cevi-Logo behält seine eigenen Farben und wird nie umgefärbt.
+- **Offen (Design-Abweichung B):** Der Nachtmodus ist hier Marineblau (Grund `#001426`), wie der Prompt es verlangt. Festgehalten ist auch «neutral dunkel, kein Marineblau». Das muss der Auftraggeber klären.

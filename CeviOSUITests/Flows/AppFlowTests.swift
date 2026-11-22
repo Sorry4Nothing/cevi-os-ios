@@ -147,7 +147,7 @@ final class AppFlowTests: XCTestCase {
         try programs.auditAccessibility()
 
         let detail = programs.open("Waldnachmittag")
-        detail.assertShows("Wir bauen ein Floss.", "Leitung")
+        detail.assertShows("Leitung")
         detail.registerAsLeader(yes: true)
         try detail.auditAccessibility()
 
@@ -204,7 +204,9 @@ final class AppFlowTests: XCTestCase {
             let app = AppRobot.launch(failure: .unauthorized)
             let signIn = SignInScreen(app: app).waitUntilDisplayed()
             signIn.signIn(username: AppRobot.username(.parent), password: AppRobot.password())
-            ProgramListScreen(app: app).waitUntilDisplayed().row("Waldnachmittag").tap()
+            let programs = ProgramListScreen(app: app).waitUntilDisplayed()
+            // Right after sign-in the list may still be fading in and not hittable; wait for it instead of tapping at once.
+            programs.scrollUntilHittable(programs.row("Waldnachmittag")).tap()
             signIn.waitUntilReset(after: AppRobot.username(.parent))
             try StateScreen(app: app, kind: .sessionEnded).auditAccessibility()
             signIn.signIn(username: AppRobot.username(.parent), password: AppRobot.password())

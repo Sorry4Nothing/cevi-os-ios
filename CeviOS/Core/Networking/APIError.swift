@@ -14,6 +14,7 @@ nonisolated struct APIError: Error, Equatable, Sendable {
         case forbidden // 403
         case notFound // 404
         case conflict // 409
+        case gone // 410: the change feed no longer reaches back
         case payloadTooLarge // 413
         case unsupportedMediaType // 415
         case appOutdated // 426
@@ -30,6 +31,8 @@ nonisolated struct APIError: Error, Equatable, Sendable {
     let message: String?
     /// Seconds until the request may be repeated (header `Retry-After`, or `X-Retry-After` of sign-in). Only on 429.
     var retryAfter: Int?
+    /// Raw body of a 409, so the caller can read the conflict details (`CampRules.versionConflict`).
+    var conflictBody: Data?
 
     static func from(status: Int, data: Data, retryAfter: Int? = nil) -> APIError {
         let body = try? JSONDecoder().decode(ErrorBody.self, from: data)
@@ -39,13 +42,14 @@ nonisolated struct APIError: Error, Equatable, Sendable {
         case 403: .forbidden
         case 404: .notFound
         case 409: .conflict
+        case 410: .gone
         case 413: .payloadTooLarge
         case 415: .unsupportedMediaType
         case 426: .appOutdated
         case 429: .rateLimited
         default: .server
         }
-        return APIError(kind: kind, status: status, code: body?.code, message: body?.message, retryAfter: kind == .rateLimited ? retryAfter : nil)
+        return APIError(kind: kind, status: status, code: body?.code, message: body?.message, retryAfter: kind == .rateLimited ? retryAfter : nil, conflictBody: kind == .conflict ? data : nil)
     }
 
     static let network = APIError(kind: .network, status: nil, code: nil, message: nil)

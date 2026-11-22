@@ -26,11 +26,6 @@ struct ProgramRow: View {
                 .font(.title(.cardTitle))
                 .foregroundStyle(Color.ceviOnSurface)
                 .strikethrough(program.status == .cancelled)
-            if let location = program.location, !location.isEmpty {
-                Text(location)
-                    .font(.subheadline)
-                    .foregroundStyle(Color.ceviOnSurfaceVariant)
-            }
             ProgramStatusLabel(status: program.status)
             ForEach(program.children) { child in
                 AnswerLabel(name: child.firstName, answer: child.answer)
