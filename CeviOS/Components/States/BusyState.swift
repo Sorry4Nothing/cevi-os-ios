@@ -11,9 +11,12 @@ final class BusyState {
     @ObservationIgnored private var count = 0
     @ObservationIgnored private var timer: Task<Void, Never>?
     @ObservationIgnored private let delay: Duration
+    /// Waits for `delay`; the tests replace it, so they run without real time.
+    @ObservationIgnored private let sleep: @Sendable (Duration) async throws -> Void
 
-    init(delay: Duration = .milliseconds(250)) {
+    init(delay: Duration = .milliseconds(250), sleep: @escaping @Sendable (Duration) async throws -> Void = { try await Task.sleep(for: $0) }) {
         self.delay = delay
+        self.sleep = sleep
     }
 
     /// Runs a user-triggered action; the overlay appears if it is still running after `delay`.
@@ -26,9 +29,9 @@ final class BusyState {
     func begin() {
         count += 1
         guard count == 1 else { return }
-        let delay = delay
+        let delay = delay, sleep = sleep
         timer = Task { [weak self] in
-            try? await Task.sleep(for: delay)
+            try? await sleep(delay)
             guard !Task.isCancelled else { return }
             self?.isOverlayVisible = true
         }
