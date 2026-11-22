@@ -14,7 +14,15 @@ extension Screen {
 
     @discardableResult
     func waitUntilDisplayed(timeout: TimeInterval = 15, file: StaticString = #filePath, line: UInt = #line) -> Self {
-        XCTAssertTrue(anchor.waitForExistence(timeout: timeout), "\(name) is not displayed", file: file, line: line)
+        let shown = anchor.waitForExistence(timeout: timeout)
+        if !shown {
+            // A screenshot of what the app shows instead, to judge the failure on the real screen.
+            let attachment = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
+            attachment.name = "not-displayed-\(name)"
+            attachment.lifetime = .keepAlways
+            XCTContext.runActivity(named: attachment.name ?? "not displayed") { $0.add(attachment) }
+        }
+        XCTAssertTrue(shown, "\(name) is not displayed", file: file, line: line)
         dismissPasswordSavePrompt()
         return self
     }
