@@ -21,6 +21,7 @@ struct ProgramListView: View {
                 }
             }
             .navigationTitle("Programme")
+            .campSwitcher()
             .navigationDestination(for: UUID.self) { id in ProgramDetailView(programId: id) }
         }
         .task { await model.load(client: appState.client) }

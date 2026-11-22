@@ -142,6 +142,30 @@ Hinweise:
 - Der Strom hat eine eigene Sitzung (`APIClient.makeSession(streaming: true)`), sonst gleich geschützt. Zeitgrenze: 75 s ohne Daten (der Server schickt alle 25 s einen Herzschlag) statt 30 s je Anfrage. Wiederverbinden macht der Aufrufer: Strom endet nach `ende` oder bei Verbindungsende; dann `campEvents(campId:lastEventId:)` mit dem letzten `upTo` und den Feed ab dort lesen. 429 `ZU_VIELE_VERBINDUNGEN` kommt als `APIError` mit `retryAfter`.
 - Der Strom läuft nur im Vordergrund; der Hintergrund (Push) ist nicht gebaut.
 
+## Schnitt B0 Navigation, Lagerwahl, übergreifende Zustände: Bildschirme (Issue #80)
+
+Gebaut (Boards A8, A9, A10, L1, L37, U1 bis U8):
+
+| Was | Code |
+| --- | --- |
+| Umschalter Programm-/Lager-Ansicht oben links, nur wenn `GET /api/v1/lager` mindestens ein Lager liefert | `CampSwitcher.swift` (`.campSwitcher()`), `CampListModel.showsSwitcher` |
+| Aktives Lager (Rolle, Titel, `isReadOnly`, Warteschlange), nur im Arbeitsspeicher | `ActiveCamp.swift`, in der Umgebung von `MainView` |
+| Lager-Tab-Leiste: Start (vorläufig: Lagerkopf und Banner), Chat (wie bisher), Mehr | `CampTabView.swift` |
+| L1 Lagerwahl (Normal, Laden, Leer, Fehler) | `CampChooserView.swift`, `CampListModel.swift` |
+| L37 Mehr (Sheet): Profil, Alle Lager | `CampMoreSheet.swift` |
+| U1 bis U4 (Zuordnung `APIError` zu Zustand), U6 Banner, U7 Konflikt, U8 Banner | `CampScreenState.swift`, `CampBanners.swift`, `CampConflictView.swift` |
+| U5 Lädt länger (nach 5 s zweite Zeile im Overlay) | `BusyState.isSlow`, `BusyOverlay(slow:)` |
+| Push `lager_*` öffnet das Lager | `CampRouter.swift` (404 beim Auflösen zeigt U3) |
+
+Nicht gebaut, weil das Ziel fehlt (kein totes Ziel in der Tab-Leiste und im Mehr-Sheet): Tabs Aufgaben und Pinnwand; Mehr-Einträge Hoecks, Anwesenheit, Zimmer und Zelte, Fahrten, Programmgruppen, Diensttausch, Abzählen, Tagesseiten, Einkaufsliste, «Als Team ansehen», Einstellungen, Feedback zur App; U6 als eigener Bildschirm «Änderungen» (Liste der Warteschlange; nur das Banner ist da); U7 «Beide ansehen» (Zusammenführen von Hand).
+
+## Offene Fragen zum Entwurf
+
+- L1: «62 Prozent erledigt, 4 überfällig» braucht `GET …/start` je Lager; «Übungslager» (Abschnitt, Chip «Übung») hat kein Feld in der API. Beides fehlt in der App.
+- A10: Untertitel «Cevi Beispielstadt» (Abteilungsname) und die Zahl «3 neu» am Lager (ungelesene Benachrichtigungen je Lager) sind nicht angeschlossen; der Umschalter zeigt «Programme».
+- U7: Der Name der Person, die zuletzt geändert hat («Lea hat …»), steht nicht in der Konflikt-Antwort; der Titel kommt vom Aufrufer.
+- U4: Die Endzeit der Wartung («bis 22:00») liefert die API nicht; der Text nennt sie nicht.
+
 ## Route fehlt (blockiert)
 
 | Gebraucht für | Fehlt | Backend-Issue |
