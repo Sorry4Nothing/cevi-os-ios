@@ -64,6 +64,26 @@ Gebaut, ohne Bildschirme. Schreib-Routen tragen `version`; Konflikte wie in A1 (
 
 Hinweise: Ein Protokoll hat in der API keine Abschnitte, nur eine Zeile (Titel, Datum, Art, Höck) mit Verweis auf eine Datei. `…/als-aufgabe` antwortet 201 (neu) oder 200 (gab es schon); die Dienstfunktion liefert nur die Aufgaben-ID. Der Anwesenheits-Haken (`PUT …/anwesende`) trägt keine `version`.
 
+## Schnitt A3 Einteilung: Datenschicht (Issue #65)
+
+Gebaut, ohne Bildschirme. Schreib-Routen tragen `version`; Konflikte wie in A1 (`CampRules.versionConflict`). Vorschläge und Bestätigung sind getrennte Aufrufe: Mischen (`suggestCampGroupShuffle`, dann `confirmCampGroupShuffle`) und «Leere Dienste füllen» (`suggestCampShifts`, dann `confirmCampShifts`) senden bei der Bestätigung denselben `seed` (und dieselben Optionen); der Server liefert bei gleichem Stand dasselbe Ergebnis. Auch der Import der Teilnehmenden hat Vorschau und Bestätigung. Namen und Stufen von Teilnehmenden gehören nie in Widgets, Logs oder Benachrichtigungen (Doc-Kommentare in den Modellen). Für den Screenreader liefert `CampShiftText.sentence` und `CampShiftPlan.sentences(days:sections:)` ganze Sätze («Küche, Montag Vormittag, Pat Muster, noch ein Platz frei»).
+
+| Was | Route (unter `/api/v1/lager/{id}`) | Code |
+| --- | --- | --- |
+| Teilnehmende (Liste mit `stufe`, Detail, anlegen, ändern, löschen) | `…/teilnehmer`, `…/teilnehmer/{id}` | `CampParticipant*`, `campParticipants` ff. `ceviName` nur für Rollen mit Recht (sonst `nil`) |
+| Import aus Text: Vorschau, dann Bestätigung | `POST …/teilnehmer/import` (`uebernehmen`) | `previewCampParticipantImport`, `importCampParticipants` |
+| Abzählliste (Filter `art`, `stufe`, `gruppe`), Haken für alle, Zurücksetzen | `GET`/`PUT …/abzaehlen`, `POST …/abzaehlen/zuruecksetzen` | `CampCountEntry`, `CampCountFilter`, `setCampCount`, `resetCampCount` |
+| Zimmer und Zelte (Team sieht nur Namen) | `…/zimmer`, `…/zimmer/{id}`, `GET …/zimmer/offen` | `CampRoomView` (voll oder Team), `CampRoomRow`, `campOpenRoomPeople` |
+| Einteilen, Herausnehmen (Überbelegung erlaubt, `ueberbelegt`) | `POST …/zimmer/{id}/zuordnung`, `…/zuordnung/entfernen` | `placeInCampRoom`, `removeFromCampRoom` |
+| Fahrten, Mitfahrende, Personen ohne Fahrt | `…/fahrten`, `…/fahrten/{id}`, `…/mitfahrer`, `GET …/fahrten/ohne` | `CampTrip*`, `addCampPassenger`, `campPeopleWithoutTrip` (Cursor ist Text) |
+| Gruppen, Zuordnung (`gruppeId` null = keine), Abwählen | `…/gruppen`, `PUT …/gruppen/zuordnung`, `PUT …/gruppen/abgewaehlt` | `CampGroup*`, `assignCampGroup`, `deselectCampParticipants` |
+| Gemischt einteilen: Vorschlag, dann Bestätigung | `POST …/gruppen/mischen` (`uebernehmen`, `seed`) | `suggestCampGroupShuffle`, `confirmCampGroupShuffle` |
+| Schichtplan lesen, Dienste, Besetzung eines Tages | `GET …/schichtplan`, `…/schichtplan/dienste`, `PUT …/schichtplan/schichten` | `CampShiftPlan`, `CampDuty*`, `setCampShifts` |
+| Leere Dienste füllen: Vorschlag, dann Bestätigung | `POST …/schichtplan/vorschlag` | `suggestCampShifts`, `confirmCampShifts`, `CampShiftOptions` |
+| Diensttausch (alle, eigene, anfragen, entscheiden, zurückziehen) | `…/diensttausch`, `…/eigene`, `…/{id}/entscheid`, `…/{id}/zurueckziehen` | `CampShiftSwap*` |
+
+Hinweise: Die Schichten-Route (`PUT …/schichten`) liefert einen Zustand ohne `version`. Antworten mit `oneOf` (Zimmer: Voll/Team) werden am Feld `plaetze` unterschieden. Der Teilnehmenden-Eintrag kennt den Cevi-Namen nur in der Vollansicht; im Schichtplan zeigt `name` bei Teilnehmenden nie den Cevi-Namen.
+
 ## Route fehlt (blockiert)
 
 | Gebraucht für | Fehlt | Backend-Issue |
@@ -78,7 +98,8 @@ Hinweise: Ein Protokoll hat in der API keine Abschnitte, nur eine Zeile (Titel, 
 | A2: Protokoll-Abschnitte (Text im Protokoll) | nur Zeile mit Dateiverweis, kein Inhalt, keine Abschnitte | L2 |
 | A2: Dateien zum Hochladen (Pinnwand, Protokoll) | `dateiIds` setzen vorhandene Dateien voraus, Hochladen: Lager-Dateien | L0g |
 | A2: Reaktionen auf anderes als Pinnwand | `zielTyp` kennt nur `pinnwand_beitrag` | L3 |
-| A3 Einteilung | Teilnehmende, Zimmer, Fahrten, Gruppen, Schichtplan, Diensttausch | L4 |
+| A3: Namen der Mitglieder (Schichtplan, Diensttausch, Gruppen-Auswahl) | Liste der Lagermitglieder für Nicht-Admins; `…/lager/{id}/mitglieder` gibt es nur unter `/api/v1/admin` (die App ruft Admin nie auf). Schichten tragen `name`, ein Tausch nur `personId`s | L4 |
+| A3: Tauschanfrage mit Namen, Zimmer-Namen der Teilnehmenden im Team | Tausch liefert keine Namen und keine Schicht-Details; Fahrer nur als `fahrer.name` | L4 |
 | A4 Im Lager | Anwesenheit, Tagesseiten, Einkauf, Packliste, Notfall, Wetter, «Heute» | L5 |
 | A5 Ablage und Querschnitt | Dokumente, Adressbuch, Wissen, Suche | L6 |
 
