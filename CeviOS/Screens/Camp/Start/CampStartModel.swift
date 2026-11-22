@@ -17,6 +17,7 @@ final class CampStartModel {
     private(set) var phase: CampPhase = .loading
     private(set) var start: CampStart?
     private(set) var myWeek: CampMyWeek?
+    private(set) var weather: CampWeather?
     /// The last load failed without network; what is shown is the stand of `loadedAt`.
     private(set) var isOffline = false
     private(set) var loadedAt: Date?
@@ -53,10 +54,26 @@ final class CampStartModel {
         }
     }
 
-    func setPreview(phase: CampPhase, start: CampStart?, myWeek: CampMyWeek? = nil, offline: Bool = false) {
+    /// «Samstag Gewitter möglich.»: the first warning in the next seven days; `nil` without weather or warning.
+    var weatherWarning: String? {
+        let today = now()
+        for day in (weather?.days ?? []).sorted(by: { $0.date < $1.date }) where (0...6).contains(CampTaskText.days(from: today, to: day.date)) {
+            if let text = day.warnings.lazy.compactMap(CampOnSiteText.warning).first { return "\(CampRosterText.weekday(day.date)) \(text)." }
+        }
+        return nil
+    }
+
+    /// The camp runs today: «Heute» (L4) is the way in.
+    var isRunning: Bool {
+        guard let camp = active.camp else { return false }
+        return CampTaskText.days(from: camp.from, to: now()) >= 0 && CampTaskText.days(from: now(), to: camp.to) >= 0
+    }
+
+    func setPreview(phase: CampPhase, start: CampStart?, myWeek: CampMyWeek? = nil, weather: CampWeather? = nil, offline: Bool = false) {
         self.phase = phase
         self.start = start
         self.myWeek = myWeek
+        self.weather = weather
         isOffline = offline
         if offline { loadedAt = now() }
     }
@@ -67,6 +84,8 @@ final class CampStartModel {
             start = try await client.campStart(campId: campId)
             // «Für dich» is optional: 403 without a readable part, any other failure leaves the page without it.
             myWeek = try? await client.campMyWeek(campId: campId)
+            // The weather is a hint only (place of the camp, no personal data): no weather, no hint.
+            weather = try? await client.campWeather(campId: campId)
             phase = .loaded
             isOffline = false
             loadedAt = now()

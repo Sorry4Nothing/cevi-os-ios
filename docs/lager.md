@@ -257,6 +257,40 @@ Abweichungen vom Entwurf:
 
 Nicht gebaut: Anlegen, Bearbeiten und Löschen von Zimmern, Zelten, Fahrten und Gruppen (kein Board im Entwurf; die Texte der Leerzustände nennen es trotzdem), Zuordnung einzelner Teilnehmender zu Gruppen, Abwählen, Import der Teilnehmenden, Konfliktbildschirm für diese Boards (Konflikt zeigt «Jemand hat das gerade geändert» und lädt neu), Board L23 (heisst jetzt T2).
 
+## Schnitt B4 Im Lager: Bildschirme (Issue #88)
+
+Gebaut mit den Zuständen Normal, Leer, Laden, Fehler, Ohne Netz, Aktion läuft, Fehler beim Speichern, Rückgängig, Anfrage nötig, ohne Recht, Lager abgeschlossen, Textgrösse AX3, Tag und Nacht (Vorschauen):
+
+| Was | Code (`Screens/Camp/OnSite`) |
+| --- | --- |
+| L4 Heute (Dienst mit Zeit, «Wichtig heute», eigene To-dos abhaken, Knopf «Notfall») | `CampTodayModel`, `CampTodayView` |
+| L26 Anwesenheit (Tag wählen, «Ganzer Tag da», Da/Frei je Abschnitt im Menü, Anfrage bei gesetztem Feld oder nach der Frist, Entscheid der Lagerleitung) | `CampAttendanceModel`, `CampAttendanceView` |
+| L27 Tagesseite (Tageschef, Wetter, Wichtig, Ideen, Programmbild, Notiz, To-dos, «In den nächsten Tag schieben») und Liste der Tage | `CampDayPageModel`, `CampDayPageView` |
+| L28 Einkaufsliste (nach Abteilung, «Nur was ich einkaufe», Abhaken mit Rückgängig, «Artikel hinzufügen» mit Vorschlägen) | `CampShoppingModel`, `CampShoppingView` |
+| L29 Packliste (abhaken, eigene Punkte, Punkt hinzufügen) | `CampPackingModel`, `CampPackingView` |
+| L30 Notfall (Rettung 144 und 1414, Kontakte, Route; ohne Netz der zuletzt geladene Stand aus dem Arbeitsspeicher) | `CampEmergencyModel`, `CampEmergencyView`, `ActiveCamp.emergencySnapshot` |
+| L32 Infos (Abschnitte, Links, «Sortieren» mit «Nach oben»/«Nach unten») | `CampInfosModel`, `CampInfosView` |
+| Wetterwarnung auf L2 («Samstag Gewitter möglich.») und «Heute»-Karte im Start-Tab | `CampStartModel.weatherWarning`, `CampStartView` |
+| Rechte nach Rolle, gemeinsame Bausteine | `CampOnSiteRights`, `CampTodoModel`, `CampOnSiteSupport.swift` |
+
+Navigation: «Heute» ist die erste Karte im Start-Tab, solange das Lager läuft. «Anwesenheit» ist für das Team ein Tab (wie im Board L3), für die Lagerleitung ein Eintrag im Mehr-Sheet. «Tagesseiten», «Einkaufsliste» (nur Lagerleitung und Leitung), «Packliste», «Notfall» und «Infos» stehen im Mehr-Sheet (Abschnitt «Im Lager»). Ein Push `lager_anwesenheit` öffnet die Anwesenheit (`CampRouter`, `ActiveCamp.destination`).
+
+Datenschutz: Kindernamen und Telefonnummern stehen in keinem Log. Anrufen und Route öffnen nur über `Link` mit `phoneURL` und `routeURL`. Der Notfall-Stand liegt nur im Arbeitsspeicher und wird beim Verlassen des Lagers verworfen. Das Wetter kennt nur den Ort.
+
+Abweichungen vom Entwurf:
+
+- Rechte (Annahme, der Server entscheidet am Ende): Matrix lesen und für alle setzen, Anfragen entscheiden, Packliste-Vorlage schreiben und Infos sortieren nur die Lagerleitung; Anwesenheit setzt auch Leitung und Team für sich selbst; Einkaufsliste sehen und ändern Lagerleitung und Leitung (die API antwortet dem Team mit 403); Packliste abhaken alle ausser «Lesen».
+- L4: «Dein Dienst» führt in den Schichtplan; die Zeit kommt aus dem Tagesabschnitt (`zeit`), ohne Zeitplan steht nur der Dienstname. Zusätzlich «Tagesseite» als Link. Das Board zeigt kein Wetter, L4 auch nicht.
+- L26: Namen der Matrix kommen aus der Abzählliste (Art Team), sonst «Person». Teilnehmende stehen nicht in der Matrix. Die Boards zeigen keine Anfragen der Lagerleitung; sie stehen als Karten «Anfrage» mit «Annehmen»/«Ablehnen» über der Matrix. Das Board «Versionskonflikt» ist der Dialog «Anfrage an die Lagerleitung nötig» (Text: «…schon etwas eingetragen»); ein echter 409 `VERSION_KONFLIKT` lädt die Liste neu. «Wartet» an Zellen fehlt (keine Operation in der Warteschlange, L0c), wie in B3.
+- L27: Der Block «Tagesprogramm» (Uhrzeiten) und «Fotos vom Tag, 14 Bilder» haben keine Quelle in der API; gezeigt werden Tageschef, Wetter, Wichtig, Ideen, Programmbilder (als Link), Notiz und To-dos. Der Leerzustand sagt nicht «Trage … ein» (Bearbeiten ist nicht gebaut). «Wartet» gilt nur fürs Abhaken.
+- L28: Abteilungsnamen wie im Board («Früchte und Gemüse», «Trockenes», «Milch»; `CampShoppingGroup.title` angepasst). «Wartet» an Artikeln und die Schaltfläche oben rechts fehlen. Der Hinweis «Reis, 12 kg vorhanden» kommt aus der geladenen Liste, die Vorschläge vom Server.
+- L29: «Vorlage übernehmen» fehlt (keine Route für Vorlagen, L1). Die Lagerleitung fügt der Vorlage Punkte hinzu, alle anderen fügen eigene Punkte hinzu. «Wartet» fehlt.
+- L30: Der Text ohne Netz lautet «Das ist der zuletzt geladene Stand. Anrufen geht trotzdem.» (nicht «auf dem Gerät gespeichert»: es gibt noch keinen lokalen Speicher). Ohne bisherigen Stand und ohne Netz zeigt der Bildschirm den Fehlerzustand, nicht die Nummern. Zusätzlich «Wichtig im Notfall» (Infos mit Merkmal «Notfall»). Die Nummern 144 und 1414 stehen fest im Code (öffentliche Notrufnummern).
+- L32: «Gesperrt wegen Rolle»: Der Hinweis erscheint für alle ausser Lagerleitung und Leitung. Ziehen ist nicht gebaut, nur «Nach oben»/«Nach unten» (Knopf «Sortieren»). «Wartet» fehlt.
+- L2: Die Wetterwarnung zeigt nur den ersten Satz des Boards; «Plane das Waldspiel mit Ausweichort.» hat keine Quelle.
+
+Nicht gebaut: Tageschef, Notiz und Blöcke bearbeiten, Wetterort setzen, Frist der Anwesenheit setzen, Anwesenheit von Teilnehmenden, Zusammenfassung (Zahlen) der Anwesenheit, Einkäufer wählen, Artikel ändern oder löschen, Punkte der Packliste entfernen oder ändern, Notfall-Kontakte, Kartenlink und Infos anlegen, ändern oder löschen (kein Board dafür), Konfliktbildschirm für diese Boards.
+
 ## Offene Fragen zum Entwurf
 
 - L1: «62 Prozent erledigt, 4 überfällig» braucht `GET …/start` je Lager; «Übungslager» (Abschnitt, Chip «Übung») hat kein Feld in der API. Beides fehlt in der App.

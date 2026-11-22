@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// L37: «Mehr» of the camp view. Only entries whose target exists; the others follow with their slices (`docs/lager.md`).
+/// L37: «Mehr» of the camp view. Only entries whose target exists and that the role may open.
 struct CampMoreSheet: View {
     let profile: Profile
     let showAllCamps: () -> Void
@@ -11,6 +11,7 @@ struct CampMoreSheet: View {
 
     /// Entries whose target exists and that the role may open.
     private var rights: CampCommsRights { CampCommsRights(role: active.role, readOnly: active.isReadOnly) }
+    private var onSite: CampOnSiteRights { CampOnSiteRights(role: active.role, readOnly: active.isReadOnly) }
 
     var body: some View {
         NavigationStack(path: $path) {
@@ -31,6 +32,14 @@ struct CampMoreSheet: View {
                     NavigationLink(value: CampDestination.shifts) { row("Schichtplan", symbol: "calendar.badge.clock") }
                     NavigationLink(value: CampDestination.swaps) { row("Diensttausch", symbol: "arrow.left.arrow.right") }
                     NavigationLink(value: CampDestination.count) { row("Abzählen", symbol: "checklist") }
+                }
+                Section("Im Lager") {
+                    if active.role == .campLeader { NavigationLink(value: CampDestination.attendance) { row("Anwesenheit", symbol: "checklist.checked") } }
+                    NavigationLink(value: CampDestination.dayPages) { row("Tagesseiten", symbol: "doc.text") }
+                    if onSite.seesShopping { NavigationLink(value: CampDestination.shopping) { row("Einkaufsliste", symbol: "cart") } }
+                    NavigationLink(value: CampDestination.packing) { row("Packliste", symbol: "suitcase") }
+                    NavigationLink(value: CampDestination.emergency) { row("Notfall", symbol: "cross") }
+                    NavigationLink(value: CampDestination.infos) { row("Infos", symbol: "info.circle") }
                 }
                 Section("Weiteres") {
                     Button { dismiss(); showAllCamps() } label: { row("Alle Lager", symbol: "tent") }
@@ -58,6 +67,12 @@ struct CampMoreSheet: View {
                 case .swaps: CampSwapsView(personId: profile.id)
                 case .count: CampCountView()
                 case .shifts: CampShiftsView(personId: profile.id)
+                case .attendance: CampAttendanceView(profile: profile)
+                case .dayPages: CampDayListView(profile: profile)
+                case .shopping: CampShoppingView()
+                case .packing: CampPackingView()
+                case .emergency: CampEmergencyView()
+                case .infos: CampInfosView()
                 case .notices: EmptyView()
                 }
             }

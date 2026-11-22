@@ -7,6 +7,14 @@ nonisolated enum CampDestination: Hashable, Sendable {
     case meetings, notifications
     /// The roster screens (B3). Only the swaps are the target of a push (`lager_einteilung`).
     case rooms, trips, groups, swaps, count, shifts
+    /// The on-site screens (B4). Only the attendance is the target of a push (`lager_anwesenheit`).
+    case attendance, dayPages, shopping, packing, emergency, infos
+}
+
+/// The emergency window as it was last loaded, with the time of loading.
+nonisolated struct CampEmergencySnapshot: Equatable, Sendable {
+    let data: CampEmergency
+    let loadedAt: Date
 }
 
 /// The camp the person works in now, kept in memory only. With a camp the app shows the camp view, without it the program view.
@@ -22,6 +30,8 @@ final class ActiveCamp {
     /// Set by a tapped push, cleared by the screen that opens it.
     var destination: CampDestination?
     private(set) var outbox: CampOutbox?
+    /// The last loaded emergency window, kept in memory only so it opens without network (no local storage yet).
+    var emergencySnapshot: CampEmergencySnapshot?
     @ObservationIgnored private(set) var client: APIClient?
 
     var isOpen: Bool { camp != nil }
@@ -38,6 +48,7 @@ final class ActiveCamp {
         waitingCount = 0
         isOffline = false
         destination = nil
+        emergencySnapshot = nil
     }
 
     func open(_ entry: CampListEntry, client: APIClient?) { open(camp: entry.camp, role: entry.role, client: client) }
@@ -50,6 +61,7 @@ final class ActiveCamp {
         client = nil
         waitingCount = 0
         isOffline = false
+        emergencySnapshot = nil
     }
 
     func refreshQueue() async {

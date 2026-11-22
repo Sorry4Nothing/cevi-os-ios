@@ -65,6 +65,12 @@ struct CampStartScreen: View {
                 CampBannerStack(staleSince: model.isOffline ? model.loadedAt : nil)
                 if !model.isLead { Text("Mein Bereich").font(.subheadline).foregroundStyle(Color.ceviOnSurfaceVariant) }
                 countdown
+                today
+                if model.isLead, let warning = model.weatherWarning {
+                    Label(warning, systemImage: "cloud.bolt").font(.headline).foregroundStyle(Color.ceviOnWarningContainer)
+                        .frame(maxWidth: .infinity, alignment: .leading).padding(Spacing.s4)
+                        .background(Color.ceviWarningContainer, in: Radius.shape(Radius.md)).accessibilityElement(children: .combine)
+                }
                 if model.isLead { lead } else { team }
                 meeting
             }
@@ -77,6 +83,31 @@ struct CampStartScreen: View {
             if model.isLead && model.canCreate {
                 CampNewTaskButton(title: "Schnell erfassen") { showsQuickEntry = true }.frame(maxWidth: .infinity, alignment: .trailing).padding(.horizontal, Spacing.s4)
             }
+        }
+    }
+
+    /// L4: «Heute» is the way in while the camp runs.
+    @ViewBuilder private var today: some View {
+        if model.isRunning, let camp = active.camp {
+            let title = CampOnSiteText.campDay(model.now(), from: camp.from, to: camp.to)
+            NavigationLink { CampTodayView(personId: personId) } label: {
+                CampOnSiteCard {
+                    HStack(spacing: Spacing.s3) {
+                        Image(systemName: "sun.max").foregroundStyle(Color.ceviAccent).accessibilityHidden(true)
+                        VStack(alignment: .leading, spacing: Spacing.s1) {
+                            Text("Heute").font(.headline).foregroundStyle(Color.ceviOnSurface)
+                            Text(title).font(.subheadline).foregroundStyle(Color.ceviOnSurfaceVariant)
+                        }
+                        Spacer(minLength: Spacing.s2)
+                        Image(systemName: "chevron.right").font(.footnote.bold()).foregroundStyle(Color.ceviOnSurfaceVariant).accessibilityHidden(true)
+                    }
+                    .frame(minHeight: Size.touchTarget)
+                }
+            }
+            .buttonStyle(.plain)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(Text("Heute, \(title)"))
+            .accessibilityHint(Text("Öffnet deinen Tag"))
         }
     }
 

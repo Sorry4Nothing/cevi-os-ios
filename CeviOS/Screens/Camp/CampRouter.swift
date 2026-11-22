@@ -4,7 +4,7 @@ import Foundation
 @MainActor
 enum CampRouter {
     /// Returns `nil` when the camp is open, otherwise the state to show.
-    /// Notices, mentions, the inbox and the swaps have a screen; the other objects open the camp only (shortcut: open them when their slice lands).
+    /// Notices, mentions, the inbox, the swaps and the attendance have a screen; the other objects open the camp only (shortcut: open them when their slice lands).
     static func open(type: CampPushType, objectId: UUID, client: APIClient?, list: CampListModel, active: ActiveCamp) async -> CampScreenState? {
         guard let client else { return nil }
         do {
@@ -22,6 +22,7 @@ enum CampRouter {
             case .feedback: CampCommsRights(role: active.role, readOnly: false).readsInbox ? .inbox : nil
             // The notifications about the roster are swap requests and their decisions.
             case .planning: .swaps
+            case .attendance: .attendance
             default: nil
             }
             return nil
