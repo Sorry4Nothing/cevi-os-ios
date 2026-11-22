@@ -23,7 +23,7 @@ struct RootView: View {
         // Disabling resigns the focused text field; the overlay swallows touches. Never over the start screen.
         .disabled(showsBusyOverlay)
         .overlay {
-            if showsBusyOverlay { BusyOverlay() }
+            if showsBusyOverlay { BusyOverlay(slow: state.busy.isSlow) }
         }
         // The app switcher shows only a cover while there is a session or the lock is on (SR-41).
         .overlay {

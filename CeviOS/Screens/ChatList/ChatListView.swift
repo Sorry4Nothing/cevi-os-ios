@@ -27,6 +27,7 @@ struct ChatListView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .ceviScreenBackground()
             .navigationTitle("Chat")
+            .campSwitcher()
             .toolbar {
                 if isParent {
                     ToolbarItem(placement: .topBarTrailing) {

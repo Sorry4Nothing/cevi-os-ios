@@ -60,6 +60,8 @@ extension APIClient {
 nonisolated enum CampRules {
     static let closedCode = "LAGER_GESCHLOSSEN"
     static let versionConflictCode = "VERSION_KONFLIKT"
+    /// Maintenance: the camp module answers 503, with this code if the server names it.
+    static let maintenanceCode = "WARTUNG"
     /// Codes of an operation answered `abgelehnt` by `POST …/aenderungen`.
     static let rejectionCodes = ["OPERATION_UNBEKANNT", "UNGUELTIGE_EINGABE", "KEINE_BERECHTIGUNG", "NICHT_GEFUNDEN", "KONFLIKT"]
     /// 429 of the event stream (header `Retry-After`).

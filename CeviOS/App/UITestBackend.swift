@@ -311,6 +311,8 @@ private nonisolated struct World {
         case ("GET", "stufen") where route.count == 1:
             return .json(200, ["stufen": [Ids.jungschar, Ids.froeschli].map(unit)])
         case (_, "chats"): return chatRoutes(request, Array(route.dropFirst()), me)
+        // No camps in the UI tests: the switcher stays hidden.
+        case ("GET", "lager") where route.count == 1: return .json(200, ["lager": [Any]()])
         case ("PUT", "push-token"): return .noContent
         default: return .notFound
         }
