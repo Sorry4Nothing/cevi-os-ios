@@ -4,6 +4,8 @@ import Foundation
 nonisolated enum PushTarget: Equatable, Sendable {
     case chat(UUID)
     case program(UUID)
+    /// Push of the camp module: the camp id is not in the push, the app resolves it (`GET /api/v1/lager/aufloesen/{typ}/{id}`).
+    case camp(CampPushType, UUID)
     /// Announcement from the administration: no target, the app just opens.
     case announcement
 
@@ -15,7 +17,7 @@ nonisolated enum PushTarget: Equatable, Sendable {
         case "chat": return id.map(PushTarget.chat)
         case "programm": return id.map(PushTarget.program)
         case "mitteilung": return .announcement
-        default: return nil
+        default: return CampPushType(rawValue: type).flatMap { campType in id.map { .camp(campType, $0) } }
         }
     }
 

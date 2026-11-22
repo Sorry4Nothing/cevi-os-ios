@@ -30,6 +30,7 @@ struct ApiContractTests {
     /// `{id}` and concrete UUIDs both become `{}`.
     static func normalize(_ path: String) -> String {
         var result = path.replacing(/\{[^}]+\}/, with: "{}")
+        result = result.replacing(/\/aufloesen\/lager_[a-z]+\//, with: "/aufloesen/{}/")
         result = result.replacing(/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}/, with: "{}")
         return result
     }
@@ -77,10 +78,19 @@ struct ApiContractTests {
         try? await client.sendMessage(chatId: id, text: "x")
         try? await client.markRead(chatId: id)
         try? await client.registerPushToken(token)
+        _ = try? await client.camps()
+        _ = try? await client.camp(id: id)
+        _ = try? await client.campRights(campId: id)
+        _ = try? await client.campNotifications(campId: id, after: other)
+        _ = try? await client.campUnreadCount(campId: id)
+        try? await client.markCampNotificationsRead(campId: id, ids: [other])
+        _ = try? await client.resolveCampPush(type: .task, objectId: id)
+        _ = try? await client.campFeedState(campId: id)
+        _ = try? await client.campChanges(campId: id, since: 0)
 
         let contract = try Self.contractOperations()
         let calls = StubProtocol.requests(host: host).map { "\($0.httpMethod ?? "GET") \(Self.normalize($0.url?.path ?? ""))" }
-        #expect(calls.count >= 25)
+        #expect(calls.count >= 34)
         let missing = Set(calls).subtracting(contract)
         #expect(missing.isEmpty, "Not in the API description: \(missing.sorted())")
     }

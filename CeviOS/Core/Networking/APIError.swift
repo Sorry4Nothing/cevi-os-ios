@@ -14,6 +14,7 @@ nonisolated struct APIError: Error, Equatable, Sendable {
         case forbidden // 403
         case notFound // 404
         case conflict // 409
+        case gone // 410: the change feed no longer reaches back
         case payloadTooLarge // 413
         case unsupportedMediaType // 415
         case appOutdated // 426
@@ -39,6 +40,7 @@ nonisolated struct APIError: Error, Equatable, Sendable {
         case 403: .forbidden
         case 404: .notFound
         case 409: .conflict
+        case 410: .gone
         case 413: .payloadTooLarge
         case 415: .unsupportedMediaType
         case 426: .appOutdated

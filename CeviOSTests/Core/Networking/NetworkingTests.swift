@@ -67,7 +67,7 @@ struct APIErrorTests {
 
     @Test(arguments: [
         (400, APIError.Kind.invalidInput), (401, .unauthorized), (403, .forbidden), (404, .notFound),
-        (409, .conflict), (413, .payloadTooLarge), (415, .unsupportedMediaType), (426, .appOutdated), (429, .rateLimited),
+        (409, .conflict), (410, .gone), (413, .payloadTooLarge), (415, .unsupportedMediaType), (426, .appOutdated), (429, .rateLimited),
         (500, .server), (503, .server),
     ])
     func statusMapsToKind(status: Int, kind: APIError.Kind) {

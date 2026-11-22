@@ -327,6 +327,156 @@ paths:
             text/javascript:
               schema:
                 type: string
+  /admin/website.js:
+    get:
+      operationId: getAdminWebsiteSkript
+      summary: Skript der Verwaltung – Bereich Website (Rahmen und Unternavigation)
+      tags:
+        - Allgemein
+      security: []
+      description: Statische Datei der Verwaltung (siehe `GET /admin`), ohne Anmeldung.
+      responses:
+        "200":
+          description: Datei (`text/javascript; charset=UTF-8`).
+          content:
+            text/javascript:
+              schema:
+                type: string
+  /admin/website.css:
+    get:
+      operationId: getAdminWebsiteStilvorlage
+      summary: Stilvorlage der Verwaltung – Bereich Website (Rahmen und Unternavigation)
+      tags:
+        - Allgemein
+      security: []
+      description: Statische Datei der Verwaltung (siehe `GET /admin`), ohne Anmeldung.
+      responses:
+        "200":
+          description: Datei (`text/css; charset=UTF-8`).
+          content:
+            text/css:
+              schema:
+                type: string
+  /admin/website-seiten.js:
+    get:
+      operationId: getAdminWebsiteSeitenSkript
+      summary: Skript der Verwaltung – Bereich Website, Seiten
+      tags:
+        - Allgemein
+      security: []
+      description: Statische Datei der Verwaltung (siehe `GET /admin`), ohne Anmeldung.
+      responses:
+        "200":
+          description: Datei (`text/javascript; charset=UTF-8`).
+          content:
+            text/javascript:
+              schema:
+                type: string
+  /admin/website-seiten.css:
+    get:
+      operationId: getAdminWebsiteSeitenStilvorlage
+      summary: Stilvorlage der Verwaltung – Bereich Website, Seiten
+      tags:
+        - Allgemein
+      security: []
+      description: Statische Datei der Verwaltung (siehe `GET /admin`), ohne Anmeldung.
+      responses:
+        "200":
+          description: Datei (`text/css; charset=UTF-8`).
+          content:
+            text/css:
+              schema:
+                type: string
+  /admin/website-editor.js:
+    get:
+      operationId: getAdminWebsiteEditorSkript
+      summary: Skript der Verwaltung – Bereich Website, Editor
+      tags:
+        - Allgemein
+      security: []
+      description: Statische Datei der Verwaltung (siehe `GET /admin`), ohne Anmeldung.
+      responses:
+        "200":
+          description: Datei (`text/javascript; charset=UTF-8`).
+          content:
+            text/javascript:
+              schema:
+                type: string
+  /admin/website-editor.css:
+    get:
+      operationId: getAdminWebsiteEditorStilvorlage
+      summary: Stilvorlage der Verwaltung – Bereich Website, Editor
+      tags:
+        - Allgemein
+      security: []
+      description: Statische Datei der Verwaltung (siehe `GET /admin`), ohne Anmeldung.
+      responses:
+        "200":
+          description: Datei (`text/css; charset=UTF-8`).
+          content:
+            text/css:
+              schema:
+                type: string
+  /admin/website-medien.js:
+    get:
+      operationId: getAdminWebsiteMedienSkript
+      summary: Skript der Verwaltung – Bereich Website, Medien
+      tags:
+        - Allgemein
+      security: []
+      description: Statische Datei der Verwaltung (siehe `GET /admin`), ohne Anmeldung.
+      responses:
+        "200":
+          description: Datei (`text/javascript; charset=UTF-8`).
+          content:
+            text/javascript:
+              schema:
+                type: string
+  /admin/website-medien.css:
+    get:
+      operationId: getAdminWebsiteMedienStilvorlage
+      summary: Stilvorlage der Verwaltung – Bereich Website, Medien
+      tags:
+        - Allgemein
+      security: []
+      description: Statische Datei der Verwaltung (siehe `GET /admin`), ohne Anmeldung.
+      responses:
+        "200":
+          description: Datei (`text/css; charset=UTF-8`).
+          content:
+            text/css:
+              schema:
+                type: string
+  /admin/website-stufenfakten.js:
+    get:
+      operationId: getAdminWebsiteStufenfaktenSkript
+      summary: Skript der Verwaltung – Bereich Website, Stufenfelder
+      tags:
+        - Allgemein
+      security: []
+      description: Statische Datei der Verwaltung (siehe `GET /admin`), ohne Anmeldung.
+      responses:
+        "200":
+          description: Datei (`text/javascript; charset=UTF-8`).
+          content:
+            text/javascript:
+              schema:
+                type: string
+  /admin/website-stufenfakten.css:
+    get:
+      operationId: getAdminWebsiteStufenfaktenStilvorlage
+      summary: Stilvorlage der Verwaltung – Bereich Website, Stufenfelder
+      tags:
+        - Allgemein
+      security: []
+      description: Statische Datei der Verwaltung (siehe `GET /admin`), ohne Anmeldung.
+      responses:
+        "200":
+          description: Datei (`text/css; charset=UTF-8`).
+          content:
+            text/css:
+              schema:
+                type: string
   /admin/zeitregeln.js:
     get:
       operationId: getAdminZeitregelnSkript
@@ -898,7 +1048,7 @@ paths:
         Person kommt immer aus der Sitzung. Mindestens ein Feld muss im Body stehen. Der Body ist strikt: Jedes
         andere Feld (auch `abteilungId`) ergibt 400, ebenso ein leerer Body oder ein Schalter, der kein Boolean ist.
 
-        **Push-Schalter.** `pushChat` (Pushes für neue Chat-Nachrichten) und `pushProgramme` (Pushes zu Programmen; bei einer Änderung oder Absage eines Programms sendet die API keinen) sind je ein Boolean und standardmässig an. Die API wertet sie bei jedem Versand aus; das Push-Token bleibt dabei bestehen. Ein Push trägt als Daten `typ` (`chat` oder `programm`) und `id` (Chat- oder Programm-ID), woraus die App das Ziel öffnet.
+        **Push-Schalter.** `pushChat` (Pushes für neue Chat-Nachrichten) und `pushProgramme` (Pushes zu Programmen; bei einer Änderung oder Absage eines Programms sendet die API keinen) sind je ein Boolean und standardmässig an. Die API wertet sie bei jedem Versand aus; das Push-Token bleibt dabei bestehen. Ein Push trägt als Daten `typ` (`chat` oder `programm`) und `id` (Chat- oder Programm-ID), woraus die App das Ziel öffnet. Die Pushes des Lagers (`typ` `lager_*`) und ihre Schalter beschreibt `GET /api/v1/ich/lager-benachrichtigungen`.
 
         **Anmelde-Push.** `pushAnmeldungen` (Push an die Leitung bei An- und Abmeldung eines Kindes für ein Programm) ist ein Boolean und standardmässig an. `GET /api/v1/ich` gibt den Schalter nur Personen mit einer Stufenrolle zurück; setzen lässt er sich von jeder Person, ohne Wirkung ohne Stufenrolle.
 
@@ -2967,7 +3117,9 @@ paths:
         der Speicher danach, bleibt die Antwort 204: Die Datei ist nicht mehr abrufbar, und der Server meldet die Waise im Log
         (code `WAISE`). Das Audit-Log hält Hochladen und Löschen fest, ohne Inhalt.
 
-        Statuscodes: 204, 400, 401, 403, 404 (unbekannt oder andere Abteilung), 426, 501.
+        Steht das Medium noch im Entwurf oder in einer Version einer Seite der Abteilung (auch einer zurückgezogenen), antwortet die Route mit 409 `MEDIUM_VERWENDET` und der Zahl der Seiten in `seiten`; nichts wird gelöscht. Das verhindert tote Bilder. Das Medium ist dafür gesperrt, bis die Zählung entschieden ist.
+
+        Statuscodes: 204, 400, 401, 403, 404 (unbekannt oder andere Abteilung), 409, 426, 501.
       tags:
         - Verwaltung
       parameters:
@@ -2984,6 +3136,26 @@ paths:
           $ref: "#/components/responses/KeineBerechtigung403"
         "404":
           $ref: "#/components/responses/NichtGefunden404"
+        "409":
+          description: Das Medium steht noch in Seiten (code `MEDIUM_VERWENDET`, `seiten` zählt sie).
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - code
+                  - message
+                  - seiten
+                properties:
+                  code:
+                    type: string
+                    enum:
+                      - MEDIUM_VERWENDET
+                  message:
+                    type: string
+                  seiten:
+                    type: integer
+                    minimum: 1
         "426":
           $ref: "#/components/responses/AppVeraltet426"
         "501":
@@ -3647,6 +3819,1936 @@ paths:
       responses:
         "204":
           description: Entzogen.
+        "400":
+          $ref: "#/components/responses/UngueltigeEingabe400"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "404":
+          $ref: "#/components/responses/NichtGefunden404"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+  /api/v1/redaktion/seiten:
+    get:
+      operationId: listeRedaktionSeiten
+      summary: Seiten der Website, die die Person bearbeiten darf
+      description: |
+        Namensraum `/api/v1/redaktion` für Personen mit Bearbeitungsrecht, nicht nur Admins. Zugang haben die Abteilungsleitung, jede Stufenleitung und Personen mit einem Recht auf Seiten in `bearbeiter` (auf die Person oder einen Tag, den sie trägt); alle anderen bekommen 403. Admins brauchen auch hier den zweiten Faktor (Code `ZWEITER_FAKTOR_FEHLT`).
+
+        Die Liste enthält nur Seiten, die die Person bearbeiten darf: die Abteilungsleitung und die Redaktion (Recht auf alle Seiten) alle Seiten der Abteilung, eine Stufenleitung die Seiten ihrer Stufe (`tagId` = Stufe). `elternId` zeigt auch auf Seiten, die nicht in der Liste stehen. Sortiert nach `reihenfolge`, dann `adresse`; den Baum baut der Client aus `elternId`. Der Inhalt der Seiten gehört nicht zu dieser Route.
+
+        Statuscodes: 200 bei Erfolg. 403 ohne Zugang.
+      tags:
+        - Redaktion
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+      responses:
+        "200":
+          description: Seiten, nach Reihenfolge sortiert.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RedaktionSeitenListe"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+    post:
+      operationId: legeRedaktionSeiteAn
+      summary: Seite anlegen
+      description: |
+        Nur Abteilungsleitung und Redaktion. Die neue Seite hat noch keinen Inhalt und keine veröffentlichte Version. Ohne `reihenfolge` kommt sie ans Ende ihrer Geschwister. Adresse, Elternseite, Titel, Reihenfolge und Sichtbarkeit wirken sofort; nur der Inhalt ist später versioniert.
+
+        Regeln: `adresse` besteht aus `a-z`, `0-9` und `-`, höchstens 60 Zeichen. Auf der obersten Ebene sind `api`, `admin`, `health`, `datenschutz`, `konto-loeschen`, `support`, `website`, `anmelden`, `medien`, `ical`, `sitemap.xml`, `robots.txt` und `.well-known` reserviert. Der Baum ist höchstens 5 Ebenen tief. Die Adresse ist unter einer Elternseite eindeutig, und eine Gruppe (`tagId`) hat höchstens eine Seite. Die Tags der Sichtbarkeit müssen zur Abteilung gehören.
+
+        Reihenfolge der Prüfungen: Zugang (403), Body (400), Elternseite in der eigenen Abteilung (404), Recht zum Anlegen (403), Gruppe in der eigenen Abteilung (404), Tags der Sichtbarkeit (400), reservierte Adresse und Tiefe (400), Eindeutigkeit (409). Das Anlegen steht im Audit-Log (`seite_angelegt`; Kennungen und Art der Sichtbarkeit, nie der Titel).
+
+        Statuscodes: 201 bei Erfolg. 400 bei ungültiger Eingabe, mit den Codes `ADRESSE_RESERVIERT` und `SEITE_ZU_TIEF` für die beiden Regeln. 403 ohne Recht. 404 für unbekannte Elternseite oder Gruppe. 409 mit `ADRESSE_VERGEBEN` oder `TAG_VERGEBEN`.
+      tags:
+        - Redaktion
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RedaktionSeiteAnlegen"
+      responses:
+        "201":
+          description: Seite angelegt.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminAngelegt"
+        "400":
+          $ref: "#/components/responses/RedaktionSeite400"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "404":
+          $ref: "#/components/responses/NichtGefunden404"
+        "409":
+          $ref: "#/components/responses/RedaktionSeite409"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+  /api/v1/redaktion/seiten/{id}:
+    get:
+      operationId: leseRedaktionSeite
+      summary: Eine Seite lesen
+      description: |
+        Struktur und Sichtbarkeit einer Seite, ohne Inhalt. `pfad` ist die volle Adresse über alle Elternseiten.
+
+        Reihenfolge der Prüfungen: Pfad (400), Seite in der eigenen Abteilung (404, auch für Seiten anderer Abteilungen), dann das Recht an dieser Seite (403): Abteilungsleitung, Redaktion, Stufenleitung der Gruppe der Seite oder ein Recht auf genau diese Seite.
+
+        Statuscodes: 200 bei Erfolg. 400 bei ungültiger ID. 403 ohne Recht an dieser Seite. 404 für unbekannte Seiten.
+      tags:
+        - Redaktion
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+        - $ref: "#/components/parameters/RedaktionSeiteId"
+      responses:
+        "200":
+          description: Die Seite.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RedaktionSeite"
+        "400":
+          $ref: "#/components/responses/UngueltigeEingabe400"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "404":
+          $ref: "#/components/responses/NichtGefunden404"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+    patch:
+      operationId: aendereRedaktionSeite
+      summary: Struktur einer Seite ändern
+      description: |
+        Ändert Titel, Adresse, Elternseite, Reihenfolge, Sichtbarkeit oder Gruppe; nur die gesendeten Felder. Die Änderung wirkt sofort, auch das Zurückziehen einer Sichtbarkeit. Den Inhalt ändert diese Route nie.
+
+        Wer die Seite bearbeiten darf (siehe `GET`), darf Titel, Adresse, Reihenfolge und Sichtbarkeit ändern. Eine andere Elternseite setzt voraus, dass die Person auch diese bearbeiten darf; auf die oberste Ebene (`elternId: null`) setzt nur die Abteilungsleitung oder die Redaktion. Die Gruppe (`tagId`) ändern ebenfalls nur Abteilungsleitung und Redaktion, weil sie festlegt, welche Stufenleitung die Seite bearbeitet. Die Regeln für Adresse, Tiefe und Tags wie beim Anlegen; zusätzlich lässt sich eine Seite nicht unter sich selbst oder eine ihrer Unterseiten legen (`SEITE_ZYKLUS`). Strukturänderungen einer Abteilung laufen nacheinander.
+
+        Reihenfolge der Prüfungen: Pfad und Body (400), Seite in der eigenen Abteilung (404), Recht an der Seite (403), neue Elternseite (404, 403), Gruppe (403, 404), Tags der Sichtbarkeit (400), Adresse, Zyklus und Tiefe (400), Eindeutigkeit (409). Das Audit-Log (`seite_geaendert`) nennt nur die Namen der geänderten Felder.
+
+        Statuscodes: 204 bei Erfolg. 400 bei ungültiger Eingabe (unbekannte Felder, kein Feld) oder wegen `ADRESSE_RESERVIERT`, `SEITE_ZYKLUS`, `SEITE_ZU_TIEF`. 403 ohne Recht. 404 für unbekannte Seite, Elternseite oder Gruppe. 409 mit `ADRESSE_VERGEBEN` oder `TAG_VERGEBEN`.
+      tags:
+        - Redaktion
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+        - $ref: "#/components/parameters/RedaktionSeiteId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RedaktionSeiteAendern"
+      responses:
+        "204":
+          description: Geändert.
+        "400":
+          $ref: "#/components/responses/RedaktionSeite400"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "404":
+          $ref: "#/components/responses/NichtGefunden404"
+        "409":
+          $ref: "#/components/responses/RedaktionSeite409"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+    delete:
+      operationId: loescheRedaktionSeite
+      summary: Seite löschen
+      description: |
+        Nur Abteilungsleitung und Redaktion. Löscht die Seite samt Entwurf und allen Versionen. Mit Unterseiten antwortet der Server mit 409 `SEITE_HAT_UNTERSEITEN`: Sie sind zuerst zu verschieben oder zu löschen. Ein Recht auf genau diese Seite in `bearbeiter` fällt mit weg. Das Löschen steht im Audit-Log (`seite_geloescht`, ohne Inhalt).
+
+        Reihenfolge der Prüfungen: Pfad (400), Seite in der eigenen Abteilung (404), Recht zum Löschen (403), Unterseiten (409).
+
+        Statuscodes: 204 bei Erfolg. 400 bei ungültiger ID. 403 ohne Recht, auch für die Stufenleitung der Seite. 404 für unbekannte Seiten. 409 `SEITE_HAT_UNTERSEITEN`.
+      tags:
+        - Redaktion
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+        - $ref: "#/components/parameters/RedaktionSeiteId"
+      responses:
+        "204":
+          description: Gelöscht.
+        "400":
+          $ref: "#/components/responses/UngueltigeEingabe400"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "404":
+          $ref: "#/components/responses/NichtGefunden404"
+        "409":
+          $ref: "#/components/responses/RedaktionSeite409"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+  /api/v1/redaktion/seiten/{id}/entwurf:
+    get:
+      operationId: leseRedaktionEntwurf
+      summary: Entwurf einer Seite lesen
+      description: |
+        Das Dokument der Bausteine im Entwurf (Form `{ v: 1, titel, bausteine }`, siehe Bausteinkatalog) und der Zähler, den das Speichern mitschicken muss. Eine neue Seite hat `dokument: null` und Zähler 0. `unveroeffentlicht` ist wahr, wenn es einen Entwurf gibt und er von der veröffentlichten Version abweicht (auch ohne veröffentlichte Version).
+
+        Reihenfolge der Prüfungen: Pfad (400), Seite in der eigenen Abteilung (404), Recht an dieser Seite (403): Abteilungsleitung, Redaktion, Stufenleitung der Gruppe der Seite oder ein Recht auf genau diese Seite. Dasselbe gilt für alle Routen unter `/seiten/{id}/…` dieses Abschnitts.
+
+        Statuscodes: 200, 400, 403, 404.
+      tags:
+        - Redaktion
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+        - $ref: "#/components/parameters/RedaktionSeiteId"
+      responses:
+        "200":
+          description: Der Entwurf.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RedaktionEntwurf"
+        "400":
+          $ref: "#/components/responses/UngueltigeEingabe400"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "404":
+          $ref: "#/components/responses/NichtGefunden404"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+    put:
+      operationId: speichereRedaktionEntwurf
+      summary: Entwurf speichern
+      description: |
+        Ersetzt den Entwurf durch das ganze Dokument. `zaehler` ist der Zähler aus dem letzten Lesen oder Speichern: Nur wer den aktuellen Stand kennt, schreibt (ein atomarer Schritt, keine Sperre). Wer mit einem veralteten Zähler speichert, bekommt 409 `KONFLIKT` mit dem aktuellen Zähler und Dokument und überschreibt nichts. Es gibt keine Sperre auf Bausteine.
+
+        Das Dokument besteht aus Bausteinen des Katalogs (strenge Schemas, kein HTML). Ein ungültiges Dokument antwortet 400 `DOKUMENT_UNGUELTIG` mit `fehler` (je Eintrag der Pfad, zum Beispiel `bausteine.2.daten.ziel`, und der Code der Prüfung, nie Werte der Eingabe, höchstens 20).
+
+        Verweisprüfung beim Speichern (und noch einmal beim Veröffentlichen), je Baustein mit Pfad `bausteine.<n>`. Fehler antworten 422; `code` ist der erste Fehlercode, `fehler` nennt alle. `MEDIUM_UNBEKANNT`: das Medium gibt es nicht oder gehört einer anderen Abteilung (beides gleich). `MEDIUM_FORMAT`: Bild und Galerie brauchen ein Bild, kein PDF. `MEDIUM_NICHT_OEFFENTLICH`: in einem öffentlichen Baustein (eigene Sichtbarkeit «öffentlich» oder «erbt» auf einer öffentlichen Seite) darf nur ein öffentliches Medium stehen. `TAG_UNBEKANNT`, `PERSON_UNBEKANNT`: nicht in der eigenen Abteilung. `SEITE_UNBEKANNT`: ein Link auf eine Seitenadresse, die es in der Abteilung nicht gibt (die Startseite `/` lässt sich nicht prüfen). Den Alt-Text sichert das Medium selbst (Pflicht oder «dekorativ» beim Hochladen).
+
+        Je Person höchstens 120 Speicherungen in der Minute (429). Das Speichern steht nicht im Audit-Log. Die Anfrage darf höchstens 512 KiB gross sein (413 `ZU_GROSS`); das Schema begrenzt Mengen und Längen, nicht die Bytes.
+
+        Reihenfolge der Prüfungen: Pfad und Body-Form (400), Seite (404), Recht (403), Rate-Limit (429), Dokument (400), Verweise (422), Zähler (409).
+
+        Statuscodes: 200 bei Erfolg, mit dem neuen Zähler. 400, 403, 404, 409, 413, 422, 429.
+      tags:
+        - Redaktion
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+        - $ref: "#/components/parameters/RedaktionSeiteId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RedaktionEntwurfSpeichern"
+      responses:
+        "200":
+          description: Gespeichert.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RedaktionZaehler"
+        "400":
+          $ref: "#/components/responses/RedaktionDokument400"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "404":
+          $ref: "#/components/responses/NichtGefunden404"
+        "409":
+          description: Der Zähler ist veraltet (code `KONFLIKT`). Der Body trägt den aktuellen Zähler und das aktuelle Dokument.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RedaktionKonflikt"
+        "413":
+          description: Die Anfrage ist grösser als 512 KiB (code ZU_GROSS).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Fehler"
+        "422":
+          $ref: "#/components/responses/RedaktionVerweis422"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+  /api/v1/redaktion/seiten/{id}/veroeffentlichen:
+    post:
+      operationId: veroeffentlicheRedaktionSeite
+      summary: Entwurf veröffentlichen
+      description: |
+        Prüft das ganze Dokument des Entwurfs und die Verweise noch einmal (Sichtbarkeit der Seite und Medien können sich seit dem Speichern geändert haben), legt eine neue, unveränderliche Version mit der nächsten Nummer an (ab 1) und setzt die veröffentlichte Version der Seite auf sie. Kein Body.
+
+        409 `NICHTS_ZU_VEROEFFENTLICHEN`, wenn es keinen Entwurf gibt oder er gleich der veröffentlichten Version ist (die Seite ist nach dem Zurückziehen nicht veröffentlicht: dann gilt jeder Entwurf als neu). Zwei gleichzeitige Veröffentlichungen laufen nacheinander: Die zweite bekommt 409. 422 `DOKUMENT_UNGUELTIG` oder ein Code der Verweisprüfung (siehe Speichern).
+
+        Meldet das Ereignis `version_veroeffentlicht` an die Auslieferung. Audit-Log: `seite_veroeffentlicht` mit der Versionsnummer, nie Inhalt.
+
+        Statuscodes: 201 bei Erfolg, mit der Nummer. 400, 403, 404, 409, 422.
+      tags:
+        - Redaktion
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+        - $ref: "#/components/parameters/RedaktionSeiteId"
+      responses:
+        "201":
+          description: Version angelegt.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - nr
+                properties:
+                  nr:
+                    type: integer
+                    minimum: 1
+        "400":
+          $ref: "#/components/responses/UngueltigeEingabe400"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "404":
+          $ref: "#/components/responses/NichtGefunden404"
+        "409":
+          description: Nichts zu veröffentlichen (code `NICHTS_ZU_VEROEFFENTLICHEN`).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Fehler"
+        "422":
+          $ref: "#/components/responses/RedaktionVerweis422"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+  /api/v1/redaktion/seiten/{id}/zurueckziehen:
+    post:
+      operationId: ziehRedaktionSeiteZurueck
+      summary: Veröffentlichung zurückziehen
+      description: |
+        Setzt nur die veröffentlichte Version der Seite zurück: Die Seite ist danach nicht mehr veröffentlicht. Alle Versionen und der Entwurf bleiben. Kein Body. 409 `NICHT_VEROEFFENTLICHT`, wenn nichts veröffentlicht ist.
+
+        Meldet das Ereignis `version_zurueckgezogen`. Audit-Log: `seite_zurueckgezogen`.
+
+        Statuscodes: 204 bei Erfolg. 400, 403, 404, 409.
+      tags:
+        - Redaktion
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+        - $ref: "#/components/parameters/RedaktionSeiteId"
+      responses:
+        "204":
+          description: Zurückgezogen.
+        "400":
+          $ref: "#/components/responses/UngueltigeEingabe400"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "404":
+          $ref: "#/components/responses/NichtGefunden404"
+        "409":
+          description: Die Seite ist nicht veröffentlicht (code `NICHT_VEROEFFENTLICHT`).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Fehler"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+  /api/v1/redaktion/seiten/{id}/versionen:
+    get:
+      operationId: listeRedaktionVersionen
+      summary: Versionen einer Seite
+      description: |
+        Die jüngsten 100 Versionen, neueste zuerst, ohne Inhalt (den liefert `versionen/{nr}`). Keine Seitenwechsel: Ältere Versionen sind über ihre Nummer erreichbar.
+
+        Statuscodes: 200, 400, 403, 404.
+      tags:
+        - Redaktion
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+        - $ref: "#/components/parameters/RedaktionSeiteId"
+      responses:
+        "200":
+          description: Versionen, neueste zuerst.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - versionen
+                properties:
+                  versionen:
+                    type: array
+                    maxItems: 100
+                    items:
+                      $ref: "#/components/schemas/RedaktionVersion"
+        "400":
+          $ref: "#/components/responses/UngueltigeEingabe400"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "404":
+          $ref: "#/components/responses/NichtGefunden404"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+  /api/v1/redaktion/seiten/{id}/versionen/{nr}:
+    get:
+      operationId: leseRedaktionVersion
+      summary: Eine Version mit ihrem Dokument
+      description: |
+        Eine veröffentlichte Version mit ihrem Dokument. Versionen sind unveränderlich: Es gibt keine Route, die eine ändert oder löscht (der API-Rolle der Datenbank ist `UPDATE` entzogen). `nr` ist eine ganze Zahl ab 1.
+
+        Statuscodes: 200, 400 (ungültige Nummer), 403, 404 (Seite oder Version unbekannt).
+      tags:
+        - Redaktion
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+        - $ref: "#/components/parameters/RedaktionSeiteId"
+        - $ref: "#/components/parameters/RedaktionVersionNr"
+      responses:
+        "200":
+          description: Die Version.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/RedaktionVersion"
+                  - type: object
+                    required:
+                      - dokument
+                    properties:
+                      dokument:
+                        type: object
+                        description: "Das Dokument der Version (`{ v: 1, titel, bausteine }`)."
+        "400":
+          $ref: "#/components/responses/UngueltigeEingabe400"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "404":
+          $ref: "#/components/responses/NichtGefunden404"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+  /api/v1/redaktion/seiten/{id}/versionen/{nr}/zurueckholen:
+    post:
+      operationId: holeRedaktionVersionZurueck
+      summary: Frühere Version in den Entwurf zurückholen
+      description: |
+        Kopiert das Dokument der Version in den Entwurf und zählt den Zähler weiter (ein Editor mit altem Stand bekommt beim Speichern 409). Der bisherige Entwurf wird überschrieben. Die veröffentlichte Seite und alle Versionen bleiben unverändert; veröffentlicht wird erst mit `veroeffentlichen`, dann als neue Version. Kein Ereignis an die Auslieferung, weil sich die öffentliche Seite nicht ändert. Audit-Log: `seite_zurueckgeholt` mit der Nummer.
+
+        Statuscodes: 200 bei Erfolg, mit dem neuen Zähler. 400, 403, 404.
+      tags:
+        - Redaktion
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+        - $ref: "#/components/parameters/RedaktionSeiteId"
+        - $ref: "#/components/parameters/RedaktionVersionNr"
+      responses:
+        "200":
+          description: Zurückgeholt.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RedaktionZaehler"
+        "400":
+          $ref: "#/components/responses/UngueltigeEingabe400"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "404":
+          $ref: "#/components/responses/NichtGefunden404"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+  /api/v1/lager:
+    get:
+      operationId: listeLager
+      summary: Meine Lager
+      description: |
+        Liefert die Lager der eigenen Abteilung, in denen die Person Mitglied ist, mit ihrer Rolle (neueste zuerst). Die Abteilungsleitung (Admin) sieht jedes Lager der Abteilung und hat darin die Rolle `lagerleitung`. Lager anderer Abteilungen und Lager ohne Mitgliedschaft erscheinen nie.
+
+        Die Rolle liest der Server bei jeder Anfrage aus der Datenbank (nie aus Sitzung oder Token): Ein Rollenwechsel oder Entfernen gilt ab der nächsten Anfrage.
+
+        Statuscodes: 200 bei Erfolg. 401 ohne Anmeldung.
+      tags:
+        - Lager
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+      responses:
+        "200":
+          description: Die Lager der Person.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LagerListe"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+  /api/v1/lager/{id}:
+    get:
+      operationId: holeLager
+      summary: Ein Lager
+      description: |
+        Liefert das Lager mit der eigenen Rolle und dem Schreibschutz. Reihenfolge der Prüfungen für jede Lager-Route: Pfad (400), Lager in der eigenen Abteilung (404), Mitgliedschaft (404; die Abteilungsleitung gilt als Lagerleitung), Recht der Route (403), Schreibschutz (409 `LAGER_GESCHLOSSEN`). Ein abgeschlossenes oder archiviertes Lager lässt nur lesende Anfragen zu.
+
+        Statuscodes: 200 bei Erfolg. 400 bei ungültiger ID. 401 ohne Anmeldung. 404, wenn das Lager unbekannt ist, zu einer anderen Abteilung gehört oder die Person kein Mitglied ist.
+      tags:
+        - Lager
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+        - name: id
+          in: path
+          required: true
+          description: ID des Lagers (UUID).
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Das Lager.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LagerDetail"
+        "400":
+          $ref: "#/components/responses/UngueltigeEingabe400"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "404":
+          $ref: "#/components/responses/NichtGefunden404"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+  /api/v1/admin/lager:
+    get:
+      operationId: listeAdminLager
+      summary: Lager der Abteilung
+      description: |
+        Nur Admins (Abteilungsleitung). Liefert alle Lager der eigenen Abteilung, neueste zuerst.
+
+        Statuscodes: 200 bei Erfolg. 403 für Nicht-Admins (und für Admins ohne zweiten Faktor, Code `ZWEITER_FAKTOR_FEHLT`).
+      tags:
+        - Verwaltung
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+      responses:
+        "200":
+          description: Die Lager der Abteilung.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - lager
+                properties:
+                  lager:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Lager"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+    post:
+      operationId: legeAdminLagerAn
+      summary: Lager anlegen
+      description: |
+        Nur Admins. Legt ein Lager in der eigenen Abteilung an, immer im Status `entwurf`. Mitglieder setzt `PUT /api/v1/admin/lager/{id}/mitglieder/{personId}`. `bis` liegt nicht vor `von`, `vorbereitungAb` nicht nach `von`. Das Logo ist ein Bild aus den Medien der eigenen Abteilung. Das Anlegen steht im Audit-Log (`lager_angelegt`, ohne Inhalte).
+
+        Statuscodes: 201 bei Erfolg. 400 bei ungültiger Eingabe (unbekannte Felder, Datum, Zeitraum, Farbe, unbekanntes Logo). 403 für Nicht-Admins.
+      tags:
+        - Verwaltung
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminLagerAnlegen"
+      responses:
+        "201":
+          description: Lager angelegt.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminAngelegt"
+        "400":
+          $ref: "#/components/responses/UngueltigeEingabe400"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+  /api/v1/admin/lager/{id}:
+    get:
+      operationId: holeAdminLager
+      summary: Lager mit Stammdaten
+      description: |
+        Nur Admins, nur Lager der eigenen Abteilung. Reihenfolge der Prüfungen: Pfad (400), Lager in der eigenen Abteilung (404), Admin-Recht (403).
+
+        Statuscodes: 200 bei Erfolg. 400 bei ungültiger ID. 403 für Nicht-Admins. 404, wenn das Lager unbekannt ist oder zu einer anderen Abteilung gehört.
+      tags:
+        - Verwaltung
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+        - name: id
+          in: path
+          required: true
+          description: ID des Lagers (UUID).
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Das Lager.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Lager"
+        "400":
+          $ref: "#/components/responses/UngueltigeEingabe400"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "404":
+          $ref: "#/components/responses/NichtGefunden404"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+    patch:
+      operationId: aendereAdminLager
+      summary: Lager ändern, Status setzen
+      description: |
+        Nur Admins. Ändert Stammdaten und Status. Ohne Schlüssel bleibt der Wert, `null` leert ein optionales Feld. Ein abgeschlossenes oder archiviertes Lager ist schreibgeschützt: Stammdaten lassen sich dann nicht ändern (409 `LAGER_GESCHLOSSEN`), der Status schon (so öffnet die Abteilungsleitung ein Lager wieder). Ein Lager wird nur `aktiv`, wenn es mindestens eine Lagerleitung hat (409 `LAGERLEITUNG_FEHLT`). Audit-Log: `lager_geaendert` (nur die Namen der Felder) und `lager_status` (alter und neuer Status).
+
+        Statuscodes: 204 bei Erfolg. 400 bei ungültiger Eingabe (auch ein Zeitraum, der nach dem Zusammenführen nicht stimmt). 403 für Nicht-Admins. 404, wenn das Lager unbekannt ist oder zu einer anderen Abteilung gehört. 409 bei `LAGER_GESCHLOSSEN` und `LAGERLEITUNG_FEHLT`.
+      tags:
+        - Verwaltung
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+        - name: id
+          in: path
+          required: true
+          description: ID des Lagers (UUID).
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminLagerAendern"
+      responses:
+        "204":
+          description: Lager geändert.
+        "400":
+          $ref: "#/components/responses/UngueltigeEingabe400"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "404":
+          $ref: "#/components/responses/NichtGefunden404"
+        "409":
+          $ref: "#/components/responses/LagerKonflikt409"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+  /api/v1/admin/lager/{id}/mitglieder:
+    get:
+      operationId: listeAdminLagerMitglieder
+      summary: Mitglieder eines Lagers
+      description: |
+        Nur Admins, nur Lager der eigenen Abteilung. Liefert die Mitglieder mit Name, Cevi-Name und Rolle, nach Name sortiert. Nie Zugangsdaten.
+
+        Statuscodes: 200 bei Erfolg. 400 bei ungültiger ID. 403 für Nicht-Admins. 404, wenn das Lager unbekannt ist oder zu einer anderen Abteilung gehört.
+      tags:
+        - Verwaltung
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+        - name: id
+          in: path
+          required: true
+          description: ID des Lagers (UUID).
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Die Mitglieder.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - mitglieder
+                properties:
+                  mitglieder:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/AdminLagerMitglied"
+        "400":
+          $ref: "#/components/responses/UngueltigeEingabe400"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "404":
+          $ref: "#/components/responses/NichtGefunden404"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+  /api/v1/admin/lager/{id}/mitglieder/{personId}:
+    put:
+      operationId: setzeAdminLagerMitglied
+      summary: Mitglied setzen oder Rolle ändern
+      description: |
+        Nur Admins. Macht ein aktives Konto der Abteilung zum Mitglied oder ändert die Rolle (`lagerleitung`, `leitung`, `team`, `lesen`); ohne Konto gibt es kein Mitglied. Ein unbekanntes, deaktiviertes oder fremdes Konto ist 404. Die Änderung gilt ab der nächsten Anfrage der Person. Ein aktives Lager behält mindestens eine Lagerleitung (409 `LAGERLEITUNG_FEHLT`); in einem abgeschlossenen oder archivierten Lager gibt es keine Änderung (409 `LAGER_GESCHLOSSEN`). Audit-Log: `mitglied_gesetzt` (Person, neue und alte Rolle).
+
+        Statuscodes: 204 bei Erfolg. 400 bei ungültiger Eingabe. 403 für Nicht-Admins. 404, wenn Lager oder Person unbekannt sind. 409 bei `LAGER_GESCHLOSSEN` und `LAGERLEITUNG_FEHLT`.
+      tags:
+        - Verwaltung
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+        - name: id
+          in: path
+          required: true
+          description: ID des Lagers (UUID).
+          schema:
+            type: string
+            format: uuid
+        - name: personId
+          in: path
+          required: true
+          description: ID der Person (UUID).
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required:
+                - rolle
+              properties:
+                rolle:
+                  $ref: "#/components/schemas/LagerRolle"
+      responses:
+        "204":
+          description: Mitglied gesetzt.
+        "400":
+          $ref: "#/components/responses/UngueltigeEingabe400"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "404":
+          $ref: "#/components/responses/NichtGefunden404"
+        "409":
+          $ref: "#/components/responses/LagerKonflikt409"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+    delete:
+      operationId: entferneAdminLagerMitglied
+      summary: Mitglied entfernen
+      description: |
+        Nur Admins. Entfernt die Person aus dem Lager; sie verliert den Zugriff bei der nächsten Anfrage. Ein aktives Lager behält mindestens eine Lagerleitung (409 `LAGERLEITUNG_FEHLT`); in einem abgeschlossenen oder archivierten Lager gibt es keine Änderung (409 `LAGER_GESCHLOSSEN`). Audit-Log: `mitglied_entfernt`.
+
+        Statuscodes: 204 bei Erfolg. 400 bei ungültiger ID. 403 für Nicht-Admins. 404, wenn das Lager unbekannt ist oder die Person kein Mitglied ist. 409 bei `LAGER_GESCHLOSSEN` und `LAGERLEITUNG_FEHLT`.
+      tags:
+        - Verwaltung
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+        - name: id
+          in: path
+          required: true
+          description: ID des Lagers (UUID).
+          schema:
+            type: string
+            format: uuid
+        - name: personId
+          in: path
+          required: true
+          description: ID der Person (UUID).
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: Mitglied entfernt.
+        "400":
+          $ref: "#/components/responses/UngueltigeEingabe400"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "404":
+          $ref: "#/components/responses/NichtGefunden404"
+        "409":
+          $ref: "#/components/responses/LagerKonflikt409"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+  /api/v1/lager/{id}/rechte:
+    get:
+      operationId: holeLagerRechte
+      summary: Rechte der Rollen lesen
+      description: |
+        Nur die Lagerleitung und die Abteilungsleitung (gilt als Lagerleitung). Liefert alle Rechte des Katalogs (49) mit Bedeutung, dem Standard und dem aktuellen Wert je Rolle (`leitung`, `team`, `lesen`). Die Lagerleitung steht nicht in der Liste: Sie hat immer alles und lässt sich nicht einstellen. Reihenfolge der Prüfungen: Pfad (400), Lager in der eigenen Abteilung (404), Mitgliedschaft (404), Lagerleitung (403 für Leitung, Team und Lesen).
+
+        Statuscodes: 200 bei Erfolg. 400 bei ungültiger ID. 401 ohne Anmeldung. 403 für Leitung, Team und Lesen. 404, wenn das Lager unbekannt ist, zu einer anderen Abteilung gehört oder (Lager-Route) die Person kein Mitglied ist.
+      tags:
+        - Lager
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+        - name: id
+          in: path
+          required: true
+          description: ID des Lagers (UUID).
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Der Rechtekatalog mit Standard und aktuellem Wert.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LagerRechteListe"
+        "400":
+          $ref: "#/components/responses/UngueltigeEingabe400"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "404":
+          $ref: "#/components/responses/NichtGefunden404"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+    put:
+      operationId: setzeLagerRechte
+      summary: Rechte der Rollen ändern
+      description: |
+        Nur die Lagerleitung und die Abteilungsleitung (gilt als Lagerleitung). Setzt einzelne Rechte von Leitung, Team und Lesen. Nur Rechte des Katalogs und nur diese drei Rollen sind zulässig (400 sonst, auch für `lagerleitung`); jedes Paar aus Rolle und Recht höchstens einmal; nicht genannte Rechte bleiben. Die Änderung gilt ab der nächsten Anfrage, nur in diesem Lager. Jeder Wert, der sich ändert, steht im Audit-Log (`lager_recht_geaendert`: Rolle, Recht, Wert, nie Inhalte). Reihenfolge der Prüfungen: Pfad (400), Lager in der eigenen Abteilung (404), Mitgliedschaft (404), Lagerleitung (403 für Leitung, Team und Lesen), Schreibschutz (409 `LAGER_GESCHLOSSEN`).
+
+        Statuscodes: 204 bei Erfolg. 400 bei ungültiger Eingabe. 401 ohne Anmeldung. 403 für Leitung, Team und Lesen. 404, wenn das Lager unbekannt ist, zu einer anderen Abteilung gehört oder (Lager-Route) die Person kein Mitglied ist. 409 bei `LAGER_GESCHLOSSEN`.
+      tags:
+        - Lager
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+        - name: id
+          in: path
+          required: true
+          description: ID des Lagers (UUID).
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LagerRechteAenderung"
+      responses:
+        "204":
+          description: Rechte gespeichert.
+        "400":
+          $ref: "#/components/responses/UngueltigeEingabe400"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "404":
+          $ref: "#/components/responses/NichtGefunden404"
+        "409":
+          $ref: "#/components/responses/LagerKonflikt409"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+  /api/v1/lager/{id}/rechte/zuruecksetzen:
+    post:
+      operationId: setzeZurueckLagerRechte
+      summary: Rechte auf den Standard zurücksetzen
+      description: |
+        Nur die Lagerleitung und die Abteilungsleitung (gilt als Lagerleitung). Setzt die Rechte von Leitung, Team und Lesen auf die Standardwerte des Katalogs zurück. Die Lagerleitung hat nie Einstellungen. Jeder Wert, der sich dadurch ändert, steht im Audit-Log (`lager_recht_geaendert`: Rolle, Recht, Wert, nie Inhalte). Die Änderung gilt ab der nächsten Anfrage. Reihenfolge der Prüfungen: Pfad (400), Lager in der eigenen Abteilung (404), Mitgliedschaft (404), Lagerleitung (403 für Leitung, Team und Lesen), Schreibschutz (409 `LAGER_GESCHLOSSEN`).
+
+        Statuscodes: 204 bei Erfolg. 400 bei ungültiger ID. 401 ohne Anmeldung. 403 für Leitung, Team und Lesen. 404, wenn das Lager unbekannt ist, zu einer anderen Abteilung gehört oder (Lager-Route) die Person kein Mitglied ist. 409 bei `LAGER_GESCHLOSSEN`.
+      tags:
+        - Lager
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+        - name: id
+          in: path
+          required: true
+          description: ID des Lagers (UUID).
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: Rechte zurückgesetzt.
+        "400":
+          $ref: "#/components/responses/UngueltigeEingabe400"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "404":
+          $ref: "#/components/responses/NichtGefunden404"
+        "409":
+          $ref: "#/components/responses/LagerKonflikt409"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+  /api/v1/admin/lager/{id}/rechte:
+    get:
+      operationId: holeAdminLagerRechte
+      summary: Rechte der Rollen lesen
+      description: |
+        Nur Admins. Liefert alle Rechte des Katalogs (49) mit Bedeutung, dem Standard und dem aktuellen Wert je Rolle (`leitung`, `team`, `lesen`). Die Lagerleitung steht nicht in der Liste: Sie hat immer alles und lässt sich nicht einstellen. Reihenfolge der Prüfungen: Pfad (400), Lager in der eigenen Abteilung (404), Admin-Recht (403).
+
+        Statuscodes: 200 bei Erfolg. 400 bei ungültiger ID. 401 ohne Anmeldung. 403 für Nicht-Admins. 404, wenn das Lager unbekannt ist, zu einer anderen Abteilung gehört oder (Lager-Route) die Person kein Mitglied ist.
+      tags:
+        - Verwaltung
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+        - name: id
+          in: path
+          required: true
+          description: ID des Lagers (UUID).
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Der Rechtekatalog mit Standard und aktuellem Wert.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LagerRechteListe"
+        "400":
+          $ref: "#/components/responses/UngueltigeEingabe400"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "404":
+          $ref: "#/components/responses/NichtGefunden404"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+    put:
+      operationId: setzeAdminLagerRechte
+      summary: Rechte der Rollen ändern
+      description: |
+        Nur Admins. Setzt einzelne Rechte von Leitung, Team und Lesen. Nur Rechte des Katalogs und nur diese drei Rollen sind zulässig (400 sonst, auch für `lagerleitung`); jedes Paar aus Rolle und Recht höchstens einmal; nicht genannte Rechte bleiben. Die Änderung gilt ab der nächsten Anfrage, nur in diesem Lager. Jeder Wert, der sich ändert, steht im Audit-Log (`lager_recht_geaendert`: Rolle, Recht, Wert, nie Inhalte). Reihenfolge der Prüfungen: Pfad (400), Lager in der eigenen Abteilung (404), Admin-Recht (403), Schreibschutz (409 `LAGER_GESCHLOSSEN`).
+
+        Statuscodes: 204 bei Erfolg. 400 bei ungültiger Eingabe. 401 ohne Anmeldung. 403 für Nicht-Admins. 404, wenn das Lager unbekannt ist, zu einer anderen Abteilung gehört oder (Lager-Route) die Person kein Mitglied ist. 409 bei `LAGER_GESCHLOSSEN`.
+      tags:
+        - Verwaltung
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+        - name: id
+          in: path
+          required: true
+          description: ID des Lagers (UUID).
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LagerRechteAenderung"
+      responses:
+        "204":
+          description: Rechte gespeichert.
+        "400":
+          $ref: "#/components/responses/UngueltigeEingabe400"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "404":
+          $ref: "#/components/responses/NichtGefunden404"
+        "409":
+          $ref: "#/components/responses/LagerKonflikt409"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+  /api/v1/admin/lager/{id}/rechte/zuruecksetzen:
+    post:
+      operationId: setzeZurueckAdminLagerRechte
+      summary: Rechte auf den Standard zurücksetzen
+      description: |
+        Nur Admins. Setzt die Rechte von Leitung, Team und Lesen auf die Standardwerte des Katalogs zurück. Die Lagerleitung hat nie Einstellungen. Jeder Wert, der sich dadurch ändert, steht im Audit-Log (`lager_recht_geaendert`: Rolle, Recht, Wert, nie Inhalte). Die Änderung gilt ab der nächsten Anfrage. Reihenfolge der Prüfungen: Pfad (400), Lager in der eigenen Abteilung (404), Admin-Recht (403), Schreibschutz (409 `LAGER_GESCHLOSSEN`).
+
+        Statuscodes: 204 bei Erfolg. 400 bei ungültiger ID. 401 ohne Anmeldung. 403 für Nicht-Admins. 404, wenn das Lager unbekannt ist, zu einer anderen Abteilung gehört oder (Lager-Route) die Person kein Mitglied ist. 409 bei `LAGER_GESCHLOSSEN`.
+      tags:
+        - Verwaltung
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+        - name: id
+          in: path
+          required: true
+          description: ID des Lagers (UUID).
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: Rechte zurückgesetzt.
+        "400":
+          $ref: "#/components/responses/UngueltigeEingabe400"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "404":
+          $ref: "#/components/responses/NichtGefunden404"
+        "409":
+          $ref: "#/components/responses/LagerKonflikt409"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+  /api/v1/lager/{id}/benachrichtigungen:
+    get:
+      operationId: listeLagerBenachrichtigungen
+      summary: Meine Benachrichtigungen in einem Lager
+      description: |
+        Liefert die eigenen Benachrichtigungen der Person in diesem Lager, neueste zuerst (die Glocke). Andere Personen sehen nie fremde Einträge. Jede Rolle liest ihre eigenen; ein eigenes Recht gibt es nicht. Die Zeile trägt Art, Ziel (`objektTyp`, `objektId`) und den Lesestatus, keinen Text: Das Ziel liest die App über die Route des Moduls, die ihre Rechte prüft.
+
+        Seiten: `limit` (1 bis 100, Standard 50) und `nach` (die `naechster`-ID der vorigen Seite). Wer die Art abgeschaltet hat (`PUT /api/v1/ich/lager-benachrichtigungen`), bekommt weder Eintrag noch Push; gelesene Einträge löscht der Server nach 90 Tagen.
+
+        Statuscodes: 200 bei Erfolg. 400 bei ungültiger ID, ungültigem `nach` oder `limit`. 401 ohne Anmeldung. 404, wenn das Lager unbekannt ist, zu einer anderen Abteilung gehört oder die Person kein Mitglied ist.
+      tags:
+        - Lager
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+        - name: id
+          in: path
+          required: true
+          description: ID des Lagers (UUID).
+          schema:
+            type: string
+            format: uuid
+        - name: nach
+          in: query
+          required: false
+          description: Cursor, die `naechster`-ID der vorigen Seite.
+          schema:
+            type: string
+            format: uuid
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 50
+      responses:
+        "200":
+          description: Eine Seite der Benachrichtigungen.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LagerBenachrichtigungenSeite"
+        "400":
+          $ref: "#/components/responses/UngueltigeEingabe400"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "404":
+          $ref: "#/components/responses/NichtGefunden404"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+  /api/v1/lager/{id}/benachrichtigungen/ungelesen:
+    get:
+      operationId: zaehleLagerBenachrichtigungenUngelesen
+      summary: Ungelesene Benachrichtigungen zählen
+      description: |
+        Zählt die ungelesenen eigenen Benachrichtigungen der Person in diesem Lager (für das Zeichen an der Glocke).
+
+        Statuscodes: 200 bei Erfolg. 400 bei ungültiger ID. 401 ohne Anmeldung. 404, wenn das Lager unbekannt ist, zu einer anderen Abteilung gehört oder die Person kein Mitglied ist.
+      tags:
+        - Lager
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+        - name: id
+          in: path
+          required: true
+          description: ID des Lagers (UUID).
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Die Anzahl.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LagerBenachrichtigungenUngelesen"
+        "400":
+          $ref: "#/components/responses/UngueltigeEingabe400"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "404":
+          $ref: "#/components/responses/NichtGefunden404"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+  /api/v1/lager/{id}/benachrichtigungen/gelesen:
+    post:
+      operationId: markiereLagerBenachrichtigungenGelesen
+      summary: Benachrichtigungen als gelesen markieren
+      description: |
+        Markiert eigene ungelesene Benachrichtigungen dieses Lagers als gelesen: die genannten `ids`, ohne `ids` alle. Fremde und unbekannte IDs ändern nichts (kein Fehler). Die Route gilt auch in einem abgeschlossenen Lager, weil sie keine Lagerdaten ändert. Der Body ist strikt: `{}` oder `{ "ids": [...] }` mit höchstens 100 IDs.
+
+        Statuscodes: 204 bei Erfolg, ohne Body. 400 bei ungültiger ID oder ungültigem Body. 401 ohne Anmeldung. 404, wenn das Lager unbekannt ist, zu einer anderen Abteilung gehört oder die Person kein Mitglied ist.
+      tags:
+        - Lager
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+        - name: id
+          in: path
+          required: true
+          description: ID des Lagers (UUID).
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LagerBenachrichtigungenGelesenAnfrage"
+      responses:
+        "204":
+          description: Markiert; kein Body.
+        "400":
+          $ref: "#/components/responses/UngueltigeEingabe400"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "404":
+          $ref: "#/components/responses/NichtGefunden404"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+  /api/v1/lager/aufloesen/{typ}/{id}:
+    get:
+      operationId: loeseLagerPushZielAuf
+      summary: Ziel eines Lager-Pushes auflösen
+      description: |
+        Löst den Deep Link eines Lager-Pushes auf. Der Push trägt als Daten nur `typ` (ein Wert von `LagerPushTyp`) und `id` (die ID des Objekts, etwa einer Aufgabe), nie eine Lager-ID. Die App fragt hier, in welchem Lager das Objekt liegt, und öffnet es dann über die Route des Moduls (die ihre Rechte selbst prüft).
+
+        Die Antwort gibt es nur, wenn die Person für dieses Objekt benachrichtigt wurde und noch Mitglied des Lagers ist. In jedem anderen Fall, auch bei unbekannter ID, fremdem Lager, fremder Abteilung oder entferntem Mitglied, antwortet der Server gleich mit 404 und verrät weder das Objekt noch das Lager.
+
+        Statuscodes: 200 bei Erfolg. 400 bei ungültigem `typ` oder ungültiger ID. 401 ohne Anmeldung. 404 wie beschrieben.
+      tags:
+        - Lager
+        - Push
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+        - name: typ
+          in: path
+          required: true
+          description: Der `typ` aus den Daten des Pushes.
+          schema:
+            $ref: "#/components/schemas/LagerPushTyp"
+        - name: id
+          in: path
+          required: true
+          description: Die `id` aus den Daten des Pushes (ID des Objekts, UUID).
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Lager und Ziel.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LagerAufloesung"
+        "400":
+          $ref: "#/components/responses/UngueltigeEingabe400"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "404":
+          $ref: "#/components/responses/NichtGefunden404"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+  /api/v1/ich/lager-benachrichtigungen:
+    get:
+      operationId: holeLagerBenachrichtigungEinstellungen
+      summary: Meine Schalter für Lager-Benachrichtigungen
+      description: |
+        Liefert je Art, ob die Person sie bekommt. Standard ist an; die Liste nennt immer alle Arten. Die Schalter gelten für alle Lager der Person und für Liste und Push zugleich. Eine abgeschaltete Art erzeugt weder Eintrag noch Push. Die Person ändert nur ihre eigenen Schalter.
+
+        Statuscodes: 200 bei Erfolg. 401 ohne Anmeldung.
+      tags:
+        - Lager
+        - Push
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+      responses:
+        "200":
+          description: Die Schalter aller Arten.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LagerBenachrichtigungEinstellungen"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+    put:
+      operationId: setzeLagerBenachrichtigungEinstellungen
+      summary: Schalter für Lager-Benachrichtigungen setzen
+      description: |
+        Setzt die genannten Arten; die übrigen bleiben unverändert. Der Body ist strikt: Jede Art höchstens einmal, nur bekannte Arten, nur `art` und `aktiv`.
+
+        Statuscodes: 204 bei Erfolg, ohne Body. 400 bei ungültigem Body. 401 ohne Anmeldung.
+      tags:
+        - Lager
+        - Push
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LagerBenachrichtigungEinstellungenAnfrage"
+      responses:
+        "204":
+          description: Gesetzt; kein Body.
+        "400":
+          $ref: "#/components/responses/UngueltigeEingabe400"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+  /api/v1/redaktion/ich:
+    get:
+      operationId: leseRedaktionIch
+      summary: Zugang zur Redaktion und sichtbare Bereiche
+      description: |
+        Nur lesen, nie eine Rechteausweitung: Das Panel fragt, welche Bereiche es der Person zeigt. Antwortet jeder Person mit Sitzung, auch ohne Zugang (`redigieren: false`, keine Bereiche). Die Routen selbst prüfen jedes Recht neu.
+
+        Statuscodes: 200. 403 für Admins ohne zweiten Faktor (`ZWEITER_FAKTOR_FEHLT`) und bei offenem Pflichtwechsel des Passworts.
+      tags:
+        - Redaktion
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+      responses:
+        "200":
+          description: Zugang und Bereiche.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RedaktionIch"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+  /api/v1/redaktion/medien:
+    get:
+      operationId: listeRedaktionMedien
+      summary: Medien der Abteilung auflisten
+      description: |
+        Für Abteilungsleitung, Stufenleitung und Personen mit einem Recht auf Seiten (dasselbe wie `/api/v1/redaktion/seiten`). Die Medien einer Abteilung sind eine gemeinsame Bibliothek: Die jüngsten 200 Medien der eigenen Abteilung, neueste zuerst; ohne Seitenwechsel. Gleiche Antwort wie `/api/v1/admin/medien`.
+
+        Statuscodes: 200, 401, 403, 426.
+      tags:
+        - Redaktion
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+      responses:
+        "200":
+          description: Die Medien.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MedienListe"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+    post:
+      operationId: legeRedaktionMediumAn
+      summary: Bild oder PDF hochladen
+      description: |
+        Für Abteilungsleitung, Stufenleitung und Personen mit einem Recht auf Seiten. Derselbe Handler wie `POST /api/v1/admin/medien` (gleiche Regeln für Typ, Grösse, Alt-Text, Verarbeitung und Begrenzung: 10 Uploads in 10 Minuten je Person, gezählt über beide Routen); nur der Zugang ist ein anderer. Die Prüfung des Zugangs kommt vor der Prüfung der Eingabe.
+
+        Statuscodes: 201, 400 (code `ALT_TEXT` bei fehlendem Alt-Text), 401, 403, 413, 415 (code `MEDIEN_FORMAT`), 426, 429, 500, 501 (ohne eingerichteten Medienspeicher).
+      tags:
+        - Redaktion
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+        - name: sichtbarkeit
+          in: query
+          required: true
+          description: Wer das Medium sehen darf, `oeffentlich` (jeder, ohne Anmeldung) oder `angemeldet` (die Abteilung).
+          schema:
+            type: string
+            enum:
+              - oeffentlich
+              - angemeldet
+        - name: altText
+          in: query
+          required: false
+          description: Alternativtext, 1 bis 500 Zeichen nach dem Entfernen von Leerraum am Rand. Bei Bildern Pflicht, ausser bei `dekorativ=true`.
+          schema:
+            type: string
+            minLength: 1
+            maxLength: 500
+        - name: dekorativ
+          in: query
+          required: false
+          description: Nur bei Bildern, ausdrückliche Markierung «dekorativ»; dann ohne `altText`.
+          schema:
+            type: string
+            enum:
+              - "true"
+      requestBody:
+        required: true
+        content:
+          image/jpeg:
+            schema:
+              type: string
+              format: binary
+          image/png:
+            schema:
+              type: string
+              format: binary
+          image/webp:
+            schema:
+              type: string
+              format: binary
+          application/pdf:
+            schema:
+              type: string
+              format: binary
+      responses:
+        "201":
+          description: Gespeichert.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Medium"
+        "400":
+          $ref: "#/components/responses/UngueltigeEingabe400"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "413":
+          description: Ein Bild ist grösser als 10 MiB oder ein PDF grösser als 20 MiB.
+        "415":
+          description: Kein JPEG, PNG, WebP oder PDF, kein lesbares Bild oder zu viele Pixel (code `MEDIEN_FORMAT`).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Fehler"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+        "500":
+          description: Der Medienspeicher oder die Datenbank hat versagt; ohne Details (code `INTERNER_FEHLER`).
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Fehler"
+        "501":
+          description: Der Server hat keinen Medienspeicher eingerichtet.
+  /api/v1/redaktion/medien/{id}:
+    patch:
+      operationId: aendereRedaktionMedium
+      summary: Alt-Text nachtragen oder ändern
+      description: |
+        Setzt einen Alt-Text (`altText`) oder markiert ein Bild als dekorativ (`dekorativ: true`), genau eines von beiden; so lässt sich eine fehlende Beschreibung nachtragen. Die Sichtbarkeit und die Datei ändern sich nie. Ein PDF kann nicht dekorativ sein (400, code `ALT_TEXT`).
+
+        Wer darf: die Person, die das Medium hochgeladen hat, sowie die Abteilungsleitung und die Redaktion (Recht auf alle Seiten). Eine Stufenleitung beschreibt also nur ihre eigenen Uploads.
+
+        Reihenfolge der Prüfungen: Pfad und Body (400), Medium in der eigenen Abteilung (404, auch für Medien anderer Abteilungen), Zugang und Recht am Medium (403), PDF nicht dekorativ (400). Das Audit-Log hält `medium_beschrieben` fest, ohne den Text.
+
+        Statuscodes: 200, 400, 401, 403, 404, 426.
+      tags:
+        - Redaktion
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+        - $ref: "#/components/parameters/MediumId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MediumAendern"
+      responses:
+        "200":
+          description: Das Medium mit dem neuen Alt-Text.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Medium"
+        "400":
+          $ref: "#/components/responses/UngueltigeEingabe400"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "404":
+          $ref: "#/components/responses/NichtGefunden404"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+    delete:
+      operationId: loescheRedaktionMedium
+      summary: Medium löschen
+      description: |
+        Nur Abteilungsleitung und Redaktion (Recht auf alle Seiten); eine Stufenleitung hat Zugang, darf aber nicht löschen (403). Derselbe Handler wie `DELETE /api/v1/admin/medien/{id}`: erst die Zeile, dann die Datei im Medienspeicher.
+
+        Reihenfolge der Prüfungen: Pfad (400), Medium in der eigenen Abteilung (404), Recht (403).
+
+        Steht das Medium noch im Entwurf oder in einer Version einer Seite der Abteilung (auch einer zurückgezogenen), antwortet die Route mit 409 `MEDIUM_VERWENDET` und der Zahl der Seiten in `seiten`; nichts wird gelöscht (wie beim Admin-Weg).
+
+        Statuscodes: 204, 400, 401, 403, 404, 409, 426, 501.
+      tags:
+        - Redaktion
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+        - $ref: "#/components/parameters/MediumId"
+      responses:
+        "204":
+          description: Gelöscht; kein Body.
+        "400":
+          $ref: "#/components/responses/UngueltigeEingabe400"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "404":
+          $ref: "#/components/responses/NichtGefunden404"
+        "409":
+          description: Das Medium steht noch in Seiten (code `MEDIUM_VERWENDET`, `seiten` zählt sie).
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - code
+                  - message
+                  - seiten
+                properties:
+                  code:
+                    type: string
+                    enum:
+                      - MEDIUM_VERWENDET
+                  message:
+                    type: string
+                  seiten:
+                    type: integer
+                    minimum: 1
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "501":
+          description: Der Server hat keinen Medienspeicher eingerichtet.
+  /api/v1/redaktion/tags:
+    get:
+      operationId: listeRedaktionTags
+      summary: Tags der Abteilung für die Auswahl im Editor
+      description: |
+        Auswahlliste für Abteilungsleitung, Stufenleitung und Personen mit einem Recht auf Seiten: alle Tags der eigenen Abteilung mit Id, Name und Typ, sortiert nach Typ und Name. Ohne Kürzel, ohne Zahl der Personen und ohne Personen.
+
+        Statuscodes: 200, 401, 403, 426.
+      tags:
+        - Redaktion
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+      responses:
+        "200":
+          description: Die Tags.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RedaktionTagListe"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+  /api/v1/redaktion/personen:
+    get:
+      operationId: listeRedaktionPersonen
+      summary: Personen mit einem Tag für die Auswahl im Editor
+      description: |
+        Auswahlliste für Abteilungsleitung, Stufenleitung und Personen mit einem Recht auf Seiten: die aktiven Konten, die den Tag tragen. Nur Id, Anzeigename (Cevi-Name, sonst der Name des Kontos) und Funktion (die Rolle am Tag). Nie Telefon, E-Mail, Benutzername oder die Rollen des Kontos. Sortiert nach der Reihenfolge im Tag, dann nach Name.
+
+        Reihenfolge der Prüfungen: Zugang (403), Query (400), Tag in der eigenen Abteilung (404, auch für Tags anderer Abteilungen).
+
+        Statuscodes: 200, 400, 401, 403, 404, 426.
+      tags:
+        - Redaktion
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+        - name: tag
+          in: query
+          required: true
+          description: Der Tag, dessen Personen gesucht sind (UUID).
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Die Personen.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RedaktionPersonenListe"
+        "400":
+          $ref: "#/components/responses/UngueltigeEingabe400"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "404":
+          $ref: "#/components/responses/NichtGefunden404"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+  /api/v1/redaktion/vorlagen:
+    get:
+      operationId: listeRedaktionVorlagen
+      summary: Vorlagen für neue Seiten
+      description: |
+        Die Startvorlagen, aus denen eine neue Seite entsteht: `stufenseite`, `anlass`, `textseite` und `leer`. Die Vorlagen stehen im Code, nicht in der Datenbank. Die Liste nennt nur Schlüssel, Name, Beschreibung und ob die Vorlage eine Gruppe (`tagId`) braucht, nie den Inhalt der Dokumente. Zugang wie bei `GET /api/v1/redaktion/seiten`.
+
+        Statuscodes: 200 bei Erfolg. 403 ohne Zugang.
+      tags:
+        - Redaktion
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+      responses:
+        "200":
+          description: Vorlagen in fester Reihenfolge.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RedaktionVorlagenListe"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+  /api/v1/redaktion/seiten/aus-vorlage:
+    post:
+      operationId: legeRedaktionSeiteAusVorlageAn
+      summary: Seite aus einer Vorlage anlegen
+      description: |
+        Wie `POST /api/v1/redaktion/seiten` (nur Abteilungsleitung und Redaktion), aber der Inhalt ist die Vorlage: ein vorbefüllter, gültiger Entwurf mit Platzhaltertexten. Die Seite ist nie veröffentlicht; die Adresse fehlt im Body und wird aus dem Titel gebildet (Kleinbuchstaben, Umlaute ausgeschrieben); gibt es sie unter der Elternseite schon, hängt die Antwort `-2`, `-3` an. Eine reservierte Adresse auf der obersten Ebene bekommt ebenso einen Zusatz. Ohne `elternId` entsteht die Seite auf der obersten Ebene, ans Ende der Geschwister. `sichtbarkeit` ist Pflicht und gilt erst beim Veröffentlichen.
+
+        Die Vorlage `stufenseite` braucht `tagId` (Leitungsteam und Termine hängen daran). Eine Gruppe hat höchstens eine Seite: Gibt es zu `tagId` schon eine, antwortet die Route mit 409. Die Rechte der Verantwortlichen folgen aus `tagId`: Die Stufenleitung der Stufe und die Verantwortlichen eines Teams (Rolle `verantwortlich` am Tag, Typ `team`) bearbeiten die Seite.
+
+        Reihenfolge der Prüfungen: Zugang (403), Body (400), Recht zum Anlegen (403), Tags der Sichtbarkeit (400), Vorlage braucht Gruppe (400), Gruppe und Elternseite in der eigenen Abteilung (404), Tiefe (400), Gruppe schon vergeben (409). Audit-Log: `seite_angelegt` (Kennungen, Art der Sichtbarkeit und Vorlage, nie der Titel).
+
+        Statuscodes: 201 bei Erfolg, mit `id` und `adresse`. 400 bei ungültiger Eingabe, `TAG_ERFORDERLICH` oder `SEITE_ZU_TIEF`. 403 ohne Recht. 404 für unbekannte Elternseite oder Gruppe. 409 mit `TAG_VERGEBEN`.
+      tags:
+        - Redaktion
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RedaktionSeiteAusVorlage"
+      responses:
+        "201":
+          description: Seite als Entwurf angelegt.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RedaktionSeiteAusVorlageAngelegt"
+        "400":
+          $ref: "#/components/responses/RedaktionSeite400"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "404":
+          $ref: "#/components/responses/NichtGefunden404"
+        "409":
+          $ref: "#/components/responses/RedaktionSeite409"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+  # lager-pfade: lager (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+  /api/v1/lager/{id}/aenderungen:
+    get:
+      operationId: holeLagerAenderungen
+      summary: Änderungsfeed des Lagers
+      description: |
+        Meldet, welche Einträge des Lagers seit einer Folgenummer neu, geändert oder gelöscht sind. Der Feed nennt nur Objekttyp, ID, Art, Version und Zeitpunkt, nie Inhalte; die App holt den Inhalt über die Route des Moduls. So gelten die Rechte der Rolle dort, und der Feed verrät höchstens, dass es einen Eintrag gibt, den die Rolle lesen darf.
+
+        Filter: Es erscheinen nur Objekttypen, deren Leserecht die Rolle hat, und davon nur die Zeilen, die der Zeilenfilter der Rolle zulässt (auch für gelöschte). Eine Seite, deren Einträge alle herausfallen, kommt leer zurück, `bis` rückt trotzdem vor.
+
+        Ablauf der App: Ohne `seit` liefert die Route die aktuelle Folgenummer `seq` und die lesbaren Objekttypen; die App lädt die Listen der Module und fragt dann mit `seit=seq`. Danach fragt sie mit `seit=<bis>` weiter, solange `weitere` wahr ist, und speichert das letzte `bis`. Jeder Schreibvorgang im Lager hat eine eigene Folgenummer; sie steigt ohne Lücke. Es gibt einen Eintrag je Schreibvorgang: Dieselbe Zeile kann mehrfach vorkommen, der letzte Eintrag gilt.
+
+        Einträge entfallen nach 30 Tagen. Ist `seit` älter als der Feed oder grösser als die aktuelle Folgenummer (zum Beispiel nach dem Zurückspielen des Lagers), antwortet die Route mit 410 `FEED_NEU_LADEN`, und die App lädt die Listen neu.
+
+        Statuscodes: 200 bei Erfolg. 400 bei ungültiger ID oder Abfrage (auch bei unbekanntem Parameter). 401 ohne Anmeldung. 404, wenn das Lager unbekannt ist, zu einer anderen Abteilung gehört oder die Person kein Mitglied ist. 410 bei zu altem oder unbekanntem Stand. Die Route ist auch in einem abgeschlossenen Lager lesbar.
+      tags:
+        - Lager
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+        - name: id
+          in: path
+          required: true
+          description: ID des Lagers (UUID).
+          schema:
+            type: string
+            format: uuid
+        - name: seit
+          in: query
+          required: false
+          description: Folgenummer, ab der der Feed liefert (ausschliesslich). Ohne Angabe liefert die Route den Stand.
+          schema:
+            type: integer
+            minimum: 0
+        - name: limit
+          in: query
+          required: false
+          description: Höchstens so viele Einträge je Seite.
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 500
+            default: 100
+      responses:
+        "200":
+          description: Eine Seite des Feeds oder, ohne `seit`, der Stand.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/LagerFeedSeite"
+                  - $ref: "#/components/schemas/LagerFeedStand"
+        "400":
+          $ref: "#/components/responses/UngueltigeEingabe400"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "404":
+          $ref: "#/components/responses/NichtGefunden404"
+        "410":
+          description: Der Stand ist zu alt für den Feed (`FEED_NEU_LADEN`). Die App lädt die Listen neu und fragt mit `seit=seq` weiter.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LagerFeedNeuLaden"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+  # lager-pfade: ereignisse (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+  # lager-pfade: papierkorb (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+  # lager-pfade: benachrichtigungen (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+  # lager-pfade: dateien (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+  # lager-pfade: ressorts (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+  # lager-pfade: aufgaben (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+  # lager-pfade: aufgaben-details (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+  # lager-pfade: zeitplan (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+  # lager-pfade: aufgaben-schnell (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+  # lager-pfade: todos (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+  # lager-pfade: vorlagen (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+  # lager-pfade: check (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+  # lager-pfade: hoecks (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+  # lager-pfade: protokolle (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+  # lager-pfade: erwaehnungen (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+  # lager-pfade: pinnwand (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+  # lager-pfade: umfragen (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+  # lager-pfade: eingang (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+  # lager-pfade: teilnehmer (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+  # lager-pfade: zimmer (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+  # lager-pfade: fahrten (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+  # lager-pfade: gruppen (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+  # lager-pfade: schichtplan (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+  # lager-pfade: diensttausch (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+  # lager-pfade: anwesenheit (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+  # lager-pfade: tagesseiten (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+  # lager-pfade: einkauf (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+  # lager-pfade: lagerinfos (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+  # lager-pfade: wetter (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+  # lager-pfade: aggregate (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+  # lager-pfade: dokumente (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+  # lager-pfade: adressbuch (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+  # lager-pfade: wissen (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+  # lager-pfade: suche (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+  # lager-pfade: verwaltung (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+  # lager-pfade: export (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+  # lager-pfade: wiederherstellen (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+  # lager-pfade: uebung (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+  # lager-pfade: ausdruck (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+  /api/v1/website/inhalt:
+    get:
+      operationId: leseWebsiteInhalt
+      summary: Geschützte Bausteine einer Seite der Website nachladen
+      description: |
+        Für das Skript der öffentlichen Website (#354). Liefert für die Seite `pfad` aus der veröffentlichten Version nur die Bausteine, die die Person laut Sichtbarkeit sehen darf, als Knoten: Elemente `{ tag, attr?, kinder? }` und Texte (Zeichenketten). Der Server liefert für geschützte Inhalte nie HTML; das Skript baut aus den Knoten DOM-Knoten ohne `innerHTML`. Telefon, E-Mail und Foto von Personen kommen nie vor.
+
+        Bei einer öffentlichen Seite kommen nur die Bausteine mit engerer Sichtbarkeit (angemeldet oder Tags), bei einer ganz geschützten Seite alle Bausteine, die die Person sehen darf, dazu der Titel. Ein Baustein ohne Inhalt (zum Beispiel ein fehlendes Medium) fehlt in der Liste.
+
+        `pfad` ist `/` (die Startseite, Adresse `start`) oder `/a/b` mit bis zu fünf Adressstücken aus `a-z`, `0-9` und `-`, ohne Schrägstrich am Ende, Anfrage oder Anker. Die Seite wird nur in der Abteilung der Person gesucht.
+
+        Ohne Sitzung 401 mit dem üblichen neutralen Body. Mit Sitzung antworten eine unbekannte Seite, eine Seite ohne veröffentlichte Version, eine Seite einer anderen Abteilung, eine Seite, die die Person nicht sehen darf, und ein ungültiger `pfad` alle gleich mit 404, ohne Hinweis auf den Inhalt. Die Antwort ist `Cache-Control: private, no-store` und `Vary: Cookie`.
+
+        Statuscodes: 200, 401, 403 (Pflichtwechsel des Passworts offen), 404.
+      tags:
+        - Website
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+        - name: pfad
+          in: query
+          required: true
+          description: Adresse der Seite auf der Website, zum Beispiel `/stufen/woelfe`.
+          schema:
+            type: string
+            maxLength: 400
+            pattern: "^/([a-z0-9-]{1,60}(/[a-z0-9-]{1,60}){0,4})?$"
+      responses:
+        "200":
+          description: Die Bausteine in der Reihenfolge der Seite.
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+                enum:
+                  - private, no-store
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WebsiteInhalt"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "404":
+          $ref: "#/components/responses/NichtGefunden404"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+  /api/v1/redaktion/weiterleitungen:
+    get:
+      operationId: listeRedaktionWeiterleitungen
+      summary: Weiterleitungen alter Adressen
+      description: |
+        Alle Weiterleitungen der Abteilung, nach alter Adresse sortiert (höchstens 1000, darum ohne Seitenwechsel). Nur Abteilungsleitung und Redaktion; eine Stufenleitung hat Zugang zum Namensraum, aber nicht zu dieser Route (403). Admins brauchen den zweiten Faktor.
+
+        Zusätzlich zu diesen Zeilen leitet die Website die alte Adresse `/cevistufe-<name>` der Stufenseiten automatisch auf die Stufenseite, sobald sie besteht; diese Zeilen stehen nicht in der Liste.
+
+        Statuscodes: 200 bei Erfolg. 403 ohne Recht.
+      tags:
+        - Redaktion
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+      responses:
+        "200":
+          description: Weiterleitungen der Abteilung.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RedaktionWeiterleitungenListe"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+    post:
+      operationId: legeRedaktionWeiterleitungAn
+      summary: Weiterleitung anlegen
+      description: |
+        Nur Abteilungsleitung und Redaktion. Eine alte Adresse leitet auf einen internen Pfad der Website. Beide Pfade sind relativ: Stücke aus `a-z`, `0-9` und `-` (dahinter Endungen mit `.`), höchstens 7 Stücke und 200 Zeichen, sie beginnen mit `/`. Ein Host, ein Schema, `//`, `\`, `..`, eine Query oder ein Anker sind 400 (kein offener Redirect). Das Ziel darf `/` sein. Die alte Adresse darf nicht mit einer reservierten obersten Adresse beginnen (siehe Seite anlegen). Ohne `status` gilt 301; erlaubt sind 301 und 302.
+
+        Das Ziel ist nie selbst eine alte Adresse, und eine alte Adresse ist nie das Ziel einer anderen Weiterleitung: Ketten und Schleifen sind 409. Die alte Adresse ist je Abteilung eindeutig. Höchstens 1000 Weiterleitungen je Abteilung.
+
+        Die Auslieferung schreibt daraus `weiterleitungen.caddy` (ein Vorschlag, nichts wird eingebunden) und eine Rückfallseite mit `meta refresh` am alten Pfad. Wo eine Seite der Website liegt, gilt keine Weiterleitung. Audit-Log: `weiterleitung_angelegt` mit dem Status, nie mit den Pfaden.
+
+        Statuscodes: 201 bei Erfolg. 400 bei ungültiger Eingabe. 403 ohne Recht. 409 mit `WEITERLEITUNG_SCHLEIFE`, `WEITERLEITUNG_KETTE`, `WEITERLEITUNG_ADRESSE_VERGEBEN` oder `WEITERLEITUNG_ZU_VIELE`.
+      tags:
+        - Redaktion
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RedaktionWeiterleitungAnlegen"
+      responses:
+        "201":
+          description: Weiterleitung angelegt.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdminAngelegt"
+        "400":
+          $ref: "#/components/responses/UngueltigeEingabe400"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+        "409":
+          $ref: "#/components/responses/RedaktionWeiterleitung409"
+  /api/v1/redaktion/weiterleitungen/{id}:
+    patch:
+      operationId: aendereRedaktionWeiterleitung
+      summary: Weiterleitung ändern
+      description: |
+        Nur Abteilungsleitung und Redaktion. Ohne Schlüssel bleibt der Wert, wie er ist; mindestens ein Feld. Es gelten dieselben Regeln wie beim Anlegen, geprüft gegen den Stand ohne diese Zeile. Audit-Log: `weiterleitung_geaendert` mit den Namen der Felder.
+
+        Reihenfolge der Prüfungen: Zugang (403), Body (400), Weiterleitung in der eigenen Abteilung (404), Recht (403), Kette und Eindeutigkeit (409).
+
+        Statuscodes: 204 bei Erfolg. 400, 403, 404 für eine fremde oder unbekannte ID, 409 wie beim Anlegen.
+      tags:
+        - Redaktion
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+        - $ref: "#/components/parameters/RedaktionWeiterleitungId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RedaktionWeiterleitungAendern"
+      responses:
+        "204":
+          description: Geändert.
+        "400":
+          $ref: "#/components/responses/UngueltigeEingabe400"
+        "401":
+          $ref: "#/components/responses/NichtAngemeldet401"
+        "403":
+          $ref: "#/components/responses/KeineBerechtigung403"
+        "404":
+          $ref: "#/components/responses/NichtGefunden404"
+        "409":
+          $ref: "#/components/responses/RedaktionWeiterleitung409"
+        "426":
+          $ref: "#/components/responses/AppVeraltet426"
+        "429":
+          $ref: "#/components/responses/ZuVieleAnfragen429"
+    delete:
+      operationId: loescheRedaktionWeiterleitung
+      summary: Weiterleitung löschen
+      description: |
+        Nur Abteilungsleitung und Redaktion. Der nächste Abgleich entfernt die Rückfallseite und die Zeile in `weiterleitungen.caddy`. Audit-Log: `weiterleitung_geloescht`.
+
+        Statuscodes: 204 bei Erfolg. 400, 403, 404 für eine fremde oder unbekannte ID.
+      tags:
+        - Redaktion
+      parameters:
+        - $ref: "#/components/parameters/AppVersion"
+        - $ref: "#/components/parameters/RedaktionWeiterleitungId"
+      responses:
+        "204":
+          description: Gelöscht.
         "400":
           $ref: "#/components/responses/UngueltigeEingabe400"
         "401":
@@ -6289,6 +8391,1209 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Medium"
+    RedaktionSichtbarkeit:
+      description: |
+        Wer die Seite sieht (Sichtbarkeitsmodul): `oeffentlich` ohne Anmeldung, `angemeldet` jede Person der Abteilung, `tags` nur Personen mit einem der Tags (ODER); die Abteilungsleitung sieht immer alles. Eine leere Tag-Menge sieht nur die Abteilungsleitung. Höchstens 50 Tags ohne Doppelte, alle aus der Abteilung.
+      oneOf:
+        - type: object
+          required:
+            - art
+          additionalProperties: false
+          properties:
+            art:
+              const: oeffentlich
+        - type: object
+          required:
+            - art
+          additionalProperties: false
+          properties:
+            art:
+              const: angemeldet
+        - type: object
+          required:
+            - art
+            - tagIds
+          additionalProperties: false
+          properties:
+            art:
+              const: tags
+            tagIds:
+              type: array
+              maxItems: 50
+              uniqueItems: true
+              items:
+                type: string
+                format: uuid
+    RedaktionSeite:
+      type: object
+      required:
+        - id
+        - elternId
+        - adresse
+        - pfad
+        - titel
+        - reihenfolge
+        - sichtbarkeit
+        - tagId
+        - veroeffentlicht
+      properties:
+        id:
+          type: string
+          format: uuid
+        elternId:
+          type:
+            - string
+            - "null"
+          format: uuid
+          description: "`null` heisst: oberste Ebene."
+        adresse:
+          type: string
+          description: Ein Pfadstück, `a-z`, `0-9` und `-`, höchstens 60 Zeichen.
+        pfad:
+          type: string
+          description: Volle Adresse über alle Elternseiten, zum Beispiel `/stufen/biber`.
+        titel:
+          type: string
+        reihenfolge:
+          type: integer
+        sichtbarkeit:
+          $ref: "#/components/schemas/RedaktionSichtbarkeit"
+        tagId:
+          type:
+            - string
+            - "null"
+          format: uuid
+          description: Die Gruppe (Stufe, Team, ...), zu der die Seite gehört; `null` ohne Gruppe.
+        veroeffentlicht:
+          type: boolean
+          description: Ob die Seite eine veröffentlichte Version hat.
+    RedaktionSeitenListe:
+      type: object
+      required:
+        - seiten
+      properties:
+        seiten:
+          type: array
+          items:
+            $ref: "#/components/schemas/RedaktionSeite"
+    RedaktionSeiteAnlegen:
+      type: object
+      required:
+        - titel
+        - adresse
+        - sichtbarkeit
+      additionalProperties: false
+      properties:
+        titel:
+          type: string
+          minLength: 1
+          maxLength: 150
+        adresse:
+          type: string
+          pattern: "^[a-z0-9-]{1,60}$"
+        elternId:
+          type:
+            - string
+            - "null"
+          format: uuid
+        sichtbarkeit:
+          $ref: "#/components/schemas/RedaktionSichtbarkeit"
+        tagId:
+          type:
+            - string
+            - "null"
+          format: uuid
+        reihenfolge:
+          type: integer
+          minimum: 0
+          maximum: 100000
+          description: Ohne Angabe ans Ende der Geschwister.
+    RedaktionSeiteAendern:
+      type: object
+      minProperties: 1
+      additionalProperties: false
+      properties:
+        titel:
+          type: string
+          minLength: 1
+          maxLength: 150
+        adresse:
+          type: string
+          pattern: "^[a-z0-9-]{1,60}$"
+        elternId:
+          type:
+            - string
+            - "null"
+          format: uuid
+        reihenfolge:
+          type: integer
+          minimum: 0
+          maximum: 100000
+        sichtbarkeit:
+          $ref: "#/components/schemas/RedaktionSichtbarkeit"
+        tagId:
+          type:
+            - string
+            - "null"
+          format: uuid
+    # lager-schemas: lager (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    LagerRolle:
+      type: string
+      description: Rolle in einem Lager. Die Abteilungsleitung (Admin) gilt in Lagern der eigenen Abteilung immer als `lagerleitung`.
+      enum:
+        - lagerleitung
+        - leitung
+        - team
+        - lesen
+    LagerStatus:
+      type: string
+      description: Zustand des Lagers. `abgeschlossen` und `archiviert` sind schreibgeschützt.
+      enum:
+        - entwurf
+        - aktiv
+        - abgeschlossen
+        - archiviert
+    Lager:
+      type: object
+      required:
+        - id
+        - titel
+        - von
+        - bis
+        - vorbereitungAb
+        - ort
+        - adresse
+        - status
+        - farbe
+        - logoMediumId
+      properties:
+        id:
+          type: string
+          format: uuid
+        titel:
+          type: string
+        von:
+          type: string
+          format: date
+        bis:
+          type: string
+          format: date
+        vorbereitungAb:
+          type:
+            - string
+            - "null"
+          format: date
+        ort:
+          type:
+            - string
+            - "null"
+        adresse:
+          type:
+            - string
+            - "null"
+        status:
+          $ref: "#/components/schemas/LagerStatus"
+        farbe:
+          type:
+            - string
+            - "null"
+          pattern: ^#[0-9a-f]{6}$
+          description: Hex-Farbe, kleingeschrieben.
+        logoMediumId:
+          type:
+            - string
+            - "null"
+          format: uuid
+    LagerListeneintrag:
+      allOf:
+        - $ref: "#/components/schemas/Lager"
+        - type: object
+          required:
+            - rolle
+          properties:
+            rolle:
+              $ref: "#/components/schemas/LagerRolle"
+    LagerListe:
+      type: object
+      required:
+        - lager
+      properties:
+        lager:
+          type: array
+          items:
+            $ref: "#/components/schemas/LagerListeneintrag"
+    LagerDetail:
+      allOf:
+        - $ref: "#/components/schemas/Lager"
+        - type: object
+          required:
+            - rolle
+            - schreibgeschuetzt
+          properties:
+            rolle:
+              $ref: "#/components/schemas/LagerRolle"
+            schreibgeschuetzt:
+              type: boolean
+              description: Wahr bei `abgeschlossen` und `archiviert`; schreibende Anfragen antworten dann mit 409 `LAGER_GESCHLOSSEN`.
+    AdminLagerAnlegen:
+      type: object
+      additionalProperties: false
+      required:
+        - titel
+        - von
+        - bis
+      properties:
+        titel:
+          type: string
+          minLength: 1
+          maxLength: 200
+        von:
+          type: string
+          format: date
+        bis:
+          type: string
+          format: date
+          description: Nicht vor `von`.
+        vorbereitungAb:
+          type: string
+          format: date
+          description: Nicht nach `von`.
+        ort:
+          type: string
+          minLength: 1
+          maxLength: 200
+        adresse:
+          type: string
+          minLength: 1
+          maxLength: 500
+        farbe:
+          type: string
+          pattern: ^#[0-9a-fA-F]{6}$
+        logoMediumId:
+          type: string
+          format: uuid
+          description: Ein Bild aus den Medien der eigenen Abteilung.
+    AdminLagerAendern:
+      type: object
+      additionalProperties: false
+      description: Ohne Schlüssel bleibt der Wert. `null` leert `vorbereitungAb`, `ort`, `adresse`, `farbe` und `logoMediumId`.
+      properties:
+        titel:
+          type: string
+          minLength: 1
+          maxLength: 200
+        von:
+          type: string
+          format: date
+        bis:
+          type: string
+          format: date
+        vorbereitungAb:
+          type:
+            - string
+            - "null"
+          format: date
+        ort:
+          type:
+            - string
+            - "null"
+          minLength: 1
+          maxLength: 200
+        adresse:
+          type:
+            - string
+            - "null"
+          minLength: 1
+          maxLength: 500
+        farbe:
+          type:
+            - string
+            - "null"
+          pattern: ^#[0-9a-fA-F]{6}$
+        logoMediumId:
+          type:
+            - string
+            - "null"
+          format: uuid
+        status:
+          $ref: "#/components/schemas/LagerStatus"
+    AdminLagerMitglied:
+      type: object
+      required:
+        - personId
+        - name
+        - ceviName
+        - rolle
+      properties:
+        personId:
+          type: string
+          format: uuid
+        name:
+          type: string
+        ceviName:
+          type:
+            - string
+            - "null"
+        rolle:
+          $ref: "#/components/schemas/LagerRolle"
+    LagerKonflikt:
+      type: object
+      description: Fehler mit Statuscode 409. Gleiche Form wie `Fehler`, mit eigenen Codes.
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          enum:
+            - LAGER_GESCHLOSSEN
+            - LAGERLEITUNG_FEHLT
+        message:
+          type: string
+    # lager-schemas: rechte (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    LagerRecht:
+      type: string
+      description: Ein Recht des Katalogs, `<bereich>.<aktion>`. Die Lagerleitung hat jedes Recht immer.
+      enum:
+        - ressorts.lesen
+        - ressorts.bearbeiten
+        - aufgaben.lesen_alle
+        - aufgaben.bearbeiten
+        - aufgaben.eigene
+        - zeitplan.lesen
+        - zeitplan.bearbeiten
+        - vorlagen.anwenden
+        - check.lesen
+        - hoecks.lesen_alle
+        - hoecks.team_lesen
+        - hoecks.bearbeiten
+        - protokolle.lesen
+        - protokolle.bearbeiten
+        - pinnwand.lesen
+        - pinnwand.bearbeiten
+        - interaktion.schreiben
+        - eingang.senden
+        - eingang.lesen
+        - eingang.antworten
+        - teilnehmer.lesen
+        - teilnehmer.bearbeiten
+        - einteilung.lesen
+        - einteilung.bearbeiten
+        - abzaehlen.schreiben
+        - diensttausch.anfragen
+        - diensttausch.entscheiden
+        - anwesenheit.lesen_alle
+        - anwesenheit.eigene
+        - anwesenheit.bearbeiten
+        - tagesseiten.lesen
+        - tagesseiten.bearbeiten
+        - einkauf.lesen
+        - einkauf.bearbeiten
+        - packliste.lesen
+        - packliste.abhaken
+        - packliste.bearbeiten
+        - notfall.lesen
+        - notfall.bearbeiten
+        - infos.lesen
+        - infos.bearbeiten
+        - vertrauliches.lesen
+        - wetter.lesen
+        - dokumente.lesen_alle
+        - dokumente.team_lesen
+        - dokumente.bearbeiten
+        - adressbuch.lesen
+        - adressbuch.bearbeiten
+        - verlauf.lesen
+    LagerRechteListe:
+      type: object
+      required:
+        - rechte
+      properties:
+        rechte:
+          type: array
+          items:
+            type: object
+            required:
+              - recht
+              - bedeutung
+              - standard
+              - aktuell
+            properties:
+              recht:
+                $ref: "#/components/schemas/LagerRecht"
+              bedeutung:
+                type: string
+              standard:
+                $ref: "#/components/schemas/LagerRechteJeRolle"
+              aktuell:
+                $ref: "#/components/schemas/LagerRechteJeRolle"
+    LagerRechteJeRolle:
+      type: object
+      description: Erlaubt oder verboten je einstellbarer Rolle.
+      required:
+        - leitung
+        - team
+        - lesen
+      properties:
+        leitung:
+          type: boolean
+        team:
+          type: boolean
+        lesen:
+          type: boolean
+    LagerRechteAenderung:
+      type: object
+      additionalProperties: false
+      required:
+        - rechte
+      properties:
+        rechte:
+          type: array
+          minItems: 1
+          maxItems: 147
+          description: Jedes Paar aus Rolle und Recht höchstens einmal.
+          items:
+            type: object
+            additionalProperties: false
+            required:
+              - rolle
+              - recht
+              - erlaubt
+            properties:
+              rolle:
+                type: string
+                description: Die Lagerleitung ist nicht einstellbar.
+                enum:
+                  - leitung
+                  - team
+                  - lesen
+              recht:
+                $ref: "#/components/schemas/LagerRecht"
+              erlaubt:
+                type: boolean
+    # lager-schemas: aenderungen (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: ereignisse (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: papierkorb (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: benachrichtigungen (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    LagerBenachrichtigungsArt:
+      type: string
+      description: |
+        Art einer Benachrichtigung des Lagers. Jedes Modul des Lager-Backends trägt seine Arten ein; der Push-`typ` (und damit der Android-Kanal) folgt aus der Art:
+        - `aufgabe_zugeteilt`, `aufgabe_geaendert`, `frist`: `lager_aufgabe`
+        - `erwaehnung`: `lager_erwaehnung`
+        - `pinnwand_wichtig`: `lager_pinnwand`
+        - `eingang_antwort`: `lager_eingang`
+        - `diensttausch`: `lager_einteilung`
+        - `anwesenheit_anfrage`: `lager_anwesenheit`
+      enum:
+        - aufgabe_zugeteilt
+        - aufgabe_geaendert
+        - erwaehnung
+        - frist
+        - pinnwand_wichtig
+        - eingang_antwort
+        - diensttausch
+        - anwesenheit_anfrage
+    LagerPushTyp:
+      type: string
+      description: |
+        Wert von `data.typ` eines Lager-Pushes. `data.id` ist die ID des Objekts; die App löst Lager und Ziel mit `GET /api/v1/lager/aufloesen/{typ}/{id}` auf. Android-Kanäle: `lager_aufgaben` (`lager_aufgabe`), `lager_mitteilungen` (`lager_erwaehnung`, `lager_pinnwand`, `lager_eingang`), `lager_einteilung` (`lager_einteilung`, `lager_anwesenheit`).
+      enum:
+        - lager_aufgabe
+        - lager_erwaehnung
+        - lager_pinnwand
+        - lager_eingang
+        - lager_einteilung
+        - lager_anwesenheit
+    LagerBenachrichtigung:
+      type: object
+      required:
+        - id
+        - art
+        - objektTyp
+        - objektId
+        - gelesen
+        - erstelltAm
+      properties:
+        id:
+          type: string
+          format: uuid
+        art:
+          $ref: "#/components/schemas/LagerBenachrichtigungsArt"
+        objektTyp:
+          type: string
+          description: Was die App öffnet, zum Beispiel `aufgabe`. Die Zeile trägt keinen Text und keinen Inhalt.
+        objektId:
+          type: string
+          format: uuid
+        gelesen:
+          type: boolean
+        erstelltAm:
+          type: string
+          format: date-time
+    LagerBenachrichtigungenSeite:
+      type: object
+      required:
+        - eintraege
+        - naechster
+      properties:
+        eintraege:
+          type: array
+          items:
+            $ref: "#/components/schemas/LagerBenachrichtigung"
+        naechster:
+          type:
+            - string
+            - "null"
+          format: uuid
+          description: Cursor für ältere Einträge (Query `nach`); `null` am Ende.
+    LagerBenachrichtigungenUngelesen:
+      type: object
+      required:
+        - anzahl
+      properties:
+        anzahl:
+          type: integer
+          minimum: 0
+    LagerBenachrichtigungenGelesenAnfrage:
+      type: object
+      additionalProperties: false
+      properties:
+        ids:
+          type: array
+          minItems: 1
+          maxItems: 100
+          items:
+            type: string
+            format: uuid
+          description: Nur diese Einträge. Ohne `ids` gelten alle ungelesenen Einträge der Person in diesem Lager.
+    LagerAufloesung:
+      type: object
+      required:
+        - lagerId
+        - objektTyp
+        - objektId
+      properties:
+        lagerId:
+          type: string
+          format: uuid
+        objektTyp:
+          type: string
+        objektId:
+          type: string
+          format: uuid
+    LagerBenachrichtigungEinstellungen:
+      type: object
+      required:
+        - arten
+      properties:
+        arten:
+          type: array
+          items:
+            type: object
+            required:
+              - art
+              - aktiv
+            properties:
+              art:
+                $ref: "#/components/schemas/LagerBenachrichtigungsArt"
+              aktiv:
+                type: boolean
+    LagerBenachrichtigungEinstellungenAnfrage:
+      type: object
+      additionalProperties: false
+      required:
+        - arten
+      properties:
+        arten:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            additionalProperties: false
+            required:
+              - art
+              - aktiv
+            properties:
+              art:
+                $ref: "#/components/schemas/LagerBenachrichtigungsArt"
+              aktiv:
+                type: boolean
+    # lager-schemas: dateien (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: ressorts (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: aufgaben (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: aufgaben-details (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: zeitplan (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: aufgaben-schnell (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: todos (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: vorlagen (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: check (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: hoecks (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: protokolle (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: erwaehnungen (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: pinnwand (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: umfragen (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: eingang (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: teilnehmer (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: zimmer (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: fahrten (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: gruppen (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: schichtplan (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: diensttausch (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: anwesenheit (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: tagesseiten (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: einkauf (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: lagerinfos (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: wetter (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: aggregate (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: dokumente (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: adressbuch (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: wissen (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: suche (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: verwaltung (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: export (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: wiederherstellen (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: uebung (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: ausdruck (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    RedaktionZaehler:
+      type: object
+      required:
+        - zaehler
+      properties:
+        zaehler:
+          type: integer
+          minimum: 0
+          description: Zählt jedes Speichern und jedes Zurückholen des Entwurfs.
+    RedaktionEntwurf:
+      type: object
+      required:
+        - zaehler
+        - dokument
+        - veroeffentlichteNr
+        - unveroeffentlicht
+      properties:
+        zaehler:
+          type: integer
+          minimum: 0
+        dokument:
+          type:
+            - object
+            - "null"
+          description: "Das Dokument `{ v: 1, titel, bausteine }`; `null`, solange noch nie gespeichert wurde."
+        veroeffentlichteNr:
+          type:
+            - integer
+            - "null"
+          description: Nummer der veröffentlichten Version; `null`, wenn die Seite nicht veröffentlicht ist.
+        unveroeffentlicht:
+          type: boolean
+          description: Der Entwurf weicht von der veröffentlichten Version ab (oder es gibt keine).
+    RedaktionEntwurfSpeichern:
+      type: object
+      additionalProperties: false
+      required:
+        - zaehler
+        - dokument
+      properties:
+        zaehler:
+          type: integer
+          minimum: 0
+          description: Der Zähler aus dem letzten Lesen oder Speichern.
+        dokument:
+          type: object
+          description: "Das ganze Dokument `{ v: 1, titel, bausteine }` (Bausteinkatalog Version 1)."
+    RedaktionKonflikt:
+      type: object
+      required:
+        - code
+        - message
+        - zaehler
+        - dokument
+      properties:
+        code:
+          type: string
+          enum:
+            - KONFLIKT
+        message:
+          type: string
+        zaehler:
+          type: integer
+          description: Der aktuelle Zähler.
+        dokument:
+          type:
+            - object
+            - "null"
+          description: Das aktuelle Dokument des Entwurfs.
+    RedaktionDokumentFehler:
+      type: object
+      required:
+        - code
+        - message
+        - fehler
+      properties:
+        code:
+          type: string
+          description: "`DOKUMENT_UNGUELTIG` oder bei 422 der erste Code der Verweisprüfung."
+          enum:
+            - DOKUMENT_UNGUELTIG
+            - MEDIUM_UNBEKANNT
+            - MEDIUM_FORMAT
+            - MEDIUM_NICHT_OEFFENTLICH
+            - TAG_UNBEKANNT
+            - PERSON_UNBEKANNT
+            - SEITE_UNBEKANNT
+        message:
+          type: string
+        fehler:
+          type: array
+          maxItems: 20
+          items:
+            type: object
+            required:
+              - pfad
+              - code
+            properties:
+              pfad:
+                type: string
+                description: Stelle im Dokument, zum Beispiel `bausteine.2.daten.ziel` oder bei der Verweisprüfung `bausteine.2`.
+              code:
+                type: string
+                description: Code der Prüfung (Code von zod oder der Verweisprüfung), nie ein Wert der Eingabe.
+    RedaktionVersion:
+      type: object
+      required:
+        - nr
+        - autorId
+        - erstelltAm
+        - veroeffentlicht
+      properties:
+        nr:
+          type: integer
+          minimum: 1
+        autorId:
+          type:
+            - string
+            - "null"
+          format: uuid
+          description: Wer veröffentlicht hat; `null`, wenn das Konto inzwischen gelöscht ist.
+        erstelltAm:
+          type: string
+          format: date-time
+        veroeffentlicht:
+          type: boolean
+          description: Die Seite zeigt gerade diese Version.
+    RedaktionIch:
+      type: object
+      required:
+        - redigieren
+        - bereiche
+        - verwalten
+      properties:
+        redigieren:
+          type: boolean
+          description: Ob die Person Zugang zur Redaktion hat (Abteilungsleitung, Stufenleitung oder ein Recht auf Seiten in `bearbeiter`).
+        bereiche:
+          type: array
+          description: Die Bereiche des Panels, die die Person sehen darf. Heute nur `website`; ohne Zugang leer.
+          items:
+            type: string
+            enum:
+              - website
+        verwalten:
+          type: boolean
+          description: Ob die Person Seiten anlegen und löschen und Medien löschen darf (Abteilungsleitung und Redaktion). Nur für die Anzeige; jede Route prüft selbst.
+    MediumAendern:
+      type: object
+      description: Genau eines von beiden, `altText` oder `dekorativ`.
+      additionalProperties: false
+      properties:
+        altText:
+          type: string
+          minLength: 1
+          maxLength: 500
+          description: Neuer Alternativtext, 1 bis 500 Zeichen nach dem Entfernen von Leerraum am Rand. Hebt «dekorativ» auf.
+        dekorativ:
+          const: true
+          description: Das Bild als dekorativ markieren; entfernt den Alt-Text. Bei einem PDF 400.
+    RedaktionTag:
+      type: object
+      required:
+        - id
+        - name
+        - typ
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        typ:
+          type: string
+          enum:
+            - stufe
+            - funktion
+            - team
+            - lager
+    RedaktionTagListe:
+      type: object
+      required:
+        - tags
+      properties:
+        tags:
+          type: array
+          items:
+            $ref: "#/components/schemas/RedaktionTag"
+    RedaktionPerson:
+      type: object
+      required:
+        - id
+        - anzeigename
+        - funktion
+      properties:
+        id:
+          type: string
+          format: uuid
+        anzeigename:
+          type: string
+          description: Der Cevi-Name, sonst der Name des Kontos.
+        funktion:
+          type:
+            - string
+            - "null"
+          description: Die Rolle der Person an diesem Tag (freier Text); `null` ohne Rolle.
+    RedaktionPersonenListe:
+      type: object
+      required:
+        - personen
+      properties:
+        personen:
+          type: array
+          items:
+            $ref: "#/components/schemas/RedaktionPerson"
+    RedaktionVorlagenListe:
+      type: object
+      required:
+        - vorlagen
+      properties:
+        vorlagen:
+          type: array
+          items:
+            type: object
+            required:
+              - schluessel
+              - name
+              - beschreibung
+              - brauchtTag
+            properties:
+              schluessel:
+                type: string
+                enum:
+                  - stufenseite
+                  - anlass
+                  - textseite
+                  - leer
+              name:
+                type: string
+              beschreibung:
+                type: string
+              brauchtTag:
+                type: boolean
+                description: Die Vorlage verlangt `tagId` (Stufenseite).
+    RedaktionSeiteAusVorlage:
+      type: object
+      required:
+        - vorlage
+        - titel
+        - sichtbarkeit
+      additionalProperties: false
+      properties:
+        vorlage:
+          type: string
+          enum:
+            - stufenseite
+            - anlass
+            - textseite
+            - leer
+        titel:
+          type: string
+          minLength: 1
+          maxLength: 150
+        elternId:
+          type:
+            - string
+            - "null"
+          format: uuid
+        tagId:
+          type:
+            - string
+            - "null"
+          format: uuid
+        sichtbarkeit:
+          $ref: "#/components/schemas/RedaktionSichtbarkeit"
+    RedaktionSeiteAusVorlageAngelegt:
+      type: object
+      required:
+        - id
+        - adresse
+      properties:
+        id:
+          type: string
+          format: uuid
+        adresse:
+          type: string
+          description: Aus dem Titel gebildet, bei Kollision mit Zusatz (`-2`, `-3`).
+    LagerFeedEintrag:
+      type: object
+      description: Eine Änderung. Nur Verweis auf die Zeile, kein Inhalt.
+      required:
+        - seq
+        - objekttyp
+        - id
+        - art
+        - version
+        - zeitpunkt
+      properties:
+        seq:
+          type: integer
+          description: Folgenummer des Schreibvorgangs im Lager.
+        objekttyp:
+          type: string
+          description: Name der Tabelle des Moduls (zum Beispiel `aufgabe`).
+        id:
+          type: string
+          format: uuid
+        art:
+          type: string
+          enum:
+            - neu
+            - geaendert
+            - geloescht
+        version:
+          type: integer
+          description: Version der Zeile nach der Änderung.
+        zeitpunkt:
+          type: string
+          format: date-time
+    LagerFeedSeite:
+      type: object
+      required:
+        - eintraege
+        - bis
+        - weitere
+      properties:
+        eintraege:
+          type: array
+          description: Nach `seq` aufsteigend, gefiltert nach Leserecht und Zeilenfilter der Rolle.
+          items:
+            $ref: "#/components/schemas/LagerFeedEintrag"
+        bis:
+          type: integer
+          description: Die App fragt mit `seit=<bis>` weiter. Auf der letzten Seite die Folgenummer des Lagers zu Beginn der Anfrage.
+        weitere:
+          type: boolean
+          description: Wahr, wenn es noch Einträge nach `bis` gibt.
+    LagerFeedStand:
+      type: object
+      description: Antwort ohne `seit`.
+      required:
+        - seq
+        - objekttypen
+      properties:
+        seq:
+          type: integer
+          description: Aktuelle Folgenummer des Lagers.
+        objekttypen:
+          type: array
+          description: Die Objekttypen, die die Rolle lesen darf.
+          items:
+            type: string
+    LagerFeedNeuLaden:
+      type: object
+      description: Fehler mit Statuscode 410. Gleiche Form wie `Fehler`, dazu die aktuelle Folgenummer.
+      required:
+        - code
+        - message
+        - seq
+      properties:
+        code:
+          type: string
+          enum:
+            - FEED_NEU_LADEN
+        message:
+          type: string
+        seq:
+          type: integer
+    LagerVersionKonflikt:
+      type: object
+      description: |
+        Fehler mit Statuscode 409 für jede Lager-Route, die eine Zeile ändert oder löscht. Die Anfrage trug nicht die aktuelle `version`. `aktuell` ist der Stand der Zeile in der Form, die die Rolle auch beim Lesen bekommt (nie mehr). `abweichend` nennt die Felder der Anfrage, die jetzt anders stehen (ohne Felder, die die Rolle nicht sieht); ist die Liste leer, kann die App die Anfrage mit der neuen Version wiederholen.
+      required:
+        - code
+        - message
+        - aktuell
+        - abweichend
+      properties:
+        code:
+          type: string
+          enum:
+            - VERSION_KONFLIKT
+        message:
+          type: string
+        aktuell:
+          type: object
+          additionalProperties: true
+        abweichend:
+          type: array
+          items:
+            type: string
+    # lager-schemas: ereignisse (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: papierkorb (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: benachrichtigungen (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: dateien (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: ressorts (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: aufgaben (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: aufgaben-details (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: zeitplan (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: aufgaben-schnell (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: todos (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: vorlagen (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: check (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: hoecks (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: protokolle (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: erwaehnungen (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: pinnwand (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: umfragen (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: eingang (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: teilnehmer (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: zimmer (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: fahrten (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: gruppen (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: schichtplan (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: diensttausch (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: anwesenheit (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: tagesseiten (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: einkauf (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: lagerinfos (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: wetter (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: aggregate (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: dokumente (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: adressbuch (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: wissen (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: suche (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: verwaltung (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: export (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: wiederherstellen (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: uebung (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    # lager-schemas: ausdruck (die Einträge dieses Moduls stehen unter dieser Zeile, vor dem nächsten Marker)
+    WebsiteInhalt:
+      type: object
+      required:
+        - titel
+        - bausteine
+      properties:
+        titel:
+          type: string
+          description: Titel der Seite (nur für die Person sichtbar, die die Seite sehen darf).
+        bausteine:
+          type: array
+          items:
+            type: object
+            required:
+              - id
+              - knoten
+            properties:
+              id:
+                type: string
+                format: uuid
+                description: ID des Bausteins; bei einer öffentlichen Seite die des Platzhalters `data-geschuetzt` im HTML.
+              knoten:
+                $ref: "#/components/schemas/WebsiteKnoten"
+    WebsiteKnoten:
+      description: Ein Text (Zeichenkette) oder ein Element. Das Skript setzt Text als Textknoten und lässt nur bekannte Elemente und Attribute mit geprüften Werten zu.
+      oneOf:
+        - type: string
+        - type: object
+          required:
+            - tag
+          properties:
+            tag:
+              type: string
+            attr:
+              type: object
+              additionalProperties:
+                oneOf:
+                  - type: string
+                  - type: boolean
+            kinder:
+              type: array
+              items:
+                $ref: "#/components/schemas/WebsiteKnoten"
+    RedaktionWeiterleitungAnlegen:
+      type: object
+      additionalProperties: false
+      required:
+        - alterPfad
+        - zielPfad
+      properties:
+        alterPfad:
+          type: string
+          maxLength: 200
+          pattern: "^/[a-z0-9-]+([.][a-z0-9]+)*(/[a-z0-9-]+([.][a-z0-9]+)*){0,6}$"
+          description: Die alte Adresse als relativer Pfad, etwa `/alte-seite`.
+        zielPfad:
+          type: string
+          maxLength: 200
+          description: Der neue Pfad auf der Website, `/` oder wie die alte Adresse aufgebaut.
+        status:
+          type: integer
+          enum: [301, 302]
+          default: 301
+    RedaktionWeiterleitungAendern:
+      type: object
+      additionalProperties: false
+      minProperties: 1
+      properties:
+        alterPfad:
+          type: string
+          maxLength: 200
+          pattern: "^/[a-z0-9-]+([.][a-z0-9]+)*(/[a-z0-9-]+([.][a-z0-9]+)*){0,6}$"
+        zielPfad:
+          type: string
+          maxLength: 200
+        status:
+          type: integer
+          enum: [301, 302]
+    RedaktionWeiterleitung:
+      type: object
+      required:
+        - id
+        - alterPfad
+        - zielPfad
+        - status
+        - erstelltAm
+      properties:
+        id:
+          type: string
+          format: uuid
+        alterPfad:
+          type: string
+        zielPfad:
+          type: string
+        status:
+          type: integer
+          enum: [301, 302]
+        erstelltAm:
+          type: string
+          format: date-time
+    RedaktionWeiterleitungenListe:
+      type: object
+      required:
+        - weiterleitungen
+      properties:
+        weiterleitungen:
+          type: array
+          items:
+            $ref: "#/components/schemas/RedaktionWeiterleitung"
   parameters:
     AppVersion:
       name: X-App-Version
@@ -6389,6 +9694,22 @@ components:
       schema:
         type: string
         format: uuid
+    RedaktionSeiteId:
+      name: id
+      in: path
+      required: true
+      description: ID der Seite (UUID).
+      schema:
+        type: string
+        format: uuid
+    RedaktionVersionNr:
+      name: nr
+      in: path
+      required: true
+      description: Nummer der Version, eine ganze Zahl ab 1.
+      schema:
+        type: integer
+        minimum: 1
     AdminBearbeiterId:
       name: id
       in: path
@@ -6410,6 +9731,14 @@ components:
       in: path
       required: true
       description: ID der Person (UUID), in der Abteilung des Admins.
+      schema:
+        type: string
+        format: uuid
+    RedaktionWeiterleitungId:
+      name: id
+      in: path
+      required: true
+      description: ID der Weiterleitung (UUID).
       schema:
         type: string
         format: uuid
@@ -6447,6 +9776,13 @@ components:
         Unter HTTPS trägt es den Präfix `__Secure-`, ohne HTTPS heisst es `better-auth.two_factor`; der Name endet
         immer auf `two_factor`.
   responses:
+    LagerKonflikt409:
+      description: |
+        Das Lager ist abgeschlossen oder archiviert und lässt sich nicht ändern (`LAGER_GESCHLOSSEN`), oder ein aktives Lager würde seine letzte Lagerleitung verlieren (`LAGERLEITUNG_FEHLT`).
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/LagerKonflikt"
     UngueltigeEingabe400:
       description: Ungültige Eingabe (code UNGUELTIGE_EINGABE), ohne Details
       content:
@@ -6477,6 +9813,36 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/Fehler"
+    RedaktionSeite400:
+      description: |
+        Ungültige Eingabe (code UNGUELTIGE_EINGABE) oder eine Regel des Seitenbaums: `ADRESSE_RESERVIERT` (Adresse auf der obersten Ebene reserviert), `SEITE_ZYKLUS` (Seite unter sich selbst oder einer Unterseite), `SEITE_ZU_TIEF` (mehr als 5 Ebenen).
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Fehler"
+    RedaktionSeite409:
+      description: |
+        Konflikt: `ADRESSE_VERGEBEN` (die Adresse gibt es unter dieser Elternseite schon), `TAG_VERGEBEN` (die Gruppe hat schon eine Seite) oder `SEITE_HAT_UNTERSEITEN` (Löschen mit Unterseiten).
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Fehler"
+    RedaktionDokument400:
+      description: |
+        Ungültige Eingabe (code UNGUELTIGE_EINGABE, ohne Details) oder ein Dokument, das den Bausteinkatalog verletzt (code `DOKUMENT_UNGUELTIG`, mit `fehler`).
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: "#/components/schemas/Fehler"
+              - $ref: "#/components/schemas/RedaktionDokumentFehler"
+    RedaktionVerweis422:
+      description: |
+        Das Dokument ist gültig, verweist aber auf etwas Unzulässiges, oder ein gespeichertes Dokument besteht das Schema nicht mehr (`DOKUMENT_UNGUELTIG`). `code` ist der erste Code, `fehler` nennt alle mit dem Pfad des Bausteins.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/RedaktionDokumentFehler"
     AnwesenheitGeschlossen409:
       description: |
         Das Programm hat noch nicht begonnen oder liegt mehr als 14 Tage zurück. Die Anwesenheit lässt sich nicht
@@ -6490,6 +9856,20 @@ components:
             message: Die Anwesenheit lässt sich erst nach Beginn des Programms und bis 14 Tage danach erfassen.
     ZuVieleAnfragen429:
       description: Zu viele Anfragen (code ZU_VIELE_ANFRAGEN)
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Fehler"
+    LagerVersionKonflikt409:
+      description: |
+        Die Anfrage trug nicht die aktuelle `version` der Zeile (`VERSION_KONFLIKT`). Der Body enthält den aktuellen Stand und die abweichenden Felder.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/LagerVersionKonflikt"
+    RedaktionWeiterleitung409:
+      description: |
+        Konflikt: `WEITERLEITUNG_SCHLEIFE` (die Weiterleitung führt im Kreis), `WEITERLEITUNG_KETTE` (das Ziel ist selbst eine alte Adresse oder umgekehrt), `WEITERLEITUNG_ADRESSE_VERGEBEN` (die alte Adresse hat schon eine Weiterleitung) oder `WEITERLEITUNG_ZU_VIELE` (mehr als 1000).
       content:
         application/json:
           schema:
