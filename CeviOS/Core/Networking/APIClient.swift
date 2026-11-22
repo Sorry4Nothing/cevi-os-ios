@@ -19,6 +19,7 @@ actor APIClient {
     private let appVersion: String
     private let cookieStore: any CookieStore
     private let session: URLSession
+    private let streamSession: URLSession
     private let onEvent: @Sendable (APIEvent) -> Void
     private var cookies: [String: String]
 
@@ -27,26 +28,30 @@ actor APIClient {
         appVersion: String,
         cookieStore: any CookieStore,
         session: URLSession = APIClient.makeSession(),
+        streamSession: URLSession = APIClient.makeSession(streaming: true),
         onEvent: @escaping @Sendable (APIEvent) -> Void = { _ in }
     ) {
         self.baseURL = baseURL
         self.appVersion = appVersion
         self.cookieStore = cookieStore
         self.session = session
+        self.streamSession = streamSession
         self.onEvent = onEvent
         cookies = cookieStore.read()
     }
 
     /// Session without cookie handling and without caching: responses such as `no-store` contacts or children's data
     /// never end up on the device.
-    nonisolated static func makeSession(protocolClasses: [AnyClass]? = nil) -> URLSession {
+    /// `streaming`: for the event stream. The idle limit is three heartbeats of the server (25 s) instead of 30 s for a whole
+    /// request; everything else (no cookies, no cache, same-origin redirects) stays the same.
+    nonisolated static func makeSession(protocolClasses: [AnyClass]? = nil, streaming: Bool = false) -> URLSession {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.httpShouldSetCookies = false
         configuration.httpCookieStorage = nil
         configuration.httpCookieAcceptPolicy = .never
         configuration.urlCache = nil
         configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
-        configuration.timeoutIntervalForRequest = 30
+        configuration.timeoutIntervalForRequest = streaming ? 75 : 30
         if let protocolClasses { configuration.protocolClasses = protocolClasses }
         return URLSession(configuration: configuration, delegate: SameOriginRedirects(), delegateQueue: nil)
     }
@@ -74,6 +79,30 @@ actor APIClient {
         body: (any Encodable & Sendable)? = nil,
         rawBody: Data? = nil
     ) async throws -> Data {
+        let request = try makeRequest(method, path, query: query, body: body, rawBody: rawBody)
+
+        let data: Data
+        let response: HTTPURLResponse
+        do {
+            let (d, r) = try await session.data(for: request)
+            guard let http = r as? HTTPURLResponse else { throw APIError.network }
+            (data, response) = (d, http)
+        } catch is CancellationError {
+            throw CancellationError()
+        } catch {
+            if (error as? URLError)?.code == .cancelled { throw CancellationError() }
+            throw APIError.network
+        }
+
+        absorbCookies(from: response)
+        guard !(200..<300).contains(response.statusCode) else { return data }
+        throw failure(response, data: data, path: path)
+    }
+
+    /// The request with the headers every call carries: version, session cookie, and for sign-in the origin.
+    func makeRequest(
+        _ method: String, _ path: String, query: [URLQueryItem] = [], body: (any Encodable & Sendable)? = nil, rawBody: Data? = nil
+    ) throws -> URLRequest {
         var components = URLComponents(url: baseURL, resolvingAgainstBaseURL: false)
         components?.path = path
         components?.queryItems = query.isEmpty ? nil : query
@@ -98,27 +127,20 @@ actor APIClient {
             request.setValue("application/octet-stream", forHTTPHeaderField: "Content-Type")
             request.httpBody = rawBody
         }
+        return request
+    }
 
-        let data: Data
-        let response: HTTPURLResponse
-        do {
-            let (d, r) = try await session.data(for: request)
-            guard let http = r as? HTTPURLResponse else { throw APIError.network }
-            (data, response) = (d, http)
-        } catch is CancellationError {
-            throw CancellationError()
-        } catch {
-            if (error as? URLError)?.code == .cancelled { throw CancellationError() }
-            throw APIError.network
-        }
-
+    /// Takes over a changed session cookie of a response.
+    func absorbCookies(from response: HTTPURLResponse) {
         let updated = CookieJar.updated(cookies, from: response)
         if updated != cookies {
             cookies = updated
             cookieStore.write(updated)
         }
+    }
 
-        guard !(200..<300).contains(response.statusCode) else { return data }
+    /// Maps a non-2xx response to an `APIError` and reports the app-wide events (401, 426, 403).
+    func failure(_ response: HTTPURLResponse, data: Data, path: String) -> APIError {
         let retryAfter = (response.value(forHTTPHeaderField: "Retry-After") ?? response.value(forHTTPHeaderField: "X-Retry-After")).flatMap { Int($0) }
         let error = APIError.from(status: response.statusCode, data: data, retryAfter: retryAfter)
         switch error.kind {
@@ -134,7 +156,36 @@ actor APIClient {
         default:
             break
         }
-        throw error
+        return error
+    }
+
+    /// Opens a GET that stays open (`text/event-stream`) on the stream session. Throws the `APIError` of a non-2xx answer.
+    func openStream(_ path: String, query: [URLQueryItem] = [], headers: [String: String] = [:]) async throws -> URLSession.AsyncBytes {
+        var request = try makeRequest("GET", path, query: query)
+        request.setValue("text/event-stream", forHTTPHeaderField: "Accept")
+        for (name, value) in headers { request.setValue(value, forHTTPHeaderField: name) }
+        let bytes: URLSession.AsyncBytes
+        let response: HTTPURLResponse
+        do {
+            let (b, r) = try await streamSession.bytes(for: request)
+            guard let http = r as? HTTPURLResponse else { throw APIError.network }
+            (bytes, response) = (b, http)
+        } catch is CancellationError {
+            throw CancellationError()
+        } catch {
+            if (error as? URLError)?.code == .cancelled { throw CancellationError() }
+            throw APIError.network
+        }
+        absorbCookies(from: response)
+        guard !(200..<300).contains(response.statusCode) else { return bytes }
+        var data = Data()
+        do {
+            for try await byte in bytes {
+                data.append(byte)
+                if data.count >= 65_536 { break }
+            }
+        } catch {}
+        throw failure(response, data: data, path: path)
     }
 
     /// GET of a server-provided image path (`bildUrl`, `logoUrl`). Only `ImagePath` addresses on the own base URL,

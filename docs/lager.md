@@ -122,12 +122,31 @@ Gebaut, ohne Bildschirme und ohne lokalen Speicher. Dateien sind in dieser API *
 
 Hinweise: `APIClient.send` gibt nur den Rumpf zurück, nicht die Kopfzeilen; für den Aushang ist der Dateiname deshalb `<art>.pdf` (so beschreibt ihn die API). Die Dokumentenliste ist eine Sammelabfrage über mehrere Module (`quelle`).
 
+## Schnitt A0b Sync: Datenschicht (Issue #71)
+
+Backend L0c und L0d sind da (Stand der Kopie `f8d55c5`). Gebaut, ohne Bildschirme und ohne lokalen Speicher:
+
+| Was | Route (unter `/api/v1/lager/{id}`) | Code |
+| --- | --- | --- |
+| Änderungen senden (Stapel bis 100, idempotent über `clientOpId`; je Änderung `ok`, `konflikt`, `abgelehnt`) | `POST …/aenderungen` | `CampOperation`, `CampOperationResult`, `sendCampOperations` |
+| Ereignisstrom im Vordergrund (nur «Es gibt Neues» und Folgenummer) | `GET …/ereignisse` (`Last-Event-ID`) | `CampEventParser`, `CampLiveEvent`, `campEvents` |
+| Warteschlange im Arbeitsspeicher | nutzt `POST …/aenderungen` | `CampOutbox`, `CampOutboxStore`, `CampOutboxMemoryStore` |
+| Konfliktauflösung (`keepMine`, `keepCurrent`, `merge`) | Folge-Aufruf: neue `clientOpId` und aktuelle `version` | `CampConflictChoice`, `CampOperation.resolved`, `CampOutbox.resolve` |
+
+Hinweise:
+
+- Die API kennt für das Senden nur `ok`, `konflikt`, `abgelehnt`. «Schon angewendet» ist kein eigener Status: Eine Wiederholung mit derselben `clientOpId` liefert das gespeicherte `ok`.
+- Die Beschreibung nennt weder die `typ`-Werte (ausser dem Beispiel `aufgabe.aendern`) noch die Felder der `nutzlast`. Der Code trägt sie als `[String: CampJSON]`. Annahme: Das Versionsfeld der Nutzlast heisst `version` (wie in den PATCH-Körpern); wer eine Operation baut, prüft das gegen die Module.
+- `keepCurrent` verwirft den Eintrag, `keepMine` und `merge` ersetzen ihn durch einen neuen `waiting`-Eintrag. So verlangt es die Beschreibung («neue `clientOpId` und die aktuelle `version`»). Ein Konflikt oder eine Ablehnung verschwindet nie ohne Entscheid der Person.
+- Ganze Anfrage abgelehnt (400, 403, 404, 409 `LAGER_GESCHLOSSEN`, 410, 413): die Einträge dieser Anfrage werden `rejected`. Netz, 401, 426, 429 und 5xx lassen sie `waiting`.
+- Der Strom hat eine eigene Sitzung (`APIClient.makeSession(streaming: true)`), sonst gleich geschützt. Zeitgrenze: 75 s ohne Daten (der Server schickt alle 25 s einen Herzschlag) statt 30 s je Anfrage. Wiederverbinden macht der Aufrufer: Strom endet nach `ende` oder bei Verbindungsende; dann `campEvents(campId:lastEventId:)` mit dem letzten `upTo` und den Feed ab dort lesen. 429 `ZU_VIELE_VERBINDUNGEN` kommt als `APIError` mit `retryAfter`.
+- Der Strom läuft nur im Vordergrund; der Hintergrund (Push) ist nicht gebaut.
+
 ## Route fehlt (blockiert)
 
 | Gebraucht für | Fehlt | Backend-Issue |
 | --- | --- | --- |
-| Ereignisstrom im Vordergrund | Server-Sent Events | L0d |
-| Offline-Warteschlange | Schreib-Route `POST …/aenderungen` mit `clientOpId`, Konfliktantwort `VERSION_KONFLIKT` | L0c (Lesen da, Schreiben fehlt) |
+| A0b: Namen der `typ`-Werte und Nutzlast-Felder der Operationen | Beschreibung nennt nur das Beispiel `aufgabe.aendern`; Module melden ihre Operationen an | L0c |
 | Papierkorb, Verlauf, Fassungen | Revisionen | L0e |
 | Dateien (Dokumente, Bilder) | Lager-Dateien im Medienspeicher | L0g |
 | A1: Lager-Check «Sind wir bereit?» | keine Route in der Beschreibung | L1 |
@@ -148,6 +167,6 @@ Nicht ableitbar: Welche Rechte die eigene Rolle hat. Die Matrix darf nur die Lag
 
 ## Entscheide, die der Auftraggeber treffen muss
 
-1. Lokaler Speicher für das Lager (SwiftData, mit Dateischutz) für Offline-Lesen und die Warteschlange. Widerspricht `docs/architektur.md` (Serverdaten nur im Arbeitsspeicher).
+1. Lokaler Speicher für das Lager (SwiftData, mit Dateischutz) für Offline-Lesen und die Warteschlange (`CampOutbox` liegt bis dahin nur im Arbeitsspeicher hinter `CampOutboxStore`). Widerspricht `docs/architektur.md` (Serverdaten nur im Arbeitsspeicher).
 2. Zwischenspeicher für Widgets (App-Gruppe), nötig erst für A7.
 3. Design-Entwurf «Cevi Lager iOS» liefern (Bildschirme erst danach).

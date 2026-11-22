@@ -53,7 +53,7 @@ nonisolated final class EventCollector: Sendable {
     var all: [APIEvent] { list.withLock { $0 } }
 }
 
-extension StubProtocol {
+nonisolated extension StubProtocol {
     /// Body of a recorded request (URLSession hands it over as a stream).
     static func body(of request: URLRequest) -> Data? {
         if let data = request.httpBody { return data }

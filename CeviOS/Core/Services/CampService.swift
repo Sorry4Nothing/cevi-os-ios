@@ -60,6 +60,10 @@ extension APIClient {
 nonisolated enum CampRules {
     static let closedCode = "LAGER_GESCHLOSSEN"
     static let versionConflictCode = "VERSION_KONFLIKT"
+    /// Codes of an operation answered `abgelehnt` by `POST …/aenderungen`.
+    static let rejectionCodes = ["OPERATION_UNBEKANNT", "UNGUELTIGE_EINGABE", "KEINE_BERECHTIGUNG", "NICHT_GEFUNDEN", "KONFLIKT"]
+    /// 429 of the event stream (header `Retry-After`).
+    static let tooManyConnectionsCode = "ZU_VIELE_VERBINDUNGEN"
     /// The preview of a milestone move is out of date: the app asks for a new preview.
     static let stalePreviewCode = "VORSCHAU_VERALTET"
     static let portfolioCodeTakenCode = "KUERZEL_VERGEBEN"

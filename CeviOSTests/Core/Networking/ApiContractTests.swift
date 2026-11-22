@@ -51,7 +51,8 @@ struct ApiContractTests {
         StubProtocol.register(host: host) { _ in (200, [:], Data("{}".utf8)) }
         let client = APIClient(
             baseURL: URL(string: "https://\(host)")!, appVersion: "1.0.0", cookieStore: InMemoryCookieStore(["s": "1"]),
-            session: APIClient.makeSession(protocolClasses: [StubProtocol.self])
+            session: APIClient.makeSession(protocolClasses: [StubProtocol.self]),
+            streamSession: APIClient.makeSession(protocolClasses: [StubProtocol.self], streaming: true)
         )
         let id = UUID(), other = UUID()
         let token = "cX1y2Z3a4B5c6D7e8F9g:APA91bxxxxxxxxxxxxxxxxxxxxxxxx"
@@ -303,10 +304,12 @@ struct ApiContractTests {
         _ = try? await client.updateCampContact(campId: id, contactId: other, CampContactPatch(version: 1))
         try? await client.deleteCampContact(campId: id, contactId: other, version: 1)
         _ = try? await client.searchCamp(campId: id, text: "Zelt")
+        _ = try? await client.sendCampOperations(campId: id, [CampOperation(type: "aufgabe.aendern", payload: [:])])
+        for try await _ in client.campEvents(campId: id, lastEventId: 1) {}
 
         let contract = try Self.contractOperations()
         let calls = StubProtocol.requests(host: host).map { "\($0.httpMethod ?? "GET") \(Self.normalize($0.url?.path ?? ""))" }
-        #expect(calls.count >= 241)
+        #expect(calls.count >= 243)
         let missing = Set(calls).subtracting(contract)
         #expect(missing.isEmpty, "Not in the API description: \(missing.sorted())")
     }
