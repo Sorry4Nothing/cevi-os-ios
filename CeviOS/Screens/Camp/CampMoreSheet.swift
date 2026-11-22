@@ -24,6 +24,14 @@ struct CampMoreSheet: View {
                     if rights.readsInbox { NavigationLink(value: CampDestination.inbox) { row("Eingang", symbol: "tray") } }
                     NavigationLink(value: CampDestination.notifications) { row("Benachrichtigungen", symbol: "bell") }
                 }
+                Section("Einteilung") {
+                    NavigationLink(value: CampDestination.rooms) { row("Zimmer und Zelte", symbol: "bed.double") }
+                    NavigationLink(value: CampDestination.trips) { row("Fahrten", symbol: "car") }
+                    NavigationLink(value: CampDestination.groups) { row("Programmgruppen", symbol: "person.3") }
+                    NavigationLink(value: CampDestination.shifts) { row("Schichtplan", symbol: "calendar.badge.clock") }
+                    NavigationLink(value: CampDestination.swaps) { row("Diensttausch", symbol: "arrow.left.arrow.right") }
+                    NavigationLink(value: CampDestination.count) { row("Abzählen", symbol: "checklist") }
+                }
                 Section("Weiteres") {
                     Button { dismiss(); showAllCamps() } label: { row("Alle Lager", symbol: "tent") }
                 }
@@ -44,6 +52,12 @@ struct CampMoreSheet: View {
                 case .mentions: CampMentionsView()
                 case .inbox: CampInboxView()
                 case .notifications: CampNotificationsView()
+                case .rooms: CampRoomsView()
+                case .trips: CampTripsView()
+                case .groups: CampGroupsView()
+                case .swaps: CampSwapsView(personId: profile.id)
+                case .count: CampCountView()
+                case .shifts: CampShiftsView(personId: profile.id)
                 case .notices: EmptyView()
                 }
             }

@@ -5,6 +5,8 @@ nonisolated enum CampDestination: Hashable, Sendable {
     case notices, mentions, inbox
     /// Only in the «Mehr» sheet (no push leads there).
     case meetings, notifications
+    /// The roster screens (B3). Only the swaps are the target of a push (`lager_einteilung`).
+    case rooms, trips, groups, swaps, count, shifts
 }
 
 /// The camp the person works in now, kept in memory only. With a camp the app shows the camp view, without it the program view.

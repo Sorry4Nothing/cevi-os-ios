@@ -228,6 +228,35 @@ Abweichungen vom Entwurf:
 - L19: Zeilen tragen keinen Text und keine Namen; der Text kommt aus der Art («Jemand hat dich erwähnt.»). Tippen auf eine Zeile öffnet das Ziel nicht (nur «Gelesen»). Einstellungen: ein Schalter je bekannter Art; der Entwurf zeigt den Reiter nicht, die Liste folgt der API.
 - Kein Zeilenzähler «3» am Pinnwand-Tab (kein Lagerzähler für die Pinnwand).
 
+## Schnitt B3 Einteilung: Bildschirme (Issue #86)
+
+Gebaut mit den Zuständen Normal, Leer, Laden, Fehler, Ohne Netz (Hinweis «Ohne Netz» mit Stand), Fehler beim Speichern, ohne Recht («Nur lesen.»), Lager abgeschlossen, Textgrösse AX3, Tag und Nacht (Vorschauen):
+
+| Was | Code (`Screens/Camp/Roster`) |
+| --- | --- |
+| L20 Zimmer und Zelte (Belegung, «Nicht eingeteilt», «Person zuweisen», «Herausnehmen», Überbelegung als Wort) | `CampRoomsModel`, `CampRoomsView` |
+| L21 Fahrten (Hin-/Rückfahrt, Mitfahrende einteilen und herausnehmen, «Fahrplan öffnen» nur für `https`) | `CampTripsModel`, `CampTripsView` |
+| L22 Programmgruppen («Automatisch mischen»: Vorschau, «Neu mischen», «Übernehmen» mit demselben `seed`) | `CampGroupsModel`, `CampGroupsView` |
+| L24 Diensttausch (entscheiden, zurückziehen, «Tausch anfragen») | `CampSwapsModel`, `CampSwapsView` |
+| L25 Abzählliste (gemeinsame Haken, Filter, Rückmeldung bei gleichzeitigem Abhaken, Zurücksetzen mit Rückgängig) | `CampCountModel`, `CampCountView` |
+| T2 Schichtplan (Liste je Tag, «Person wählen», «Leere Dienste füllen» als Vorschlag, «Verteilung», «Dienst anlegen»; VoiceOver liest je Dienst einen ganzen Satz aus `CampShiftText`) | `CampShiftsModel`, `CampShiftsView` |
+| Rechte nach Rolle, gemeinsame Bausteine | `CampRosterRights`, `CampRosterModel`, `CampPersonPicker` (`CampRosterSupport.swift`) |
+
+Navigation: Alle sechs Einträge liegen im Mehr-Sheet (Abschnitt «Einteilung»); der Entwurf zeigt sie unter «Mehr», nicht als Tab. Ein Push `lager_einteilung` öffnet den Diensttausch (die Benachrichtigungen der Einteilung sind Tauschanfragen und -entscheide; `CampRouter`).
+
+Abweichungen vom Entwurf:
+
+- Rechte (Annahme, der Server entscheidet am Ende): Einteilen in Zimmer, Fahrten, Gruppen und Tausch entscheiden nur die Lagerleitung; Schichten bearbeitet auch die Leitung; Abhaken: Lagerleitung, Leitung, Team; Zurücksetzen: Lagerleitung, Leitung. Fehlende Aktion ist ein fehlender Knopf.
+- Namen: Wo die API nur `personId` liefert, steht «Person». Der Diensttausch löst Namen über die Schichten des Schichtplans auf. «Person wählen» (Schichten) bietet nur Personen aus der Statistik des Plans und die Leitenden der Gruppen an (Mitgliederliste fehlt, B1). Offene Anfragen ohne Gegenüber lassen sich nicht annehmen (man müsste die übernehmende Person wählen), nur ablehnen.
+- Ohne Netz: «Wartet» an einzelnen Zeilen fehlt, die Warteschlange kennt für diese Änderungen keine Operationen (L0c). Es erscheinen Warteschlangen-Banner und Stand-Hinweis.
+- L24 «Rückgängig» nach Annehmen fehlt (die API kennt keine Rücknahme einer Entscheidung). L25 «Rückgängig» nach Zurücksetzen setzt die vorher gesetzten Haken wieder.
+- L25: Filter «Leitung» ist die Art Team; die weiteren Chips sind die Programmgruppen (der Entwurf nennt «Wölfe», «Adler»). Die Stufe ist kein Filter.
+- L22: «Vorschau: gemischt» ohne «nach Stufe» (die API nennt das Kriterium nicht).
+- T2: Ziehen nicht gebaut (Board T2-D); die Alternative «Person wählen» ist die einzige Einteilung. Der Vorschlag gilt für alle Lagertage und hat die Schalter «Nur Anwesende» und «Auch Teilnehmende» (Optionen der API).
+- Neu ohne Board: «Tausch anfragen» (eigener Dienst, Notiz), «Verteilung» (Statistik), «Dienst anlegen» wie im Leerzustand des Entwurfs.
+
+Nicht gebaut: Anlegen, Bearbeiten und Löschen von Zimmern, Zelten, Fahrten und Gruppen (kein Board im Entwurf; die Texte der Leerzustände nennen es trotzdem), Zuordnung einzelner Teilnehmender zu Gruppen, Abwählen, Import der Teilnehmenden, Konfliktbildschirm für diese Boards (Konflikt zeigt «Jemand hat das gerade geändert» und lädt neu), Board L23 (heisst jetzt T2).
+
 ## Offene Fragen zum Entwurf
 
 - L1: «62 Prozent erledigt, 4 überfällig» braucht `GET …/start` je Lager; «Übungslager» (Abschnitt, Chip «Übung») hat kein Feld in der API. Beides fehlt in der App.
@@ -251,6 +280,7 @@ Abweichungen vom Entwurf:
 | A3: Namen der Mitglieder (Schichtplan, Diensttausch, Gruppen-Auswahl) | Liste der Lagermitglieder für Nicht-Admins; `…/lager/{id}/mitglieder` gibt es nur unter `/api/v1/admin` (die App ruft Admin nie auf). Schichten tragen `name`, ein Tausch nur `personId`s | L4 |
 | A3: Tauschanfrage mit Namen, Zimmer-Namen der Teilnehmenden im Team | Tausch liefert keine Namen und keine Schicht-Details; Fahrer nur als `fahrer.name` | L4 |
 | A4: Namen der Anwesenheits-Matrix, des Tageschefs im Team und der Einkäufer-Auswahl | Matrix nennt nur IDs (Mitglieder und Teilnehmende löst die App über Listen auf); Mitglieder-Liste fehlt für Nicht-Admins | L4 |
+| B3: Namen in Diensttausch, Schichtauswahl und Zimmer-/Fahrtenauswahl des Teams | wie A3: Mitgliederliste für Nicht-Admins fehlt; die App zeigt «Person», wo nur `personId` kommt | L4 |
 | A5: Wissen früherer Lager übernehmen | keine Route in der Beschreibung | L6 |
 | A5: Papierkorb ansehen, Wiederherstellen, Verlauf (ausser `…/aufgaben/{id}/verlauf`) | keine Routen (Löschen ist weich, aber nicht abrufbar) | L0e |
 | A5: Exporte als Word und Excel | nur Aushänge als PDF (`…/aushaenge/{art}`) | L7 |
