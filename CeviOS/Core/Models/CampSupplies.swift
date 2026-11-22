@@ -18,11 +18,11 @@ nonisolated enum CampShoppingGroup: String, CampTolerantEnum, CaseIterable {
 
     var title: String {
         switch self {
-        case .produce: String(localized: "Obst und Gemüse")
+        case .produce: String(localized: "Früchte und Gemüse")
         case .bread: String(localized: "Brot")
-        case .dairy: String(localized: "Milch und Käse")
+        case .dairy: String(localized: "Milch")
         case .meat: String(localized: "Fleisch und Fisch")
-        case .pantry: String(localized: "Vorrat")
+        case .pantry: String(localized: "Trockenes")
         case .drinks: String(localized: "Getränke")
         case .household: String(localized: "Haushalt")
         case .other, .unknown: String(localized: "Diverses")
