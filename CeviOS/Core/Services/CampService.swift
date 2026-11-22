@@ -1,7 +1,7 @@
 import Foundation
 
 extension APIClient {
-    private func campPath(_ id: UUID) -> String { "/api/v1/lager/\(id.uuidString.lowercased())" }
+    func campPath(_ id: UUID) -> String { "/api/v1/lager/\(id.uuidString.lowercased())" }
 
     /// The camps of the person (only camps where the person is a member).
     func camps() async throws -> [CampListEntry] {
@@ -56,10 +56,27 @@ extension APIClient {
     }
 }
 
-/// Texts for a camp that is read-only or an action the server refuses.
+/// Texts for a camp that is read-only or an action the server refuses, and the error codes of the camp routes.
 nonisolated enum CampRules {
+    static let closedCode = "LAGER_GESCHLOSSEN"
+    static let versionConflictCode = "VERSION_KONFLIKT"
+    /// The preview of a milestone move is out of date: the app asks for a new preview.
+    static let stalePreviewCode = "VORSCHAU_VERALTET"
+    static let portfolioCodeTakenCode = "KUERZEL_VERGEBEN"
+    static let portfolioHasChildrenCode = "RESSORT_HAT_UNTERRESSORTS"
+    static let portfolioCycleCode = "RESSORT_ZYKLUS"
+    static let notAMemberCode = "KEIN_MITGLIED"
+    static let limitReachedCode = "LIMIT_ERREICHT"
+
     /// Shown for 409 `LAGER_GESCHLOSSEN`; other errors show the server text.
     static func writeError(_ error: APIError) -> String {
-        error.code == "LAGER_GESCHLOSSEN" ? String(localized: "Das Lager ist abgeschlossen. Es lässt sich nur noch lesen.") : error.displayText
+        error.code == closedCode ? String(localized: "Das Lager ist abgeschlossen. Es lässt sich nur noch lesen.") : error.displayText
+    }
+
+    /// The details of a 409 `VERSION_KONFLIKT` ("my version" is what the person typed, "current" is `current`).
+    /// `nil` for any other error. `Row` is the type of the row the request wrote, for example `CampTask`.
+    static func versionConflict<Row: Decodable & Sendable>(_ error: APIError, as row: Row.Type) -> CampVersionConflict<Row>? {
+        guard error.kind == .conflict, error.code == versionConflictCode, let body = error.conflictBody else { return nil }
+        return try? JSONDecoder.api.decode(CampVersionConflict<Row>.self, from: body)
     }
 }

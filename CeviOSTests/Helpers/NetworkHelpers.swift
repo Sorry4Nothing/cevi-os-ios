@@ -52,3 +52,21 @@ nonisolated final class EventCollector: Sendable {
     func add(_ e: APIEvent) { list.withLock { $0.append(e) } }
     var all: [APIEvent] { list.withLock { $0 } }
 }
+
+extension StubProtocol {
+    /// Body of a recorded request (URLSession hands it over as a stream).
+    static func body(of request: URLRequest) -> Data? {
+        if let data = request.httpBody { return data }
+        guard let stream = request.httpBodyStream else { return nil }
+        stream.open()
+        defer { stream.close() }
+        var data = Data()
+        var buffer = [UInt8](repeating: 0, count: 4096)
+        while stream.hasBytesAvailable {
+            let count = stream.read(&buffer, maxLength: buffer.count)
+            if count <= 0 { break }
+            data.append(buffer, count: count)
+        }
+        return data
+    }
+}
