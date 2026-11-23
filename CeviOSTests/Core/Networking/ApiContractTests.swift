@@ -70,13 +70,10 @@ struct ApiContractTests {
         _ = try? await client.image(path: "/api/v1/personen/\(id.uuidString.lowercased())/bild")
         _ = try? await client.image(path: "/api/v1/stufen/\(id.uuidString.lowercased())/logo")
         _ = try? await client.units()
-        _ = try? await client.programs(from: .now, to: .now)
-        _ = try? await client.program(id: id)
         _ = try? await client.contacts(programId: id)
         try? await client.setParticipation(programId: id, childId: other, answer: .yes)
         try? await client.setOwnRegistration(programId: id, answer: .no)
         _ = try? await client.participationOverview(programId: id)
-        try? await client.assign(programId: id, unitIds: [other], visibility: .parents)
         _ = try? await client.chats()
         _ = try? await client.openDirectChat(unitId: id)
         _ = try? await client.messages(chatId: id)
@@ -332,11 +329,8 @@ struct ApiContractTests {
 
         let contract = try Self.contractOperations()
         let calls = StubProtocol.requests(host: host).map { "\($0.httpMethod ?? "GET") \(Self.normalize($0.url?.path ?? ""))" }
-        #expect(calls.count >= 264)
-        // The backend dropped the manual assignment of programs (404, #449); `assign` is still called by the leader screen.
-        // Remove the call and this exception together in a follow-up.
-        let removedByBackend: Set<String> = ["PUT /api/v1/programme/{}/zuordnung"]
-        let missing = Set(calls).subtracting(contract).subtracting(removedByBackend)
+        #expect(calls.count >= 261)
+        let missing = Set(calls).subtracting(contract)
         #expect(missing.isEmpty, "Not in the API description: \(missing.sorted())")
     }
 

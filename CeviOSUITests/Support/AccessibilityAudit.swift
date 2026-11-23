@@ -56,6 +56,13 @@ enum AccessibilityAudit {
     private static let verifiedUnclipped = [
         "Du hast ein Startpasswort", "Nochmals versuchen", "An welche Stufenleitung", "Nachricht an die Stufenleitung", "Nachrichten an die Stufenleitung",
         "Ich habe die Datenschutzerklärung", "Konto löschen", "Mitteilungen zu Anmeldungen",
+        // Termine screens (default size, screenshots of the failed audits, Nov 2026): banner lines, the header of the registration and
+        // the sheet with the new calendar link wrap and are complete.
+        "Das zuständige Team", "Die Abteilungsleitung prüft", "Anmeldung Sommerlager", "Teile ihn mit deinem Kalender", "Dein Link ist bereit",
+        "Fertig", "Deine Eingabe ist noch da", "Etwas ist schiefgegangen. Bitte später", "Prüfe deine Eingaben", "Ein Feld braucht",
+        "Dieser Raum ist schon belegt", "Wähle eine andere Zeit", "Anfrage gesendet", "Gesendet.", "Das hat nicht geklappt", "Du erfährst es", "Abmelden geht", "Erst nach der Freigabe", "Zweck:", "Die Anmeldung ist geschlossen", "Anmeldung geschlossen", "Angemeldet", "Teilen oder kopieren",
+        // Notifications (A7, default size, screenshot of the failed audit, Nov 2026): the titles and sentences wrap and are complete.
+        "Mitteilungen zeigen nie", "Programme und Erinnerungen", "Wenn ", "Die Gruppen kommen aus der Outlook-Kategorie",
         // Program card line: complete on the default-size screenshots of the flow run (Nov 2026).
         "Ganztägig ·",
         // Chat list (dark mode, screenshot of the failed audit, Nov 2026): the footnote and the preview wrap and are complete.
@@ -110,12 +117,17 @@ enum AccessibilityAudit {
             return screen == "CampPageScreen" && ["vorgestern", "gestern", "heute", "vor "].contains { issue.element?.label.hasPrefix($0) == true }
         case .sufficientElementDescription:
             // File names as labels («Reiseplan.pdf») are what the person sees and hears; the audit finds the dot «not human-readable».
+            // Result banners of the Termine forms read «Angemeldet.», «Gesendet.», «Anfrage gesendet.»: words, with a full stop.
+            if ["EventRegistrationScreen", "SuggestEventScreen", "RequestRoomScreen"].contains(screen),
+               ["Angemeldet.", "Gesendet.", "Anfrage gesendet."].contains(issue.element?.label ?? "") { return true }
             return screen == "CampPageScreen" && issue.element?.label.range(of: #"\.\w{3,4}$"#, options: .regularExpression) != nil
         case .elementDetection:
             // Contact avatar initials (iOS 27 audit): decorative text, hidden from VoiceOver on purpose because the name beside
             // it says the same. The finding has no element and no frame.
             // Same for the code chips of portfolios («KÜ» beside «Küche») in the camp task screens (CampCodeChip, hidden on purpose).
-            return ["ProgramDetailScreen", "CampTasksScreen", "CampTaskDetailScreen", "CampStartScreen", "CampPageScreen"].contains(screen) && issue.element == nil
+            return ["ProgramDetailScreen", "CampTasksScreen", "CampTaskDetailScreen", "CampStartScreen", "CampPageScreen",
+                    // Termine forms (screenshots of the failed audits, Nov 2026): every label is read; the finding names the text «-» with no frame.
+                    "SuggestEventScreen", "RequestRoomScreen", "EventRegistrationScreen", "ProfileScreen"].contains(screen) && issue.element == nil
         case .dynamicType, .textClipped:
             // Clipped text without an element or frame: the footer line that scrolls under the glass tab bar (Profile,
             // screenshot of the failed audit, Nov 2026). Nothing to locate, and the line is complete once scrolled up.
@@ -140,6 +152,8 @@ enum AccessibilityAudit {
             if let element = issue.element, element.label.count <= 2, [CGSize(width: 44, height: 44), CGSize(width: 32, height: 32)].contains(element.frame.size) { return true }
             // The audit grows these texts without a new layout pass. Screenshots at the default size and at AX5 show
             // them complete (they wrap or the row grows), so the finding does not hold for the real layout.
+            // Registration header: the date line («2. Januar bis 9. Januar 2027, Anmeldeschluss …») wraps and is complete.
+            if screen == "EventRegistrationScreen", issue.auditType == .textClipped, issue.element?.label.contains("Anmeldeschluss") == true { return true }
             if verifiedUnclipped.contains(where: { issue.element?.label.hasPrefix($0) == true }) { return true }
             // Camp choice, closed camp (screenshot of the failed audit, Nov 2026): «… 1. Oktober 2026, nur lesen» wraps onto a second
             // line and is complete; the audit measures the first line only.

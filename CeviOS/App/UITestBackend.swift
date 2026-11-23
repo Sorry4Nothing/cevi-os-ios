@@ -9,6 +9,7 @@ import SwiftUI
 /// - `-UITestFailure offline|server|unauthorized|outdated|empty`: failure injection for the state screens (offline:
 ///   first request; server: first program list 500; unauthorized: first program detail 401; outdated: every request 426;
 ///   empty: no programs).
+/// - `-UITestFailure noRooms|occasionClosed`: the room list is empty; the registration of the occasion is closed.
 /// - `-UITestSignedIn <username>`: cold start with a stored session of that persona (goes through `get-session`).
 /// - `-UITestLocked YES`: switches the app lock on and shows the lock screen once; «Entsperren» unlocks without Face ID.
 /// - `-AppleInterfaceStyle Dark`: dark mode; iOS apps do not apply this argument by themselves.
@@ -257,6 +258,7 @@ nonisolated struct World {
     var chats: [Chat]
     var counter = 0x100
     var campState = UITestCampState()
+    var eventState = UITestEventState()
 
     init(failure: String?, seededUser: String?) {
         self.failure = failure
@@ -273,6 +275,8 @@ nonisolated struct World {
             Program(id: Ids.games, title: "Spielnachmittag", status: "aktiv", visibility: "eltern", units: [Ids.jungschar],
                     isAllDay: false, day: -2,
                     answers: [kids[0].id: "ja", kids[1].id: "nein", kids[2].id: "ja"], leaderAnswers: [Ids.leader: "ja"]),
+            Program(id: World.camp2027, title: "Sommerlager Beispiel 2027", status: "aktiv", visibility: "eltern", units: [Ids.jungschar],
+                    isAllDay: true, day: 40, length: 8),
         ]
         chats = []
         // 22 messages: one page (20) plus older ones, so «Ältere Nachrichten laden» has something to load.
@@ -306,6 +310,7 @@ nonisolated struct World {
         if route.contains("bild") || route.last == "logo" { return .notFound }
         switch (request.method, route.first) {
         case (_, "ich") where route.last == "lager-benachrichtigungen": return campSettings(request, me)
+        case (_, "ich") where route.dropFirst().first == "kalender-link": return eventRoutes(request, route, me)
         case ("GET", "ich"): return .json(200, profile(me))
         case ("POST", "ich") where route.last == "datenschutz":
             accounts[username]?.privacyRead = .now
@@ -314,6 +319,7 @@ nonisolated struct World {
         case (_, "programme"): return programmes(request, Array(route.dropFirst()), me)
         case ("GET", "stufen") where route.count == 1:
             return .json(200, ["stufen": [Ids.jungschar, Ids.froeschli].map(unit)])
+        case (_, "termine"), (_, "termin-vorschlaege"), (_, "raeume"), (_, "anlaesse"): return eventRoutes(request, route, me)
         case (_, "chats"): return chatRoutes(request, Array(route.dropFirst()), me)
         // Camps: `leitung…` is camp lead, `team…` team; everyone else has no camp and no switcher.
         case (_, "lager"): return campRoutes(request, Array(route.dropFirst()), me)
@@ -324,8 +330,8 @@ nonisolated struct World {
 
     /// One-shot failures hit the first matching request; `outdated` and `empty` hold for the whole launch.
     private mutating func injectedFailure(_ request: Request) -> Reply? {
-        let isProgramList = request.method == "GET" && request.path == "/api/v1/programme"
-        let isProgramDetail = request.method == "GET" && request.path.hasPrefix("/api/v1/programme/") && request.path.split(separator: "/").count == 4
+        let isProgramList = request.method == "GET" && request.path == "/api/v1/termine/mein"
+        let isProgramDetail = request.method == "GET" && request.path.hasPrefix("/api/v1/termine/") && request.path.split(separator: "/").count == 4 && request.path != "/api/v1/termine/mein"
         switch failure {
         case "offline":
             failure = nil
@@ -339,7 +345,7 @@ nonisolated struct World {
             failure = nil
             return .error(401, "NICHT_ANGEMELDET", "Bitte melde dich an.")
         case "empty" where isProgramList:
-            return .json(200, ["programme": [Any]()])
+            return .json(200, ["termine": [Any](), "weitere": false, "naechste": NSNull()])
         default:
             return nil
         }
@@ -469,26 +475,19 @@ nonisolated struct World {
             guard programs[index].start > .now else { return .error(409, "PROGRAMM_BEGONNEN", "Das Programm hat begonnen.") }
             programs[index].leaderAnswers[me.id] = request.body["status"] as? String
             return .noContent
-        case ("PUT", "zuordnung"):
-            guard !me.roles.filter({ $0.type == "stufenleitung" }).isEmpty else {
-                return .error(403, "KEIN_ZUGRIFF", "Kein Zugriff.")
-            }
-            programs[index].units = request.body["stufen"] as? [String] ?? []
-            programs[index].visibility = request.body["sichtbarkeit"] as? String ?? "intern"
-            return .noContent
         default:
             return .notFound
         }
     }
 
-    private func isVisible(_ program: Program, to me: Person) -> Bool {
+    func isVisible(_ program: Program, to me: Person) -> Bool {
         if me.isParent {
             return program.visibility == "eltern" && program.units.contains { unit in me.children.contains { $0.unit == unit } }
         }
         return program.units.contains(where: me.leads)
     }
 
-    private func program(_ p: Program, for me: Person) -> [String: Any] {
+    func program(_ p: Program, for me: Person) -> [String: Any] {
         let kids = me.children.filter { p.units.contains($0.unit) }
         var object: [String: Any] = [
             "id": p.id, "titel": p.title, "status": p.status, "sichtbarkeit": p.visibility, "ganztaegig": p.isAllDay,

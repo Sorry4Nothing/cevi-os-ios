@@ -29,37 +29,12 @@ struct LeadershipPermissionsTests {
     @Test func parentsGetNoLeadershipControls() throws {
         let permissions = LeadershipPermissions(profile: try profile())
         #expect(!permissions.canSeeOverview(of: try program(units: [unitA])))
-        #expect(!permissions.canAssign)
     }
 
-    @Test func leadersSeeTheOverviewOfTheirUnitsButCannotAssign() throws {
+    @Test func leadersSeeTheOverviewOfTheirUnits() throws {
         let permissions = LeadershipPermissions(profile: try profile(roles: [(unitA, "leitung")]))
         #expect(permissions.canSeeOverview(of: try program(units: [unitA])))
         #expect(!permissions.canSeeOverview(of: try program(units: [unitB])))
-        #expect(!permissions.canAssign)
-    }
-
-    @Test func unitLeadersMayOnlyChangeTheirOwnUnits() throws {
-        let permissions = LeadershipPermissions(profile: try profile(roles: [(unitA, "stufenleitung")]))
-        #expect(permissions.canAssign)
-        #expect(permissions.canSaveAssignment(oldUnits: [], newUnits: [unitA], oldVisibility: .parents, newVisibility: .parents))
-        #expect(!permissions.canSaveAssignment(oldUnits: [], newUnits: [unitB], oldVisibility: .parents, newVisibility: .parents))
-        // Keeping a foreign unit unchanged is fine as long as visibility stays.
-        #expect(permissions.canSaveAssignment(oldUnits: [unitB], newUnits: [unitA, unitB], oldVisibility: .parents, newVisibility: .parents))
-        // Changing visibility needs all units to be theirs.
-        #expect(!permissions.canSaveAssignment(oldUnits: [unitB], newUnits: [unitA, unitB], oldVisibility: .parents, newVisibility: .leaders))
-    }
-
-    @Test func adminsMayDoEverything() throws {
-        let permissions = LeadershipPermissions(profile: try profile(admin: true))
-        #expect(permissions.canAssign)
-        #expect(permissions.canSaveAssignment(oldUnits: [unitB], newUnits: [], oldVisibility: .parents, newVisibility: .internalOnly))
-    }
-
-    @Test func noUnitsOnlyAllowsInternalVisibility() {
-        #expect(LeadershipPermissions.isValidAssignment(units: [], visibility: .internalOnly))
-        #expect(!LeadershipPermissions.isValidAssignment(units: [], visibility: .parents))
-        #expect(LeadershipPermissions.isValidAssignment(units: [UUID()], visibility: .parents))
     }
 
     @Test func ownRegistrationNeedsTheKeyAndAProgramThatHasNotStarted() throws {
@@ -68,7 +43,6 @@ struct LeadershipPermissionsTests {
         #expect(!permissions.canRegisterAsLeader(for: try program(units: [unitA])))
         #expect(!permissions.canRegisterAsLeader(for: try program(units: [unitA], own: "ja", start: "2020-01-01T10:00:00Z")))
     }
-
 }
 
 struct LeadershipModelsTests {

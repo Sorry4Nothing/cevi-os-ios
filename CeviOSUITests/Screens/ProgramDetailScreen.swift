@@ -37,13 +37,20 @@ struct ProgramDetailScreen: Screen {
         XCTAssertFalse(app.buttons.matching(NSPredicate(format: "label ENDSWITH ', Ja'")).firstMatch.exists, file: file, line: line)
     }
 
-    func openParticipation() -> ParticipationOverviewScreen {
-        tap("Anmeldungen")
-        return ParticipationOverviewScreen(app: app).waitUntilDisplayed()
+    /// The leader section: where the groups come from and the way to the registrations, with the counts in words.
+    func assertLeaderSection(counts: String, file: StaticString = #filePath, line: UInt = #line) {
+        assertShows("Die Gruppen kommen aus der Outlook-Kategorie.", "Für Leitende")
+        wait(for: button(containing: "Anmeldungen ansehen"), "label CONTAINS %@", counts, file: file, line: line)
     }
 
-    func openAssignment() -> AssignmentScreen {
-        tap("Stufen und Sichtbarkeit")
-        return AssignmentScreen(app: app).waitUntilDisplayed()
+    /// The row to the registration of an occasion (K4).
+    func openRegistration(_ label: String) -> EventRegistrationScreen {
+        scrollUntilHittable(button(containing: label)).tap()
+        return EventRegistrationScreen(app: app).waitUntilDisplayed()
+    }
+
+    func openParticipation() -> ParticipationOverviewScreen {
+        scrollUntilHittable(button(containing: "Anmeldungen ansehen")).tap()
+        return ParticipationOverviewScreen(app: app).waitUntilDisplayed()
     }
 }

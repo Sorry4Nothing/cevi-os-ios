@@ -1,4 +1,4 @@
-# Termine: Datenschicht (Schnitt C1)
+# Termine: Datenschicht (C1) und Bildschirme (C2)
 
 Modelle, Dienste und Tests für die Termine der App. Keine Bildschirme, kein lokaler Speicher, keine Widgets.
 Quelle ist `api-vertrag/openapi.yaml` (Stand der Kopie siehe `api-vertrag/README.md`). Neue Dateien tragen das Präfix `Event`.
@@ -46,4 +46,35 @@ Tests: `CeviOSTests/Core/Services/EventTests.swift`; alle Aufrufe stehen im Vert
 - `ETag` und `If-None-Match` (304) der beiden Terminrouten sind nicht umgesetzt: Die App lädt bei jedem Aufruf neu. Das gehört zum Entscheid über den lokalen Speicher.
 - Wer vorschlagen darf und wer Räume anfragen darf, sind laut Beschreibung Annahmen des Servers, noch nicht vom Nutzer bestätigt. Die App richtet sich nach `darfVorschlagen` und den Antworten 403/404.
 - Offen (nicht geprüft): ob die Liste einen mehrtägigen Termin einmal oder je Tag liefert. Die Beschreibung sagt «erscheint an jedem seiner Tage».
-- Die neue Beschreibung kennt `PUT /api/v1/programme/{id}/zuordnung` nicht mehr (Backend #449: 404). Der Aufruf `assign` in `LeadershipService` bleibt vorerst und ist im Vertragstest als Ausnahme eingetragen; beides entfällt zusammen mit der Umstellung der Programme auf «Mein Kalender».
+
+## Bildschirme (Schnitt C2)
+
+| Board | Bildschirm | Code |
+|---|---|---|
+| A1, A2 | Programme: «Mein Kalender» mit Ort, Gruppen-Chips, Antwortzeile ohne Kindernamen | `ProgramListView`, `ProgramRow`, `ProgramListModel` (lädt `GET /termine/mein`, folgt den Seiten) |
+| A3, A4 | Detail: Gruppen, Treffpunkt, Ja/Nein pro Kind (`/programme/{id}/teilnahmen/{kindId}` bleibt), Leitende: Hinweis auf Outlook-Kategorie und «Anmeldungen ansehen» mit Zahlen | `ProgramDetailView`, `ProgramDetailModel` (lädt `GET /termine/{id}`), `EventProgram.swift` |
+| A6 | Profil: Meine Gruppen, Kalender-Link (erzeugen, ersetzen, widerrufen, Teilen-Blatt) | `ProfileView`, `CalendarLinkCard`, `CalendarLinkModel` |
+| A7 | Benachrichtigungen | `NotificationsView`, `NotificationsModel` |
+| K1 | Termin vorschlagen | `SuggestEventView`, `SuggestEventModel` |
+| K2 | Raum anfragen | `RequestRoomView`, `RequestRoomModel` |
+| K3 | Meine Raumanfragen | `MyRoomRequestsView`, `MyRoomRequestsModel` |
+| K4 | Anlass-Anmeldung | `EventRegistrationView`, `EventRegistrationModel` |
+
+Erreichbar: K1 bis K3 über das «+»-Menü im Programme-Tab, K4 über die Zeile «Zur Anmeldung» im Detail eines Termins mit Anlass, A7 über Profil, «App».
+
+Rückbau (Backend #449): `PUT /programme/{id}/zuordnung`, `LeadershipService.assign`, der Zuordnungs-Bildschirm, `programs(from:to:)` und `program(id:)` sind entfernt.
+
+### Abweichungen vom Entwurf
+- Nur «Mein Kalender» (Design-Abweichung 1), keine Kindernamen in den Antwortzeilen.
+- «Ohne Netz» (A1 bis A3, K1, K4) mit Stand von heute und wartenden Änderungen braucht lokalen Speicher und die Warteschlange der Termine: nicht gebaut. Ohne Verbindung zeigt der Bildschirm «Keine Verbindung».
+- A2: Die Liste liefert `eigeneAnmeldung` nicht, die Zeilen der Leitung zeigen darum «Du kommst» nicht. Die eigene Antwort steht im Detail.
+- A3/A4: Die Schaltfläche «Zum Kalender hinzufügen» (EventKit) ist nicht gebaut. Der Block «Info» fehlt, die API liefert keinen Infotext.
+- A6: «Link kopieren» geht nur direkt nach dem Erzeugen (die Adresse gibt es nur einmal); darum «Link erzeugen» und «Link neu erzeugen» mit Teilen-Blatt, dazu «Link widerrufen». «Meine Gruppen» nennt Stufen, Funktion und Lager; Teams stehen nicht in `GET /ich`.
+- A7: Die Schalter «Entscheid zu meinem Terminvorschlag» und «Entscheid zu meiner Raumanfrage» fehlen: Die API kennt dafür keine Art. Dazu stehen Chat, Programme und Anmeldungen (Profil-Schalter) und die Lager-Arten.
+- K3: Stornieren offener Anfragen steht nicht im Entwurf, `cancelRoomRequest` wird nur für «Rückgängig» in K2 genutzt.
+- K4: «Zu den Programmen» geht einen Schritt zurück (zum Detail), nicht an die Wurzel.
+- «Termin vorschlagen» zeigt nur zeitgebundene Termine (der Entwurf kennt kein «ganztägig»).
+
+### Offene Fragen zum Entwurf und zur API
+- Ob die `id` eines Stufen-Tags der `stufeId` aus `GET /ich` entspricht: Die App nimmt es an (Rechte für «Anmeldungen ansehen», Logo).
+- Wo K1 bis K3 im Entwurf einsteigen: die Boards zeigen keinen Einstieg, gebaut ist das «+»-Menü.

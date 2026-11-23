@@ -27,6 +27,10 @@ enum AppRobot {
         case outdated
         /// The program list is empty.
         case empty
+        /// The room list is empty.
+        case noRooms
+        /// The registration of the occasion is closed.
+        case occasionClosed
     }
 
     static let largestTextCategory = "UICTContentSizeCategoryAccessibilityXXXL"

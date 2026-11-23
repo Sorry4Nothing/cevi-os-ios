@@ -29,8 +29,8 @@ final class AppFlowTests: XCTestCase {
         tabs.assertTabs([.programs, .chat, .profile])
         let programs = ProgramListScreen(app: app).waitUntilDisplayed()
         try programs.auditAccessibility()
-        programs.assertRow("Waldnachmittag", shows: "Jungschar", "Zusage für Lena offen", "Zusage für Noah offen")
-        programs.assertRow("Kerzenziehen", shows: "Abgesagt", "Lena kommt")
+        programs.assertRow("Waldnachmittag", shows: "Jungschar", "Zusage für 2 Kinder offen")
+        programs.assertRow("Kerzenziehen", shows: "Abgesagt", "Zusage für 1 Kind offen")
         programs.assertMultiDay("Herbstweekend")
         programs.assertRow("Herbstweekend", shows: "Wird geprüft")
 
@@ -43,7 +43,7 @@ final class AppFlowTests: XCTestCase {
         detail.back()
         // Persistence: the list and the reopened detail show the saved answers.
         programs.waitUntilDisplayed()
-        programs.assertRow("Waldnachmittag", shows: "Lena kommt", "Noah kommt nicht")
+        programs.assertRow("Waldnachmittag", shows: "1 Kind hat abgesagt")
         detail = programs.open("Waldnachmittag")
         detail.assertAnswer(child: "Lena", yes: true)
         detail.assertAnswer(child: "Noah", yes: false)
@@ -77,10 +77,14 @@ final class AppFlowTests: XCTestCase {
         tabs.open(.profile)
         let profile = ProfileScreen(app: app).waitUntilDisplayed()
         try profile.auditAccessibility()
-        profile.assertShows("Eva Beispiel", "Elternteil · Lena und Noah", "Benachrichtigungen")
-        profile.setSwitch("Mitteilungen zum Chat", on: false)
-        profile.setSwitch("Mitteilungen und Erinnerungen", on: false)
-        profile.setSwitch("Mitteilungen zum Chat", on: true)
+        profile.assertShows("Eva Beispiel", "Elternteil · Lena und Noah", "Meine Gruppen")
+        let notifications = profile.openNotifications()
+        try notifications.auditAccessibility()
+        notifications.setSwitch("Chat", on: false)
+        notifications.setSwitch("Programme und Erinnerungen", on: false)
+        notifications.setSwitch("Chat", on: true)
+        notifications.back()
+        profile.waitUntilDisplayed()
         profile.signOut(username: AppRobot.username(.parent))
     }
 
@@ -147,7 +151,7 @@ final class AppFlowTests: XCTestCase {
         try programs.auditAccessibility()
 
         let detail = programs.open("Waldnachmittag")
-        detail.assertShows("Leitung")
+        detail.assertLeaderSection(counts: "0 kommen, 4 offen")
         detail.registerAsLeader(yes: true)
         try detail.auditAccessibility()
 
@@ -161,13 +165,6 @@ final class AppFlowTests: XCTestCase {
         overview.assertRow("Biber", answer: "Ja")
         try overview.auditAccessibility()
         overview.back()
-
-        let assignment = detail.waitUntilDisplayed().openAssignment()
-        try assignment.auditAccessibility()
-        assignment.assertUnitRequired("Jungschar")
-        assignment.setVisibility("Leitende")
-        assignment.save()
-        detail.waitUntilDisplayed()
 
         tabs.open(.chat)
         let chats = ChatListScreen(app: app).waitUntilDisplayed()
@@ -198,7 +195,7 @@ final class AppFlowTests: XCTestCase {
             SignInScreen(app: app).waitUntilDisplayed().signIn(username: AppRobot.username(.parent), password: AppRobot.password())
             let empty = StateScreen(app: app, kind: .empty).waitUntilDisplayed()
             try empty.auditAccessibility()
-            empty.assertShows("In den nächsten Monaten ist nichts geplant.")
+            empty.assertShows("Es gibt gerade keine Termine für deine Gruppen.")
         }
         try XCTContext.runActivity(named: "Session ended, back to sign-in") { _ in
             let app = AppRobot.launch(failure: .unauthorized)

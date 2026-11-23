@@ -9,7 +9,7 @@ struct StateScreen: Screen {
             switch self {
             case .offline: "Keine Verbindung"
             case .error: "Etwas ist schiefgelaufen"
-            case .empty: "Keine Programme"
+            case .empty: "Keine Termine für dich"
             case .outdated: "Bitte die App aktualisieren"
             case .sessionEnded: "Schön, bist du da."
             }

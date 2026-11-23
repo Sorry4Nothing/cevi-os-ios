@@ -59,6 +59,12 @@ nonisolated struct Program: Decodable, Equatable, Identifiable, Sendable {
     /// The person's own registration as a leader. `nil` if the person is not a leader of an assigned unit.
     let ownRegistration: OwnRegistration?
 
+    // From «Mein Kalender» only (not in the old program routes)
+    var place: String? = nil
+    /// Tags of the event that are not units: group, team, camp.
+    var otherTags: [EventTag] = []
+    var occasion: EventOccasionRef? = nil
+
     enum CodingKeys: String, CodingKey {
         case id, units = "stufen", visibility = "sichtbarkeit", status, start = "beginn", end = "ende"
         case title = "titel", isAllDay = "ganztaegig", dayFrom = "tagVon", dayTo = "tagBis"
