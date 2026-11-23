@@ -172,6 +172,9 @@ enum AccessibilityAudit {
             if screen == "CampTaskDetailScreen" { return true }
             // Chat times such as «5:08» (screenshot of the failed audit, Nov 2026): one short line, complete.
             if isClockTime(issue.element?.label ?? "") { return true }
+            // Chat day marker «Heute»/«Gestern» (the text depends on the time of the run): one short line between messages,
+            // complete on the screenshots of the failed audit (Nov 2026); the audit grows it without a new layout pass.
+            if screen == "ChatScreen", ["Heute", "Gestern"].contains(issue.element?.label ?? "") { return true }
             // At AX5 the audit tries to enlarge text beyond the largest size, which is impossible; the screenshots of
             // these screens at AX5 show the full text. The default size is audited without this exception.
             return variant == .largestText
