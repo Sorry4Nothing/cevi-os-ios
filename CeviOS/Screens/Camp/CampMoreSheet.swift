@@ -18,7 +18,7 @@ struct CampMoreSheet: View {
         NavigationStack(path: $path) {
             List {
                 Section {
-                    Button { showsProfile = true } label: { row("Profil", symbol: "person.crop.circle") }
+                    Button { showsProfile = true } label: { row("Profil", symbol: "person.crop.circle", showsChevron: true) }
                 }
                 Section("Lager") {
                     NavigationLink(value: CampDestination.meetings) { row("Hoecks", symbol: "calendar") }
@@ -48,10 +48,12 @@ struct CampMoreSheet: View {
                     NavigationLink(value: CampDestination.search) { row("Suche", symbol: "magnifyingglass") }
                 }
                 Section("Weiteres") {
-                    Button { dismiss(); showAllCamps() } label: { row("Alle Lager", symbol: "tent") }
+                    Button { dismiss(); showAllCamps() } label: { row("Alle Lager", symbol: "tent", showsChevron: true) }
                 }
                 Section {} footer: { Text("Oben links wechselst du zurück zur Programm-Ansicht.") }
             }
+            // Section titles in the text color instead of the system grey (3:1 on the light surface).
+            .environment(\.headerProminence, .increased)
             .scrollContentBackground(.hidden)
             .ceviScreenBackground()
             .navigationTitle("Mehr")
@@ -93,12 +95,13 @@ struct CampMoreSheet: View {
         }
     }
 
-    private func row(_ title: LocalizedStringKey, symbol: String) -> some View {
+    /// A navigation link draws its own chevron; only the buttons need one.
+    private func row(_ title: LocalizedStringKey, symbol: String, showsChevron: Bool = false) -> some View {
         HStack(spacing: Spacing.s3) {
             Image(systemName: symbol).foregroundStyle(Color.ceviAccent).frame(width: Size.touchTarget / 2).accessibilityHidden(true)
             Text(title).foregroundStyle(Color.ceviOnSurface)
             Spacer(minLength: Spacing.s2)
-            Image(systemName: "chevron.right").font(.footnote.bold()).foregroundStyle(Color.ceviOnSurfaceVariant).accessibilityHidden(true)
+            if showsChevron { Image(systemName: "chevron.right").font(.footnote.bold()).foregroundStyle(Color.ceviOnSurfaceVariant).accessibilityHidden(true) }
         }
         .frame(minHeight: Size.touchTarget)
         .contentShape(.rect)

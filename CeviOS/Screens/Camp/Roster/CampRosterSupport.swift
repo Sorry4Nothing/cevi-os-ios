@@ -208,9 +208,9 @@ struct CampInitialsBadge: View {
     var body: some View {
         Text(CampRosterText.initials(name))
             .font(.caption2.bold())
-            .foregroundStyle(Color.ceviOnPrimary)
+            .foregroundStyle(Color.ceviOnSecondary)
             .frame(width: 30, height: 30)
-            .background(Color.ceviPrimary, in: Circle())
+            .background(Color.ceviSecondary, in: Circle())
             .overlay(Circle().stroke(Color.ceviSurfaceContainerLow, lineWidth: 2))
             .accessibilityHidden(true)
     }

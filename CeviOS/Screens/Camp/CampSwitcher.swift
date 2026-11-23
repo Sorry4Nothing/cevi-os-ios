@@ -34,7 +34,13 @@ private struct CampSwitcher: ViewModifier {
                 Text("Lagerwahl, auch abgeschlossene")
             }
         } label: {
-            Label(active.isOpen ? active.title : String(localized: "Programme"), systemImage: active.isOpen ? "tent" : "calendar")
+            // The design shows the name with a chevron in a pill; a plain Label would collapse to its icon in the bar.
+            HStack(spacing: Spacing.s1) {
+                Image(systemName: active.isOpen ? "tent" : "calendar")
+                Text(active.isOpen ? active.title : String(localized: "Programme")).lineLimit(1)
+                Image(systemName: "chevron.down").font(.caption2.bold())
+            }
+            .font(.subheadline.weight(.semibold))
         }
         .accessibilityLabel(Text("Ansicht wechseln, jetzt \(active.isOpen ? active.title : String(localized: "Programme"))"))
     }

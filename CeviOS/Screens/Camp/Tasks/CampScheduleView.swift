@@ -67,8 +67,10 @@ struct CampScheduleView: View {
                     }
                     .frame(maxWidth: .infinity, alignment: .leading).contentShape(.rect)
                 }
-                .buttonStyle(.plain).disabled(item.taskId == nil).ceviCard()
+                // Milestones have no target: not tappable, but not dimmed either (a disabled button loses its contrast).
+                .buttonStyle(.plain).allowsHitTesting(item.taskId != nil).ceviCard()
                 .accessibilityElement(children: .combine)
+                .accessibilityRemoveTraits(item.taskId == nil ? .isButton : [])
             }
         }
     }
@@ -80,12 +82,12 @@ struct CampScheduleView: View {
         let weekdays = [String(localized: "Mo"), String(localized: "Di"), String(localized: "Mi"), String(localized: "Do"), String(localized: "Fr"), String(localized: "Sa"), String(localized: "So")]
         return VStack(alignment: .leading, spacing: Spacing.s2) {
             HStack {
-                Button("Vorheriger Monat", systemImage: "chevron.left") { model.shiftMonth(by: -1) }.labelStyle(.iconOnly).frame(width: Size.touchTarget, height: Size.touchTarget)
+                Button("Vorheriger Monat", systemImage: "chevron.left") { model.shiftMonth(by: -1) }.labelStyle(.iconOnly).frame(width: Size.touchTarget, height: Size.touchTarget).contentShape(.rect)
                 Spacer()
                 Text(model.month.formatted(Date.FormatStyle(locale: Locale(identifier: "de_CH"), timeZone: DateFormats.timeZone).month(.wide).year()))
                     .font(.title(.title2)).foregroundStyle(Color.ceviOnSurface).accessibilityAddTraits(.isHeader)
                 Spacer()
-                Button("Nächster Monat", systemImage: "chevron.right") { model.shiftMonth(by: 1) }.labelStyle(.iconOnly).frame(width: Size.touchTarget, height: Size.touchTarget)
+                Button("Nächster Monat", systemImage: "chevron.right") { model.shiftMonth(by: 1) }.labelStyle(.iconOnly).frame(width: Size.touchTarget, height: Size.touchTarget).contentShape(.rect)
             }
             Grid(horizontalSpacing: 2, verticalSpacing: 2) {
                 GridRow { ForEach(weekdays, id: \.self) { Text($0).font(.caption.bold()).foregroundStyle(Color.ceviOnSurfaceVariant).frame(maxWidth: .infinity) } }

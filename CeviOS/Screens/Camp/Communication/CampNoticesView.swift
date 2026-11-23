@@ -53,7 +53,7 @@ struct CampNoticesScreen: View {
             Text(notice.poll != nil ? "Umfrage: \(notice.title)" : notice.title).font(.headline).foregroundStyle(Color.ceviOnSurface)
                 .accessibilityAddTraits(.isHeader)
             let chips = chipItems(notice)
-            if !chips.isEmpty { FlowLayout(spacing: Spacing.s2) { ForEach(chips, id: \.text) { CampStatusChip(text: $0.text, symbol: $0.symbol, isWarning: $0.warning) } } }
+            if !chips.isEmpty { FlowLayout(spacing: Spacing.s2) { ForEach(chips, id: \.text) { CampStatusChip(text: $0.text, symbol: $0.symbol, isWarning: $0.warning, isNeutral: $0.symbol == "mappin.circle") } } }
             Text(model.audience(notice)).font(.subheadline).foregroundStyle(Color.ceviOnSurfaceVariant)
             if !notice.text.isEmpty { Text(notice.text).foregroundStyle(Color.ceviOnSurface) }
             ForEach(notice.files) { file in
@@ -72,8 +72,8 @@ struct CampNoticesScreen: View {
 
     private func chipItems(_ notice: CampNotice) -> [(text: String, symbol: String, warning: Bool)] {
         var items: [(String, String, Bool)] = []
-        if notice.important { items.append((String(localized: "Wichtig"), "exclamationmark.triangle", true)) }
-        if notice.pinned { items.append((String(localized: "Angeheftet"), "pin", false)) }
+        if notice.important { items.append((String(localized: "Wichtig"), "exclamationmark.triangle", false)) }
+        if notice.pinned { items.append((String(localized: "Angeheftet"), "mappin.circle", false)) }
         if let state = model.windowState(notice) { items.append((state, "clock", false)) }
         return items
     }

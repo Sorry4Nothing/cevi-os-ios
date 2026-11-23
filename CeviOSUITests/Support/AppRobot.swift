@@ -8,6 +8,8 @@ enum AppRobot {
     enum Persona: String {
         case parent = "eltern"
         case leader = "leitung"
+        /// Unit leader and team member of the camp (no task list).
+        case team = "team"
         case newcomer = "neu"
     }
 

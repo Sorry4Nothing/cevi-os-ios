@@ -94,8 +94,8 @@ struct CampCountScreen: View {
             .font(.subheadline.bold())
             .padding(.horizontal, Spacing.s4)
             .frame(minHeight: Size.touchTarget)
-            .foregroundStyle(isOn ? Color.ceviOnPrimary : Color.ceviOnSurface)
-            .background(isOn ? Color.ceviPrimary : Color.clear, in: .capsule)
+            .foregroundStyle(isOn ? Color.ceviSurface : Color.ceviOnSurface)
+            .background(isOn ? Color.ceviAccent : Color.clear, in: .capsule)
             .overlay(Capsule().stroke(Color.ceviOutline, lineWidth: isOn ? 0 : Size.border))
         }
         .buttonStyle(.plain)
@@ -105,7 +105,7 @@ struct CampCountScreen: View {
     @ViewBuilder private func rowView(_ row: CampCountModel.Row) -> some View {
         let content = HStack(spacing: Spacing.s3) {
             Image(systemName: row.checked ? "checkmark.circle.fill" : "circle")
-                .font(.title2).foregroundStyle(row.checked ? Color.ceviPrimary : Color.ceviOnSurfaceVariant).accessibilityHidden(true)
+                .font(.title2).foregroundStyle(row.checked ? Color.ceviAccent : Color.ceviOnSurfaceVariant).accessibilityHidden(true)
             Text(row.label).foregroundStyle(Color.ceviOnSurface)
             Spacer(minLength: 0)
         }

@@ -45,7 +45,7 @@ private nonisolated struct FixedCookieStore: CookieStore {
 
 /// Simulated, stateful in-memory server for the UI tests. Serves every endpoint the app uses with fictional data
 /// (invented names, `example.org`). The persona follows the username typed at sign-in: `eltern…` parent with two
-/// children, `leitung…` unit leader, `neu…` first sign-in; anything else is a parent. Any non-empty password is accepted; there are no credentials anywhere.
+/// children, `leitung…` unit leader and camp lead, `team…` unit leader and camp team, `neu…` first sign-in; anything else is a parent. Any non-empty password is accepted; there are no credentials anywhere.
 nonisolated final class UITestBackend: URLProtocol {
     static let sessionCookie = "cevi_session"
     static let seededToken = "seeded"
@@ -107,10 +107,10 @@ nonisolated final class UITestBackend: URLProtocol {
 // MARK: - World
 
 /// `null` in JSONSerialization terms.
-private nonisolated func orNull(_ value: Any?) -> Any { value ?? NSNull() }
+nonisolated func orNull(_ value: Any?) -> Any { value ?? NSNull() }
 
 /// State of the simulated server for one app launch.
-private nonisolated struct World {
+nonisolated struct World {
     struct Request {
         let method: String
         let path: String
@@ -222,6 +222,7 @@ private nonisolated struct World {
         static let otherParent = "00000000-0000-0000-0000-000000000033"
         static let newcomer = "00000000-0000-0000-0000-000000000032"
         static let leader = "00000000-0000-0000-0000-000000000021"
+        static let teamMember = "00000000-0000-0000-0000-000000000022"
         static let forest = "00000000-0000-0000-0000-0000000000a1"
         static let candles = "00000000-0000-0000-0000-0000000000a2"
         static let weekend = "00000000-0000-0000-0000-0000000000a3"
@@ -243,6 +244,7 @@ private nonisolated struct World {
     /// Authors and contacts: id → (name, Cevi name, unit leader).
     static let people: [String: (name: String, ceviName: String?, unitLeader: Bool)] = [
         Ids.leader: ("Jan Muster", "Biber", true),
+        Ids.teamMember: ("Tina Beispiel", "Wiesel", false),
         Ids.parent: ("Eva Beispiel", nil, false),
         Ids.otherParent: ("Sara Muster", nil, false),
         Ids.newcomer: ("Mara Beispiel", nil, false),
@@ -254,6 +256,7 @@ private nonisolated struct World {
     var programs: [Program]
     var chats: [Chat]
     var counter = 0x100
+    var campState = UITestCampState()
 
     init(failure: String?, seededUser: String?) {
         self.failure = failure
@@ -302,6 +305,7 @@ private nonisolated struct World {
         // Image routes (profile images, unit logos): no pictures in the UI tests; the app shows initials and the Cevi logo.
         if route.contains("bild") || route.last == "logo" { return .notFound }
         switch (request.method, route.first) {
+        case (_, "ich") where route.last == "lager-benachrichtigungen": return campSettings(request, me)
         case ("GET", "ich"): return .json(200, profile(me))
         case ("POST", "ich") where route.last == "datenschutz":
             accounts[username]?.privacyRead = .now
@@ -311,8 +315,8 @@ private nonisolated struct World {
         case ("GET", "stufen") where route.count == 1:
             return .json(200, ["stufen": [Ids.jungschar, Ids.froeschli].map(unit)])
         case (_, "chats"): return chatRoutes(request, Array(route.dropFirst()), me)
-        // No camps in the UI tests: the switcher stays hidden.
-        case ("GET", "lager") where route.count == 1: return .json(200, ["lager": [Any]()])
+        // Camps: `leitung…` is camp lead, `team…` team; everyone else has no camp and no switcher.
+        case (_, "lager"): return campRoutes(request, Array(route.dropFirst()), me)
         case ("PUT", "push-token"): return .noContent
         default: return .notFound
         }
@@ -386,7 +390,10 @@ private nonisolated struct World {
     @discardableResult
     private mutating func account(_ username: String) -> Person {
         if let known = accounts[username] { return known }
-        let person: Person = if username.hasPrefix("leitung") {
+        let person: Person = if username.hasPrefix("team") {
+            Person(id: Ids.teamMember, username: username, kind: .leader, name: "Tina Beispiel", ceviName: "Wiesel",
+                   mustChangePassword: false, privacyRead: .now, phone: "000 000 00 02")
+        } else if username.hasPrefix("leitung") {
             Person(id: Ids.leader, username: username, kind: .leader, name: "Jan Muster", ceviName: "Biber",
                    mustChangePassword: false, privacyRead: .now, phone: "000 000 00 01")
         } else if username.hasPrefix("neu") {
