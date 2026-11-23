@@ -31,7 +31,7 @@ nonisolated struct APIError: Error, Equatable, Sendable {
     let message: String?
     /// Seconds until the request may be repeated (header `Retry-After`, or `X-Retry-After` of sign-in). Only on 429.
     var retryAfter: Int?
-    /// Raw body of a 409, so the caller can read the conflict details (`CampRules.versionConflict`).
+    /// Raw body of a 409 or 400, so the caller can read the details (`CampRules.versionConflict`, `EventRules.answerErrors`).
     var conflictBody: Data?
 
     static func from(status: Int, data: Data, retryAfter: Int? = nil) -> APIError {
@@ -49,7 +49,7 @@ nonisolated struct APIError: Error, Equatable, Sendable {
         case 429: .rateLimited
         default: .server
         }
-        return APIError(kind: kind, status: status, code: body?.code, message: body?.message, retryAfter: kind == .rateLimited ? retryAfter : nil, conflictBody: kind == .conflict ? data : nil)
+        return APIError(kind: kind, status: status, code: body?.code, message: body?.message, retryAfter: kind == .rateLimited ? retryAfter : nil, conflictBody: kind == .conflict || kind == .invalidInput ? data : nil)
     }
 
     static let network = APIError(kind: .network, status: nil, code: nil, message: nil)
