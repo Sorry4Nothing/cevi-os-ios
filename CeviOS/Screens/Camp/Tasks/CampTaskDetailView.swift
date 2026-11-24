@@ -137,9 +137,9 @@ struct CampTaskDetailView: View {
                             Text(CampTaskText.statusName(status))
                         }
                             .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(selected ? Color.ceviOnPrimary : Color.ceviOnSurface)
+                            .foregroundStyle(selected ? Color.ceviSurface : Color.ceviOnSurface)
                             .padding(.horizontal, Spacing.s4).frame(minHeight: Size.touchTarget)
-                            .background(selected ? Color.ceviSwitchOn : Color.clear, in: .capsule)
+                            .background(selected ? Color.ceviAccent : Color.clear, in: .capsule)
                             .overlay(Capsule().stroke(Color.ceviOutline, lineWidth: selected ? 0 : Size.border))
                     }
                     .buttonStyle(.plain)
@@ -219,21 +219,25 @@ struct CampTaskDetailView: View {
             VStack(spacing: 0) {
                 ForEach(model.checklist) { item in
                     HStack {
-                        Button { Task { await model.toggle(item) } } label: {
-                            HStack(spacing: Spacing.s3) {
-                                Image(systemName: item.done ? "checkmark.circle.fill" : "circle").font(.title3)
-                                    .foregroundStyle(item.done ? Color.ceviAccent : Color.ceviOnSurfaceVariant).accessibilityHidden(true)
-                                Text(item.text).strikethrough(item.done).foregroundStyle(Color.ceviOnSurface).multilineTextAlignment(.leading)
-                                Spacer(minLength: 0)
-                            }
-                            .frame(minHeight: Size.touchTarget).contentShape(.rect)
+                        let row = HStack(spacing: Spacing.s3) {
+                            Image(systemName: item.done ? "checkmark.circle.fill" : "circle").font(.title3)
+                                .foregroundStyle(item.done ? Color.ceviAccent : Color.ceviOnSurfaceVariant).accessibilityHidden(true)
+                            Text(item.text).strikethrough(item.done).foregroundStyle(Color.ceviOnSurface).multilineTextAlignment(.leading)
+                            Spacer(minLength: 0)
                         }
-                        .buttonStyle(.plain).disabled(!(model.canSetStatus))
-                        .accessibilityLabel(Text("\(item.text), \(item.done ? String(localized: "erledigt") : String(localized: "offen"))"))
-                        .accessibilityAddTraits(.isButton)
+                        .frame(minHeight: Size.touchTarget).contentShape(.rect)
+                        // Read-only: plain text, not a dimmed button (a disabled button loses its contrast).
+                        if model.canSetStatus {
+                            Button { Task { await model.toggle(item) } } label: { row }
+                                .buttonStyle(.plain)
+                                .accessibilityLabel(Text("\(item.text), \(item.done ? String(localized: "erledigt") : String(localized: "offen"))"))
+                        } else {
+                            row.accessibilityElement(children: .ignore)
+                                .accessibilityLabel(Text("\(item.text), \(item.done ? String(localized: "erledigt") : String(localized: "offen"))"))
+                        }
                         if model.canEdit {
                             Button("Punkt löschen", systemImage: "trash") { Task { await model.removeChecklistItem(item) } }
-                                .labelStyle(.iconOnly).foregroundStyle(Color.ceviOnSurfaceVariant).frame(width: Size.touchTarget, height: Size.touchTarget)
+                                .labelStyle(.iconOnly).foregroundStyle(Color.ceviOnSurfaceVariant).frame(width: Size.touchTarget, height: Size.touchTarget).contentShape(.rect)
                         }
                     }
                     Divider()
@@ -245,7 +249,7 @@ struct CampTaskDetailView: View {
                             .frame(minHeight: Size.touchTarget)
                         if !newItem.isEmpty {
                             Button("Hinzufügen", systemImage: "plus.circle.fill") { let text = newItem; newItem = ""; Task { await model.addChecklistItem(text) } }
-                                .labelStyle(.iconOnly).frame(width: Size.touchTarget, height: Size.touchTarget)
+                                .labelStyle(.iconOnly).frame(width: Size.touchTarget, height: Size.touchTarget).contentShape(.rect)
                         }
                     }
                 } else if model.checklist.isEmpty {
@@ -330,10 +334,10 @@ struct CampTaskDetailView: View {
                         Text(item.text).foregroundStyle(Color.ceviOnSurface)
                         Spacer(minLength: Spacing.s2)
                         Button("Nach oben", systemImage: "arrow.up") { Task { await model.moveChecklistItem(item, by: -1) } }
-                            .labelStyle(.iconOnly).frame(width: Size.touchTarget, height: Size.touchTarget)
+                            .labelStyle(.iconOnly).frame(width: Size.touchTarget, height: Size.touchTarget).contentShape(.rect)
                             .disabled(item == model.checklist.first)
                         Button("Nach unten", systemImage: "arrow.down") { Task { await model.moveChecklistItem(item, by: 1) } }
-                            .labelStyle(.iconOnly).frame(width: Size.touchTarget, height: Size.touchTarget)
+                            .labelStyle(.iconOnly).frame(width: Size.touchTarget, height: Size.touchTarget).contentShape(.rect)
                             .disabled(item == model.checklist.last)
                     }
                     .buttonStyle(.borderless)

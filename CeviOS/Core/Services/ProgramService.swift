@@ -1,19 +1,6 @@
 import Foundation
 
 extension APIClient {
-    /// `GET /programme?von=&bis=`: programs touching the window, both days inclusive (Swiss calendar days).
-    func programs(from: Date, to: Date) async throws -> [Program] {
-        let list: ProgramList = try await load("GET", "/api/v1/programme", query: [
-            URLQueryItem(name: "von", value: DateFormats.calendarDayText(from)),
-            URLQueryItem(name: "bis", value: DateFormats.calendarDayText(to)),
-        ])
-        return list.programs
-    }
-
-    func program(id: UUID) async throws -> Program {
-        try await load("GET", "/api/v1/programme/\(id.uuidString.lowercased())")
-    }
-
     /// Never cached by the server (`no-store`) and not by the client either.
     func contacts(programId: UUID) async throws -> [Contact] {
         let list: ContactList = try await load("GET", "/api/v1/programme/\(programId.uuidString.lowercased())/kontakte")

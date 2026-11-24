@@ -54,7 +54,7 @@ struct CampTasksScreen: View {
                 .navigationTitle(mode == .schedule ? "Zeitplan" : "Aufgaben")
                 .navigationBarTitleDisplayMode(.large)
                 .toolbar {
-                    ToolbarItem(placement: .topBarTrailing) { if mode != .schedule { optionsMenu } }
+                    ToolbarItem(placement: .topBarTrailing) { optionsMenu }
                 }
                 .campSwitcher()
                 .navigationDestination(for: CampTaskRoute.self) { route in
@@ -235,9 +235,9 @@ struct CampTasksScreen: View {
                         let count = model.tasks(in: status).count
                         Button { withAnimation { kanbanStatus = status } } label: {
                             Text("\(CampTaskText.statusName(status)) \(count)").font(.subheadline.weight(.semibold))
-                                .foregroundStyle(kanbanStatus == status ? Color.ceviOnPrimary : Color.ceviOnSurface)
+                                .foregroundStyle(kanbanStatus == status ? Color.ceviSurface : Color.ceviOnSurface)
                                 .padding(.horizontal, Spacing.s4).frame(minHeight: Size.touchTarget)
-                                .background(kanbanStatus == status ? Color.ceviSwitchOn : Color.ceviSurfaceContainerHigh, in: .capsule)
+                                .background(kanbanStatus == status ? Color.ceviAccent : Color.ceviSurfaceContainerHigh, in: .capsule)
                         }
                         .buttonStyle(.plain)
                         .accessibilityLabel(Text("\(CampTaskText.statusName(status)), \(count) Aufgaben"))
@@ -289,27 +289,30 @@ struct CampTasksScreen: View {
                 Label("Kanban", systemImage: "rectangle.split.3x1").tag(Mode.kanban)
                 Label("Zeitplan", systemImage: "calendar").tag(Mode.schedule)
             }
-            Picker("Sortieren", selection: $model.sort) {
-                Text("Nach Frist").tag(CampTaskSort.due)
-                Text("Nach Titel").tag(CampTaskSort.title)
-                Text("Von Hand").tag(CampTaskSort.manual)
-            }
-            Section("Filter") {
-                Toggle("Nur Überfällige", isOn: $model.filter.overdueOnly)
-                Toggle("Nur mit Stern", isOn: $model.filter.starredOnly)
-                Picker("Status", selection: $model.filter.status) {
-                    Text("Alle Status").tag(CampTaskStatus?.none)
-                    ForEach(CampTaskText.boardStatuses, id: \.self) { Text(CampTaskText.statusName($0)).tag(CampTaskStatus?.some($0)) }
+            // Sorting and filters belong to the task views; the schedule keeps only the choice of view, so there is a way back.
+            if mode != .schedule {
+                Picker("Sortieren", selection: $model.sort) {
+                    Text("Nach Frist").tag(CampTaskSort.due)
+                    Text("Nach Titel").tag(CampTaskSort.title)
+                    Text("Von Hand").tag(CampTaskSort.manual)
                 }
-                if !model.portfolios.isEmpty {
-                    Picker("Ressort", selection: $model.filter.portfolioId) {
-                        Text("Alle Ressorts").tag(UUID?.none)
-                        ForEach(model.portfolios) { Text($0.name).tag(UUID?.some($0.id)) }
+                Section("Filter") {
+                    Toggle("Nur Überfällige", isOn: $model.filter.overdueOnly)
+                    Toggle("Nur mit Stern", isOn: $model.filter.starredOnly)
+                    Picker("Status", selection: $model.filter.status) {
+                        Text("Alle Status").tag(CampTaskStatus?.none)
+                        ForEach(CampTaskText.boardStatuses, id: \.self) { Text(CampTaskText.statusName($0)).tag(CampTaskStatus?.some($0)) }
                     }
+                    if !model.portfolios.isEmpty {
+                        Picker("Ressort", selection: $model.filter.portfolioId) {
+                            Text("Alle Ressorts").tag(UUID?.none)
+                            ForEach(model.portfolios) { Text($0.name).tag(UUID?.some($0.id)) }
+                        }
+                    }
+                    if model.filter.isActive { Button("Filter zurücksetzen", systemImage: "xmark.circle") { model.filter = CampTaskLocalFilter() } }
                 }
-                if model.filter.isActive { Button("Filter zurücksetzen", systemImage: "xmark.circle") { model.filter = CampTaskLocalFilter() } }
+                if model.rights.canEdit, !model.isSelecting { Button("Auswählen", systemImage: "checkmark.circle") { model.startSelecting() } }
             }
-            if model.rights.canEdit, !model.isSelecting { Button("Auswählen", systemImage: "checkmark.circle") { model.startSelecting() } }
         } label: {
             Image(systemName: model.filter.isActive ? "line.3.horizontal.decrease.circle.fill" : "line.3.horizontal.decrease")
                 .frame(minWidth: Size.touchTarget, minHeight: Size.touchTarget)

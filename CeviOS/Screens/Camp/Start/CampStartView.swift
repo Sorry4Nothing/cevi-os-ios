@@ -36,8 +36,17 @@ struct CampStartScreen: View {
     var body: some View {
         NavigationStack(path: $path) {
             content
+                // The camp name is long («Sommerlager Beispiel 2027»); a system large title cuts it with «…», the design wraps it.
+                .safeAreaInset(edge: .top, spacing: 0) {
+                    Text(active.title).font(.title(.largeTitle)).foregroundStyle(Color.ceviOnSurface)
+                        .frame(maxWidth: .infinity, alignment: .leading).padding(.horizontal, Spacing.s4)
+                        .lineLimit(3).minimumScaleFactor(0.5)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityAddTraits(.isHeader)
+                }
                 .navigationTitle(active.title)
-                .navigationBarTitleDisplayMode(.large)
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar(removing: .title)
                 .campSwitcher()
                 .navigationDestination(for: CampTaskRoute.self) { route in
                     switch route {

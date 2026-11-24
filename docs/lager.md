@@ -315,6 +315,13 @@ Abweichungen vom Entwurf:
 
 Nicht gebaut: **L38 Papierkorb** (alle Boards: Normal, Laden, Leer, Fehler, Erfolg und Rückgängig, Aktion läuft). Es gibt keine Route zum Ansehen oder Wiederherstellen (Revisionen, L0e), und das Entwurf-Set hat keinen Zustand «nicht verfügbar». Der Stichwort-Filter (`stichwort`) der Dokumente (die Suche findet Stichworte über `q`), Dokumente anlegen, ändern und löschen, Dateien verknüpfen (Datenschicht ist da, kein Board ausser dem Hochladen).
 
+## Schnitt C3 Testserver, UI-Tests, Abgleich mit dem Entwurf (Issue #94)
+
+- `CeviOS/App/UITestBackend.swift` (nur DEBUG) kennt zwei Lager: «Sommerlager Beispiel 2027» (aktiv, beginnt in 12 Tagen) und «Herbstlager Beispiel 2026» (abgeschlossen). Persona `leitung…` ist Lagerleitung, `team…` Team; Eltern haben kein Lager. Die Antworten stehen in `UITestCampFixtures.swift` (Pflichtfelder nach `api-vertrag/openapi.yaml`, Datums-Platzhalter `{{D+n}}`/`{{T-n}}`), der Zustand (Aufgaben, Checkliste, Pinnwand) in `UITestCampBackend.swift`.
+- `CampTestServerTests` liest jede Route der Bildschirme gegen den Testserver und dekodiert sie mit den echten Modellen. Ein Fall (Status von «Busfahrt buchen») antwortet einmal mit 409 `VERSION_KONFLIKT`.
+- UI-Abläufe: `CampFlowTests` (Lagerleitung, Team, abgeschlossenes Lager, grösste Schrift, Dunkelmodus, alle Einträge von «Mehr»).
+- Lesende Routen liefern feste Beispieldaten. Schreibende Routen ausser Status, Checkliste und neuer Pinnwand-Beitrag antworten 204 ohne Inhalt (die Bildschirme zeigen dann einen Fehler beim Speichern).
+
 ## Offene Fragen zum Entwurf
 
 - L1: «62 Prozent erledigt, 4 überfällig» braucht `GET …/start` je Lager; «Übungslager» (Abschnitt, Chip «Übung») hat kein Feld in der API. Beides fehlt in der App.
@@ -323,6 +330,11 @@ Nicht gebaut: **L38 Papierkorb** (alle Boards: Normal, Laden, Leer, Fehler, Erfo
 - L38: Der Papierkorb hat keine Route in der API und im Entwurf keinen Zustand «nicht verfügbar»; die Bildschirme fehlen, bis die Revisionen (L0e) da sind und geklärt ist, ob ein Hinweis nötig ist.
 - L33: «Hochladen» (Fortschritt, Dateityp, 20 MB) setzt Medienspeicher voraus (L0g); der Entwurf kennt keinen Bildschirm «Link hinzufügen» für das Verknüpfen eines Ablageorts.
 - L36: «Personen» und «Zuletzt angesehen» haben keine Quelle (keine Route, kein lokaler Speicher).
+- L2: Die Schnellzugriffe «Notiz», «Protokoll», «Mitteilung» und die Zahl «7 für dich» fehlen; die Aufgabenkarten zeigen kein «Checkliste 2 von 4» (die Aufgabenliste liefert keine Zähler der Checkliste).
+- L2/L5: Der Entwurf setzt die Frist und den Hinweis «Fällig in …» in eine Zeile; die App stapelt sie. Der Umschalter hat keinen roten Punkt (ungelesen je Lager, siehe A10).
+- L20/L28/L33/T3: Der Entwurf zeigt die Lagerbildschirme als Seiten des Tab «Mehr» mit Umschalter oben; die App öffnet sie im «Mehr»-Blatt ohne Umschalter. Der Entwurf fasst Zeilen in einer Karte mit Trennlinien zusammen (Einkauf, Zeitplan); die App zeigt je Zeile eine Karte.
+- L33: Die Suche steht im Entwurf oben im Bildschirm, in der App unten (iOS-26-Suchleiste).
+- Grosse Titel: Die Titelschrift der Navigationsleiste ist reines Schwarz, der Entwurf zeigt ein dunkles Grau.
 - U4: Die Endzeit der Wartung («bis 22:00») liefert die API nicht; der Text nennt sie nicht.
 
 ## Route fehlt (blockiert)

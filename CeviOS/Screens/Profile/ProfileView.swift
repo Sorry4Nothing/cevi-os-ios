@@ -10,8 +10,10 @@ struct ProfileView: View {
     let profile: Profile
 
     @State private var action = ActionState()
-    /// Toggle values that were changed here and are not yet confirmed by a reloaded profile.
-    @State private var pending: [String: Bool] = [:]
+    @State private var link = CalendarLinkModel()
+    @State private var confirmsReplace = false
+    @State private var confirmsRevoke = false
+    @Environment(CampListModel.self) private var campList: CampListModel?
     @State private var phone = ""
     @State private var isPickingPhoto = false
     @State private var photo: PhotosPickerItem?
@@ -28,20 +30,21 @@ struct ProfileView: View {
                 }
 
                 Section {
-                    toggle("Mitteilungen zum Chat", key: "chat", value: profile.pushChat) { ProfilePatch(pushChat: $0) }
-                    toggle("Mitteilungen und Erinnerungen", key: "programs", value: profile.pushPrograms) {
-                        ProfilePatch(pushPrograms: $0)
-                    }
-                    if let registrations = profile.pushRegistrations {
-                        toggle("Mitteilungen zu Anmeldungen", key: "registrations", value: registrations) {
-                            ProfilePatch(pushRegistrations: $0)
-                        }
-                    }
+                    groupChips
                 } header: {
-                    sectionHeader("Benachrichtigungen")
+                    sectionHeader("Meine Gruppen")
+                }
+                .listRowBackground(Color.clear)
+
+                Section {
+                    CalendarLinkCard(model: link, confirmsReplace: $confirmsReplace, confirmsRevoke: $confirmsRevoke)
+                        .padding(.vertical, Spacing.s2)
+                } header: {
+                    sectionHeader("Mein Kalender-Link")
                 }
 
                 Section {
+                    NavigationLink { NotificationsView() } label: { row("Benachrichtigungen", symbol: "bell") }
                     // Without Face ID or Touch ID there is nothing to lock, so the row is hidden.
                     if lock.isAvailable {
                         Toggle(isOn: Binding(get: { lock.isEnabled }, set: { lock.setEnabled($0) })) {
@@ -81,7 +84,7 @@ struct ProfileView: View {
         .onAppear {
             phone = profile.phone ?? ""
         }
-        .onChange(of: profile) { pending = [:] }
+        .modifier(CalendarLinkPresentation(model: link, confirmsReplace: $confirmsReplace, confirmsRevoke: $confirmsRevoke))
         .photosPicker(isPresented: $isPickingPhoto, selection: $photo, matching: .images)
         .onChange(of: photo) { _, item in
             guard let item else { return }
@@ -165,6 +168,18 @@ struct ProfileView: View {
         return lines
     }
 
+    // MARK: Groups
+
+    /// Units of the person and their children, the function and the camps. The server sends no tags of the person, so
+    /// teams are not named here.
+    private var groupChips: some View {
+        let names = ProfileGroups.names(for: profile, camps: campList?.camps.map(\.camp.title) ?? [])
+        return TagChips(names: names)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel(Text("Meine Gruppen: \(names.joined(separator: ", "))"))
+    }
+
     // MARK: Rows
 
     private func sectionHeader(_ title: LocalizedStringKey) -> some View {
@@ -179,25 +194,6 @@ struct ProfileView: View {
             Image(systemName: symbol).foregroundStyle(Color.ceviSecondary)
         }
         .frame(minHeight: Size.touchTarget)
-    }
-
-    private func toggle(
-        _ title: LocalizedStringKey, key: String, value: Bool, patch: @escaping (Bool) -> ProfilePatch
-    ) -> some View {
-        Toggle(isOn: Binding(
-            get: { pending[key] ?? value },
-            set: { new in
-                pending[key] = new
-                Task {
-                    await action.perform { try await requireClient().updateProfile(patch(new)) }
-                    if action.error != nil { pending[key] = nil } else { await state.reloadProfile() }
-                }
-            }
-        )) {
-            row(title, symbol: "bell")
-        }
-        .tint(Color.ceviSwitchOn)
-        .disabled(action.isRunning)
     }
 
     private var phoneSection: some View {
@@ -281,4 +277,19 @@ struct ProfileView: View {
     ProfileView(profile: profile)
         .environment(AppState())
         .environment(AppLock())
+}
+
+/// Names for «Meine Gruppen» in the profile.
+nonisolated enum ProfileGroups {
+    static func names(for profile: Profile, camps: [String]) -> [String] {
+        var names: [String] = []
+        let childUnits = Set(profile.children.map(\.unitId))
+        for unit in profile.units where childUnits.contains(unit.id) || profile.roles.contains(where: { $0.unitId == unit.id }) {
+            names.append(String(localized: "Stufe \(unit.name)"))
+        }
+        if profile.isUnitLeader { names.append(String(localized: "Funktion Stufenleitung")) }
+        else if profile.isLeader { names.append(String(localized: "Funktion Leitung")) }
+        names += camps.map { String(localized: "Lager \($0)") }
+        return names
+    }
 }

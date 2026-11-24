@@ -9,11 +9,17 @@ final class ProgramDetailModel {
     private(set) var saving: Set<UUID> = []
     private(set) var savingOwn = false
     var answerError: String?
+    /// Children counts for the leader row «Anmeldungen ansehen»; `nil` until loaded or without the right.
+    private(set) var childCounts: ParticipationCounts?
+
+    func loadChildCounts(programId: UUID, client: APIClient?) async {
+        childCounts = try? await client?.participationOverview(programId: programId).totals.children
+    }
 
     func load(programId: UUID, client: APIClient?) async {
         guard let client else { return }
         do {
-            program = try await client.program(id: programId)
+            program = Program(detail: try await client.calendarEvent(id: programId))
             loadError = nil
         } catch is CancellationError {
             return
@@ -30,8 +36,8 @@ final class ProgramDetailModel {
 
     /// Silent refresh while the detail is open: no loading state, errors keep what is shown.
     func refresh(programId: UUID, client: APIClient?) async {
-        guard let client, let fresh = try? await client.program(id: programId) else { return }
-        program = fresh
+        guard let client, let fresh = try? await client.calendarEvent(id: programId) else { return }
+        program = Program(detail: fresh)
         if let contacts = try? await client.contacts(programId: programId) { self.contacts = contacts }
     }
 

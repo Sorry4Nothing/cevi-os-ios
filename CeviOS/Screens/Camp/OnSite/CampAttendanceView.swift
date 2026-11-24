@@ -73,8 +73,8 @@ struct CampAttendanceScreen: View {
                         .font(.subheadline.bold())
                         .padding(.horizontal, Spacing.s4)
                         .frame(minHeight: Size.touchTarget)
-                        .foregroundStyle(isOn ? Color.ceviOnPrimary : Color.ceviOnSurface)
-                        .background(isOn ? Color.ceviPrimary : Color.clear, in: .capsule)
+                        .foregroundStyle(isOn ? Color.ceviSurface : Color.ceviOnSurface)
+                        .background(isOn ? Color.ceviAccent : Color.clear, in: .capsule)
                         .overlay(Capsule().stroke(Color.ceviOutline, lineWidth: isOn ? 0 : Size.border))
                     }
                     .buttonStyle(.plain)

@@ -75,6 +75,7 @@ struct ProgramDetailView: View {
                 tiles(program)
                 infoCard(program)
                 contactsCard(program)
+                occasionRow(program)
                 if !program.children.isEmpty { participation(program) }
                 leadershipSections(program)
             }
@@ -87,21 +88,19 @@ struct ProgramDetailView: View {
 
     private func header(_ program: Program) -> some View {
         VStack(alignment: .leading, spacing: Spacing.s1) {
-            HStack(spacing: Spacing.s2) {
-                ForEach(program.units.isEmpty ? [nil] : program.units.map { Optional($0.id) }, id: \.self) { UnitLogo(unitId: $0) }
-            }
             Text(program.title)
                 .font(.title(.title1))
                 .foregroundStyle(Color.ceviOnSurface)
                 .strikethrough(program.status == .cancelled)
                 .accessibilityAddTraits(.isHeader)
-            let subtitle = (program.units.map(\.name) + [program.firstDay.map(ProgramFormat.shortDate)].compactMap { $0 })
-                .joined(separator: " · ")
+            let subtitle = ([program.units.map(\.name).formatted(.list(type: .and, width: .standard))]
+                + [program.firstDay.map(ProgramFormat.shortDate)].compactMap { $0 }).filter { !$0.isEmpty }.joined(separator: ", ")
             if !subtitle.isEmpty {
                 Text(subtitle)
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(Color.ceviOnSurfaceVariant)
             }
+            TagChips(names: program.units.map(\.name) + program.otherTags.map(\.name)).padding(.top, Spacing.s1)
             ProgramStatusLabel(status: program.status).padding(.top, Spacing.s1)
             if program.status == .review {
                 Text("Dieses Programm wird von der Leitung geprüft. Eine Anmeldung ist im Moment nicht möglich.")
@@ -117,11 +116,11 @@ struct ProgramDetailView: View {
     private func tiles(_ program: Program) -> some View {
         let startTime = program.isAllDay ? nil : program.start.map(ProgramFormat.clock)
         let endTime = program.closingTime ?? (program.isAllDay ? nil : program.end.map(ProgramFormat.clock))
-        let showStart = startTime != nil || program.meetingPoint != nil
+        let showStart = startTime != nil || program.meetingPoint != nil || program.place != nil
         let showEnd = endTime != nil || program.closingPlace != nil
         if showStart || showEnd {
             adaptiveRow {
-                if showStart { tile("Treffpunkt", time: startTime, place: program.meetingPoint) }
+                if showStart { tile("Treffpunkt", time: startTime, place: program.meetingPoint ?? program.place) }
                 if showEnd { tile("Schluss", time: endTime, place: program.closingPlace) }
             }
         }
@@ -236,27 +235,48 @@ struct ProgramDetailView: View {
                     if program.children.isEmpty, let error = model.answerError { ErrorRow(text: error) }
                 }
             }
-            if permissions.canSeeOverview(of: program) || permissions.canAssign {
+            if permissions.canSeeOverview(of: program) {
                 VStack(alignment: .leading, spacing: Spacing.s2) {
-                    sectionTitle("Leitung")
-                    VStack(spacing: 0) {
-                        if permissions.canSeeOverview(of: program) {
-                            NavigationLink { ParticipationOverviewView(programId: program.id) } label: {
-                                linkRow("Anmeldungen", symbol: "person.3")
-                            }
+                    Label {
+                        VStack(alignment: .leading, spacing: 0) {
+                            Text("Die Gruppen kommen aus der Outlook-Kategorie.").fontWeight(.semibold)
+                            Text("Ändere sie in Outlook.")
                         }
-                        if permissions.canAssign {
-                            NavigationLink {
-                                AssignmentView(program: program, profile: profile) { Task { await model.load(programId: program.id, client: appState.client) } }
-                            } label: {
-                                linkRow("Stufen und Sichtbarkeit", symbol: "slider.horizontal.3")
-                            }
-                        }
+                    } icon: {
+                        Image(systemName: "info.circle")
+                    }
+                    .font(.callout)
+                    .foregroundStyle(Color.ceviOnSecondaryContainer)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(Spacing.s3)
+                    .background(Color.ceviSecondaryContainer, in: Radius.shape(Radius.md))
+                    .accessibilityElement(children: .combine)
+                    sectionTitle("Für Leitende")
+                    NavigationLink { ParticipationOverviewView(programId: program.id) } label: {
+                        linkRow("Anmeldungen ansehen", symbol: "person.3", detail: model.childCounts.map(countsText))
                     }
                     .buttonStyle(.plain)
                     .ceviCard(padding: 0)
                 }
+                .task(id: program.id) { await model.loadChildCounts(programId: program.id, client: appState.client) }
             }
+        }
+    }
+
+    private func countsText(_ counts: ParticipationCounts) -> String {
+        String(localized: "\(counts.yes) kommen, \(counts.open) offen")
+    }
+
+    /// Registration for an occasion (K4) when the event has one that is open or the person is registered already.
+    @ViewBuilder
+    private func occasionRow(_ program: Program) -> some View {
+        if let occasion = program.occasion, occasion.isOpen || occasion.isRegistered {
+            NavigationLink { EventRegistrationView(occasionId: occasion.id) } label: {
+                linkRow(occasion.isRegistered ? "Anmeldung ansehen" : "Zur Anmeldung", symbol: "person.crop.circle.badge.checkmark",
+                        detail: occasion.deadline.map { String(localized: "Anmeldeschluss \(ProgramFormat.shortDate($0))") })
+            }
+            .buttonStyle(.plain)
+            .ceviCard(padding: 0)
         }
     }
 
@@ -268,10 +288,13 @@ struct ProgramDetailView: View {
             .padding(.top, Spacing.s2)
     }
 
-    private func linkRow(_ title: LocalizedStringKey, symbol: String) -> some View {
+    private func linkRow(_ title: LocalizedStringKey, symbol: String, detail: String? = nil) -> some View {
         HStack(spacing: Spacing.s3) {
             Image(systemName: symbol).foregroundStyle(Color.ceviAccent).accessibilityHidden(true)
-            Text(title).font(.body).foregroundStyle(Color.ceviOnSurface)
+            VStack(alignment: .leading, spacing: 0) {
+                Text(title).font(.body).foregroundStyle(Color.ceviOnSurface)
+                if let detail { Text(detail).font(.footnote).foregroundStyle(Color.ceviOnSurfaceVariant) }
+            }
             Spacer(minLength: 0)
             Image(systemName: "chevron.right").font(.footnote.weight(.semibold))
                 .foregroundStyle(Color.ceviOnSurfaceVariant).accessibilityHidden(true)
@@ -280,6 +303,7 @@ struct ProgramDetailView: View {
         .padding(.vertical, Spacing.s2)
         .frame(minHeight: Size.touchTarget)
         .contentShape(Rectangle())
+        .accessibilityElement(children: .combine)
     }
 
     private func contactsCard(_ program: Program) -> some View {

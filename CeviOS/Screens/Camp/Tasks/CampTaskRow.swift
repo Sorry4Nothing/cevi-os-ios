@@ -16,13 +16,15 @@ struct CampCodeChip: View {
 struct CampStatusChip: View {
     let text: String
     let symbol: String
+    /// Error colors (overdue). Without it the chip is a hint (warning colors), or neutral with `isNeutral`.
     var isWarning = false
+    var isNeutral = false
 
     var body: some View {
         Label(text, systemImage: symbol).font(.caption.bold())
-            .foregroundStyle(isWarning ? Color.ceviOnErrorContainer : Color.ceviOnWarningContainer)
+            .foregroundStyle(isNeutral ? Color.ceviOnSecondaryContainer : isWarning ? Color.ceviOnErrorContainer : Color.ceviOnWarningContainer)
             .padding(.horizontal, Spacing.s2).padding(.vertical, Spacing.s1)
-            .background(isWarning ? Color.ceviErrorContainer : Color.ceviWarningContainer, in: .capsule)
+            .background(isNeutral ? Color.ceviSecondaryContainer : isWarning ? Color.ceviErrorContainer : Color.ceviWarningContainer, in: .capsule)
     }
 }
 
@@ -40,6 +42,8 @@ struct CampTaskRow: View {
     var toggleStar: () -> Void = {}
     var select: () -> Void = {}
     var openPortfolio: (UUID) -> Void = { _ in }
+
+    @Environment(\.dynamicTypeSize) private var typeSize
 
     private var hint: (text: String, isOverdue: Bool)? { CampTaskText.dueHint(task, today: today) }
 
@@ -82,8 +86,9 @@ struct CampTaskRow: View {
             Text(task.title).font(.title(.cardTitle)).foregroundStyle(Color.ceviOnSurface)
                 .strikethrough(task.status == .done).multilineTextAlignment(.leading)
             if task.portfolio != nil || task.responsible != nil {
-                HStack(spacing: Spacing.s2) {
-                    if let portfolio = task.portfolio { CampCodeChip(code: portfolio.code); Text(portfolio.name) }
+                // At accessibility sizes the facts stack, so no word breaks letter by letter.
+                (typeSize.isAccessibilitySize ? AnyLayout(VStackLayout(alignment: .leading, spacing: Spacing.s1)) : AnyLayout(HStackLayout(spacing: Spacing.s2))) {
+                    if let portfolio = task.portfolio { HStack(spacing: Spacing.s2) { CampCodeChip(code: portfolio.code); Text(portfolio.name) } }
                     if let person = CampTaskText.person(task.responsible) { Text(person) }
                 }
                 .font(.subheadline).foregroundStyle(Color.ceviOnSurfaceVariant)
