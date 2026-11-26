@@ -346,9 +346,15 @@ struct ApiContractTests {
         _ = try? await client.registerForEvent(occasionId: id, childId: other, answers: [:])
         try? await client.unregisterFromEvent(occasionId: id, childId: other)
 
+        // Lädeli
+        _ = try? await client.shopCatalog()
+        _ = try? await client.myShopOrders(after: other)
+        _ = try? await client.createShopOrder(ShopOrderCreate(lines: [.init(articleId: id, variant: nil, quantity: 1)], handover: "x", expectedTotalCents: 0))
+        try? await client.cancelShopOrder(id: id)
+
         let contract = try Self.contractOperations()
         let calls = StubProtocol.requests(host: host).map { "\($0.httpMethod ?? "GET") \(Self.normalize($0.url?.path ?? ""))" }
-        #expect(calls.count >= 267)
+        #expect(calls.count >= 271)
         let missing = Set(calls).subtracting(contract)
         #expect(missing.isEmpty, "Not in the API description: \(missing.sorted())")
     }

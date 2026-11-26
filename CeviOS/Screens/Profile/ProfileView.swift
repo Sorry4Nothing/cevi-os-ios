@@ -17,6 +17,7 @@ struct ProfileView: View {
     @State private var phone = ""
     @State private var decisions = RoomDecisionsModel()
     @State private var showsDecisions = false
+    @State private var shop = ShopModel()
     @State private var isPickingPhoto = false
     @State private var photo: PhotosPickerItem?
 
@@ -59,6 +60,12 @@ struct ProfileView: View {
                     } header: {
                         sectionHeader("Räume")
                     }
+                }
+
+                Section {
+                    NavigationLink { ShopView(model: shop) } label: { row("Lädeli", symbol: "bag") }
+                } header: {
+                    sectionHeader("Abteilung")
                 }
 
                 Section {

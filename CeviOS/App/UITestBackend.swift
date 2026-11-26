@@ -322,6 +322,7 @@ nonisolated struct World {
         case ("GET", "stufen") where route.count == 1:
             return .json(200, ["stufen": [Ids.jungschar, Ids.froeschli].map(unit)])
         case (_, "termine"), (_, "termin-vorschlaege"), (_, "raeume"), (_, "anlaesse"): return eventRoutes(request, route, me)
+        case (_, "laden"): return shopRoutes(request, route)
         case (_, "chats"): return chatRoutes(request, Array(route.dropFirst()), me)
         // Camps: `leitung…` is camp lead, `team…` team; everyone else has no camp and no switcher.
         case (_, "lager"): return campRoutes(request, Array(route.dropFirst()), me)
