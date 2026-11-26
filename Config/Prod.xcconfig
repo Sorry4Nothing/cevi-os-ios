@@ -9,3 +9,6 @@ SWIFT_ACTIVE_COMPILATION_CONDITIONS = PROD $(inherited)
 API_BASE_URL = $(API_BASE_URL_PROD)
 // App Attest (not in Dev: a free Personal Team cannot sign this entitlement).
 CODE_SIGN_ENTITLEMENTS = Config/CeviOS.entitlements
+
+APP_GROUP_ID = group.$(APP_BUNDLE_IDENTIFIER)
+WIDGET_ENTITLEMENTS = Config/CeviOSWidgets.entitlements

@@ -3,6 +3,8 @@ import SwiftUI
 /// Where a tapped push leads inside the camp (`CampRouter`); the tab bar or the «Mehr» sheet consumes it.
 nonisolated enum CampDestination: Hashable, Sendable {
     case notices, mentions, inbox
+    /// The task list; only a tap on a widget leads there.
+    case tasks
     /// Only in the «Mehr» sheet (no push leads there).
     case meetings, notifications
     /// The roster screens (B3). Only the swaps are the target of a push (`lager_einteilung`).

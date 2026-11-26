@@ -89,7 +89,7 @@ struct CampMoreSheet: View {
                 case .search: CampSearchView()
                 case .handouts: CampHandoutsView()
                 case .check: CampCheckView()
-                case .notices: EmptyView()
+                case .notices, .tasks: EmptyView()
                 }
             }
             .onAppear {

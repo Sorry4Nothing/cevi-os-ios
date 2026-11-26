@@ -37,6 +37,10 @@ final class AppState {
     /// `GET /stufen`, loaded once per session for the unit logos. Dropped on sign-out and lock.
     private(set) var units: [UnitInfo]?
     private var isLoadingUnits = false
+    /// Redacted data for the home-screen widgets; written to the app group, emptied on sign-out.
+    let widgets = WidgetRefresher()
+    /// The app lock is on: the widgets then show only the redacted form.
+    var widgetsHideContent = false
 
     /// `session` is replaced only by the DEBUG UI-test backend (`UITestLaunch`).
     init(
@@ -62,7 +66,9 @@ final class AppState {
             Task { @MainActor in self?.handle(event) }
         }
         phase = hasCookies ? .loading : .signIn
+        if !hasCookies { widgets.markSignedOutIfNeeded() }
         onSignOut.append { [weak self] in
+            self?.widgets.clear()
             await self?.client?.clearCampCache()
             ProfileImageCache.shared.removeAll()
             self?.units = nil
@@ -71,6 +77,12 @@ final class AppState {
             ProfileImageCache.shared.removeAll()
             self?.units = nil
         }
+    }
+
+    /// Refreshes the widgets: on opening and leaving the app, after answers and data pushes. Fire and forget.
+    func refreshWidgets() {
+        guard case .ready(let profile) = phase else { return }
+        Task { await widgets.refresh(client: client, profile: profile, hidesContent: widgetsHideContent) }
     }
 
     /// Logo path of a unit, `nil` without own logo or before the units are loaded.
