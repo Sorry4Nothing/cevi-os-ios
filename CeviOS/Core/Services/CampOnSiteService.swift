@@ -43,13 +43,6 @@ extension APIClient {
         try await load("GET", rowPath(campId, "wetter"))
     }
 
-    /// Camp leadership only. Both values `nil` switch the weather off. Returns the stored place (`nil` if off).
-    func setCampWeatherPlace(campId: UUID, latitude: Double?, longitude: Double?) async throws -> CampWeatherPlace? {
-        let result: CampWeatherPlaceSetting = try await load("PUT", rowPath(campId, "wetter", nil, "/ort"), body: CampWeatherPlaceSetting(latitude: latitude, longitude: longitude))
-        guard let latitude = result.latitude, let longitude = result.longitude else { return nil }
-        return CampWeatherPlace(latitude: latitude, longitude: longitude)
-    }
-
     // MARK: Today and my week (Heute, Meine Woche)
 
     /// 403 if the role reads no part of it.

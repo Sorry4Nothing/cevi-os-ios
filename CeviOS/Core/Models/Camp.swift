@@ -30,9 +30,11 @@ nonisolated struct Camp: Decodable, Equatable, Identifiable, Sendable {
     let color: String?
     /// Logo in the media storage (`GET /api/v1/medien/{id}`).
     let logoMediumId: UUID?
+    let weatherPlace: CampWeatherPlace
 
     enum CodingKeys: String, CodingKey {
         case id, status, color
+        case weatherPlace = "wetterOrt"
         case title = "titel", from = "von", to = "bis", preparationFrom = "vorbereitungAb"
         case place = "ort", address = "adresse", logoMediumId
     }

@@ -37,38 +37,35 @@ nonisolated struct CampWeatherDay: Codable, Equatable, Sendable {
     }
 }
 
-/// The place of the camp as the weather service gets it: degrees, rounded to two decimals.
-nonisolated struct CampWeatherPlace: Codable, Equatable, Sendable {
-    let latitude: Double
-    let longitude: Double
+/// State of the place search for the weather. The server derives the place from the camp place; nobody enters
+/// coordinates.
+nonisolated enum CampWeatherPlaceStatus: String, CampTolerantEnum {
+    case noPlace = "kein_ort"
+    case pending = "offen"
+    case found = "gefunden"
+    case notFound = "nicht_gefunden"
+    case ambiguous = "mehrdeutig"
+    case unreachable = "nicht_erreichbar"
+    case unknown
 
-    enum CodingKeys: String, CodingKey { case latitude = "breite", longitude = "laenge" }
+    static var fallback: Self { .unknown }
+}
+
+nonisolated struct CampWeatherPlace: Codable, Equatable, Sendable {
+    let status: CampWeatherPlaceStatus
+    /// The place found, with canton; only with `.found`.
+    let name: String?
 }
 
 /// The forecast: from two days back to 16 days ahead. Without a place, on an outage of the service and when the
 /// values are older than 24 hours, `days` is empty (no error).
 nonisolated struct CampWeather: Codable, Equatable, Sendable {
-    /// `nil` until the camp leadership sets one.
-    let place: CampWeatherPlace?
+    let place: CampWeatherPlace
     /// When the values were fetched last; `nil` without values.
     let asOf: Date?
     let days: [CampWeatherDay]
 
     enum CodingKeys: String, CodingKey { case place = "ort", asOf = "stand", days = "tage" }
-}
-
-/// Both `nil` switches the weather off. Sent as `null`.
-nonisolated struct CampWeatherPlaceSetting: Codable, Equatable, Sendable {
-    let latitude: Double?
-    let longitude: Double?
-
-    enum CodingKeys: String, CodingKey { case latitude = "breite", longitude = "laenge" }
-
-    func encode(to encoder: any Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(latitude, forKey: .latitude)
-        try container.encode(longitude, forKey: .longitude)
-    }
 }
 
 // MARK: Day pages (Tagesseiten)

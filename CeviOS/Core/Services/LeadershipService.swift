@@ -25,7 +25,7 @@ nonisolated struct LeadershipPermissions {
 
     /// Overview of who registered: admins and leaders of an assigned unit.
     func canSeeOverview(of program: Program) -> Bool {
-        profile.admin || program.units.contains { profile.isLeader(of: $0.id) }
+        profile.isDepartmentLead || program.units.contains { profile.isLeader(of: $0.id) }
     }
 
     /// Own registration is only offered when the server sent `eigeneAnmeldung` and the program has not started.

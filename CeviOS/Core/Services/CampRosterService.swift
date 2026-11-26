@@ -5,6 +5,14 @@ import Foundation
 extension APIClient {
     private func lower(_ id: UUID) -> String { id.uuidString.lowercased() }
 
+    // MARK: Members (Mitglieder)
+
+    /// Names for ids. Needs the right `einteilung.lesen` (403 otherwise); the team sees only people it already sees in lists.
+    func campMembers(campId: UUID) async throws -> [CampMember] {
+        let list: CampMemberList = try await load("GET", rowPath(campId, "mitglieder"))
+        return list.members
+    }
+
     // MARK: Participants (Teilnehmende)
 
     /// `level` filters by level.

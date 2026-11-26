@@ -49,7 +49,7 @@ nonisolated extension World {
     /// Events as the list sends them: the person's children only, the occasion on the camp.
     private func event(_ p: Program, for me: Person) -> [String: Any] {
         var object = program(p, for: me)
-        for key in ["stufen", "sichtbarkeit", "treffpunkt", "schlussOrt", "schlussZeit", "mitnehmen", "teilnahmeOffen", "eigeneAnmeldung"] {
+        for key in ["stufen", "treffpunkt", "schlussOrt", "schlussZeit", "mitnehmen", "teilnahmeOffen", "eigeneAnmeldung"] {
             object[key] = nil
         }
         object["ort"] = orNull(p.meetingPoint ?? "Beispielwald")

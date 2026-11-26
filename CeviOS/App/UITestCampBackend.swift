@@ -39,8 +39,8 @@ nonisolated extension World {
         return [
             "id": id, "titel": closed ? "Herbstlager Beispiel 2026" : "Sommerlager Beispiel 2027",
             "von": closed ? "{{D-60}}" : "{{D+12}}", "bis": closed ? "{{D-53}}" : "{{D+19}}", "vorbereitungAb": NSNull(),
-            "ort": "Beispielwald", "adresse": "Beispielweg 1, 8000 Beispielstadt", "status": closed ? "abgeschlossen" : "aktiv",
-            "farbe": "#003973", "logoMediumId": NSNull(), "rolle": role,
+            "ort": "Beispielwald", "adresse": "Beispielweg 1, 8000 Beispielstadt", "status": closed ? "abgeschlossen" : "aktiv", "uebung": false,
+            "farbe": "#003973", "logoMediumId": NSNull(), "wetterOrt": ["status": "kein_ort", "name": NSNull()], "rolle": role,
         ]
     }
 

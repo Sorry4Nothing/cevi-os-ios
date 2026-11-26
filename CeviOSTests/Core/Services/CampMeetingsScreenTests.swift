@@ -10,7 +10,7 @@ private nonisolated let meetingUUID = UUID(uuidString: uid(1))!
 private func active(_ role: CampRole = .campLeader, status: String = "aktiv", host: String) throws -> ActiveCamp {
     let json = """
     {"id":"\(campUUID.uuidString)","titel":"Sommerlager","von":"2027-07-17","bis":"2027-07-24","vorbereitungAb":null,"ort":null,
-     "adresse":null,"status":"\(status)","farbe":null,"logoMediumId":null}
+     "adresse":null,"status":"\(status)","farbe":null,"logoMediumId":null,"wetterOrt":{"status":"kein_ort","name":null}}
     """
     let client = APIClient(baseURL: URL(string: "https://\(host)")!, appVersion: "1.0.0", cookieStore: InMemoryCookieStore(["s": "1"]),
                            session: APIClient.makeSession(protocolClasses: [StubProtocol.self]))

@@ -66,15 +66,15 @@ struct CampOnSiteModelTests {
     }
 
     @Test func weatherDecodesPlaceOnly() throws {
-        let weather = try decode(CampWeather.self, #"{"ort":{"breite":46.95,"laenge":7.45},"stand":"2027-07-12T06:00:00Z","tage":[\#(weatherDayJSON)]}"#)
-        #expect(weather.place?.latitude == 46.95 && weather.days.first?.maxTemperature == 24.5 && weather.days.first?.gusts == 38)
-        let off = try decode(CampWeather.self, #"{"ort":null,"stand":null,"tage":[]}"#)
-        #expect(off.place == nil && off.asOf == nil && off.days.isEmpty)
+        let weather = try decode(CampWeather.self, #"{"ort":{"status":"gefunden","name":"Beispielort BE"},"stand":"2027-07-12T06:00:00Z","tage":[\#(weatherDayJSON)]}"#)
+        #expect(weather.place.status == .found && weather.place.name == "Beispielort BE" && weather.days.first?.maxTemperature == 24.5 && weather.days.first?.gusts == 38)
+        let off = try decode(CampWeather.self, #"{"ort":{"status":"kein_ort","name":null},"stand":null,"tage":[]}"#)
+        #expect(off.place.status == .noPlace && off.place.name == nil && off.asOf == nil && off.days.isEmpty)
     }
 
-    @Test func placeSettingSendsNullToSwitchOff() throws {
-        let off = try encoded(CampWeatherPlaceSetting(latitude: nil, longitude: nil))
-        #expect(off["breite"] is NSNull && off["laenge"] is NSNull)
+    @Test func unknownPlaceStatusDecodesTolerantly() throws {
+        let place = try decode(CampWeatherPlace.self, #"{"status":"neu","name":null}"#)
+        #expect(place.status == .unknown)
     }
 
     @Test func todayHoldsOnlyWhatTheRoleMayRead() throws {
@@ -221,13 +221,8 @@ struct CampOnSiteServiceTests {
     }
 
     @Test func weatherRoutes() async throws {
-        var r = try await sent(#"{"ort":null,"stand":null,"tage":[]}"#) { _ = try await $0.campWeather(campId: camp) }
+        var r = try await sent(#"{"ort":{"status":"offen","name":null},"stand":null,"tage":[]}"#) { _ = try await $0.campWeather(campId: camp) }
         #expect(r.method == "GET" && r.path == campPath + "/wetter")
-        var place: CampWeatherPlace?
-        r = try await sent(#"{"breite":46.9,"laenge":7.4}"#) { place = try await $0.setCampWeatherPlace(campId: camp, latitude: 46.9, longitude: 7.4) }
-        #expect(r.method == "PUT" && r.path == campPath + "/wetter/ort" && r.body?["breite"] as? Double == 46.9 && place?.longitude == 7.4)
-        r = try await sent(#"{"breite":null,"laenge":null}"#) { place = try await $0.setCampWeatherPlace(campId: camp, latitude: nil, longitude: nil) }
-        #expect(r.body?["breite"] is NSNull && place == nil)
     }
 
     @Test func aggregateRoutes() async throws {

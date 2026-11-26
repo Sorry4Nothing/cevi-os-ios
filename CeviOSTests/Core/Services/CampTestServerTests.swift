@@ -85,6 +85,8 @@ struct CampTestServerTests {
         await check("document") { try await client.campDocument(campId: camp, documentId: row) }
         await check("contacts") { try await client.campContacts(campId: camp) }
         await check("contact") { try await client.campContact(campId: camp, contactId: row) }
+        await check("members") { try await client.campMembers(campId: camp) }
+        await check("templates") { try await client.campTemplates(campId: camp) }
         await check("search") { try await client.searchCamp(campId: camp, text: "Zelt") }
         #expect(failures.isEmpty, "\(failures.joined(separator: "\n"))")
     }

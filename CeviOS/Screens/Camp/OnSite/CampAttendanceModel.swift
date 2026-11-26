@@ -117,6 +117,7 @@ final class CampAttendanceModel: CampRosterModel {
     override func load() async {
         guard let client = active.client, let campId = active.camp?.id else { return }
         do {
+            await active.loadMemberNames()
             if days.isEmpty {
                 let schedule = try await client.campSchedule(campId: campId)
                 days = schedule.campDays.sorted { $0.date < $1.date }
@@ -133,7 +134,7 @@ final class CampAttendanceModel: CampRosterModel {
                 entries = page.entries
                 deadline = page.deadline
                 requests = (try? await open.requests) ?? requests
-                people = Self.merged(await team, entries: page.entries)
+                people = Self.merged(await team, entries: page.entries, names: active.memberNames)
             } else {
                 let own = try await client.ownCampAttendance(campId: campId)
                 entries = own.entries
@@ -166,10 +167,10 @@ final class CampAttendanceModel: CampRosterModel {
     }
 
     /// People without a name in the list (the list failed or is stale) still show up with a neutral label.
-    static func merged(_ named: [CampPersonChoice], entries: [CampAttendanceEntry]) -> [CampPersonChoice] {
+    static func merged(_ named: [CampPersonChoice], entries: [CampAttendanceEntry], names: [UUID: String] = [:]) -> [CampPersonChoice] {
         var result = named
         for id in entries.compactMap(\.personId) where !result.contains(where: { $0.id == id }) {
-            result.append(CampPersonChoice(id: id, isParticipant: false, label: CampRosterText.unknownPerson))
+            result.append(CampPersonChoice(id: id, isParticipant: false, label: names[id] ?? CampRosterText.unknownPerson))
         }
         return result
     }

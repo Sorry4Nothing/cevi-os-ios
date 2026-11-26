@@ -77,4 +77,6 @@ Rückbau (Backend #449): `PUT /programme/{id}/zuordnung`, `LeadershipService.ass
 
 ### Offene Fragen zum Entwurf und zur API
 - Ob die `id` eines Stufen-Tags der `stufeId` aus `GET /ich` entspricht: Die App nimmt es an (Rechte für «Anmeldungen ansehen», Logo).
+- Konto eines Kindes (`teilnehmer` in `GET /ich`, nie Rolle, nie Abteilungsleitung; `chat` ist `aus`, `lesen` oder `schreiben`; `aktiv: false` heisst, das Konto sieht nichts): Die App liest das Feld, zeigt dem Konto aber noch die Ansicht der Eltern ohne Kinder (leer). Fotoalben und Chat-Schreiben sind für das Konto gesperrt. Was soll es sehen? Entwurf nötig.
+- `clientArt` (`app_nachgewiesen`, `app_ungeprueft`): Die App lädt den Nachweis (`/api/v1/app/nachweis`) nicht; das Profil nennt `app_ungeprueft`. Ob Funktionen davon abhängen, steht nicht in der Beschreibung.
 - Wo K1 bis K3 im Entwurf einsteigen: die Boards zeigen keinen Einstieg, gebaut ist das «+»-Menü.

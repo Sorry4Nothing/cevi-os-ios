@@ -421,7 +421,7 @@ nonisolated struct World {
             "mussPasswortAendern": me.mustChangePassword,
             "datenschutzGelesenAm": orNull(me.privacyRead.map(DateFormats.timestampText)),
             "telefon": orNull(me.phone), "bildUrl": NSNull(), "pushChat": me.pushChat, "pushProgramme": me.pushPrograms,
-            "admin": false,
+            "geschlecht": NSNull(), "abteilungsleitung": false, "entwickler": false, "clientArt": "web", "rechte": [Any](), "zweiterFaktor": false,
             "rollen": me.roles.map { ["stufeId": $0.unit, "typ": $0.type] },
             "stufen": me.units.map(unit),
             "kinder": me.children.map { ["id": $0.id, "vorname": $0.firstName, "nachname": $0.lastName, "stufeId": $0.unit] },
@@ -448,7 +448,9 @@ nonisolated struct World {
         guard let id = route.first else {
             guard request.method == "GET" else { return .notFound }
             let visible = programs.filter { $0.day + $0.length > 0 && isVisible($0, to: me) }.sorted { $0.start < $1.start }
-            return .json(200, ["programme": visible.map { program($0, for: me) }])
+            // The list carries no detail fields.
+            let detailKeys = ["treffpunkt", "schlussOrt", "schlussZeit", "mitnehmen", "teilnahmeOffen", "eigeneAnmeldung"]
+            return .json(200, ["programme": visible.map { program($0, for: me).filter { !detailKeys.contains($0.key) } }])
         }
         guard let index = programs.firstIndex(where: { $0.id == id }), isVisible(programs[index], to: me) else { return .notFound }
         switch (request.method, route.dropFirst().first) {
@@ -490,7 +492,7 @@ nonisolated struct World {
     func program(_ p: Program, for me: Person) -> [String: Any] {
         let kids = me.children.filter { p.units.contains($0.unit) }
         var object: [String: Any] = [
-            "id": p.id, "titel": p.title, "status": p.status, "sichtbarkeit": p.visibility, "ganztaegig": p.isAllDay,
+            "id": p.id, "titel": p.title, "status": p.status, "ganztaegig": p.isAllDay,
             "stufen": p.units.map { ["id": $0, "name": Self.unitNames[$0]?.0 ?? ""] },
             "kinder": kids.map { ["id": $0.id, "vorname": $0.firstName, "status": orNull(p.answers[$0.id])] },
             "treffpunkt": orNull(p.meetingPoint), "schlussOrt": orNull(p.meetingPoint), "mitnehmen": orNull(p.bring),
@@ -504,6 +506,7 @@ nonisolated struct World {
             object["ende"] = DateFormats.timestampText(Self.date(days: p.day, hour: p.endHour))
             object["schlussZeit"] = String(format: "%02d:00", p.endHour)
         }
+        for key in ["tagVon", "tagBis", "beginn", "ende"] where object[key] == nil { object[key] = NSNull() }
         if p.units.contains(where: me.leads) {
             if me.kind == .leader { object["eigeneAnmeldung"] = p.leaderAnswers[me.id] ?? "offen" }
         }

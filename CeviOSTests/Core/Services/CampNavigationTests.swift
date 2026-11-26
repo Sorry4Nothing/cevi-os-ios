@@ -54,7 +54,7 @@ struct ActiveCampTests {
     private func camp(_ status: String, id: UUID = UUID()) throws -> Camp {
         let json = """
         {"id":"\(id.uuidString)","titel":"Sommerlager","von":"2027-07-10","bis":"2027-07-17","vorbereitungAb":null,"ort":null,
-         "adresse":null,"status":"\(status)","farbe":null,"logoMediumId":null}
+         "adresse":null,"status":"\(status)","farbe":null,"logoMediumId":null,"wetterOrt":{"status":"kein_ort","name":null}}
         """
         return try JSONDecoder.api.decode(Camp.self, from: Data(json.utf8))
     }
@@ -66,6 +66,22 @@ struct ActiveCampTests {
         #expect(active.isOpen && active.role == .team && active.title == "Sommerlager" && !active.isReadOnly)
         active.leave()
         #expect(!active.isOpen && active.role == nil)
+    }
+
+    @Test func memberNamesAreLoadedOnceAndStayEmptyOnRefusal() async throws {
+        let person = UUID()
+        for (status, body, expected) in [(200, #"{"mitglieder":[{"personId":"\#(person.uuidString)","name":"Lea","bildUrl":null,"rolle":"team","ressorts":[]}]}"#, "Lea"), (403, "{}", nil)] {
+            let host = "a\(UUID().uuidString.prefix(8).lowercased()).test.example.org"
+            StubProtocol.register(host: host) { _ in (status, [:], Data(body.utf8)) }
+            let client = APIClient(baseURL: URL(string: "https://\(host)")!, appVersion: "1.0.0", cookieStore: InMemoryCookieStore(["s": "1"]),
+                                   session: APIClient.makeSession(protocolClasses: [StubProtocol.self]))
+            let active = ActiveCamp()
+            active.open(camp: try camp("aktiv"), role: .team, client: client)
+            await active.loadMemberNames()
+            await active.loadMemberNames()
+            #expect(active.memberNames[person] == expected)
+            #expect(StubProtocol.requests(host: host).count == (expected == nil ? 2 : 1))
+        }
     }
 
     @Test func completedAndArchivedCampsAreReadOnly() throws {
@@ -90,7 +106,7 @@ struct CampListAndRouterTests {
     private nonisolated static func entryJSON(_ id: UUID, status: String) -> String {
         """
         {"id":"\(id.uuidString)","titel":"Lager","von":"2027-07-10","bis":"2027-07-17","vorbereitungAb":null,"ort":null,
-         "adresse":null,"status":"\(status)","farbe":null,"logoMediumId":null,"rolle":"team"}
+         "adresse":null,"status":"\(status)","farbe":null,"logoMediumId":null,"wetterOrt":{"status":"kein_ort","name":null},"rolle":"team"}
         """
     }
 

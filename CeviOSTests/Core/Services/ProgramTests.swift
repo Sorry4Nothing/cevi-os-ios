@@ -16,7 +16,7 @@ struct ProgramTests {
     ) -> Data {
         func q(_ s: String?) -> String { s.map { "\"\($0)\"" } ?? "null" }
         return Data("""
-        {"id":"\(id)","titel":"Treff","status":"\(status)","sichtbarkeit":"eltern","ganztaegig":\(allDay),
+        {"id":"\(id)","titel":"Treff","status":"\(status)","ganztaegig":\(allDay),
          "beginn":\(q(start)),"ende":\(q(end)),"tagVon":\(q(dayFrom)),"tagBis":\(q(dayTo)),
          "stufen":[{"id":"22222222-2222-2222-2222-222222222222","name":"Stufe A"}],
          "kinder":\(children)\(extra)}
