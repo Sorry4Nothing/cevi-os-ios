@@ -46,6 +46,19 @@ struct ApiContractTests {
         #expect(operations.count > 40)
     }
 
+    @Test func appProofCallsAreInTheDescription() async throws {
+        let server = AppAttestTests.Server()
+        let client = APIClient(
+            baseURL: URL(string: "https://\(server.host)")!, appVersion: "1.0.0", cookieStore: InMemoryCookieStore(),
+            session: APIClient.makeSession(protocolClasses: [StubProtocol.self]),
+            appAttest: AppAttestSetup(provider: FakeAppAttest(), keyStore: InMemoryAppAttestKeyStore())
+        )
+        _ = try? await client.signIn(username: "a", password: "b")
+        let calls = Set(StubProtocol.requests(host: server.host).map { "\($0.httpMethod ?? "GET") \(Self.normalize($0.url?.path ?? ""))" })
+        #expect(calls.count == 3)
+        #expect(calls.subtracting(try Self.contractOperations()).isEmpty)
+    }
+
     @Test func everyCallOfTheAppIsInTheDescription() async throws {
         let host = "a\(UUID().uuidString.prefix(8).lowercased()).test.example.org"
         StubProtocol.register(host: host) { _ in (200, [:], Data("{}".utf8)) }

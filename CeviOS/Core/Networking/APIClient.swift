@@ -21,6 +21,7 @@ actor APIClient {
     private let session: URLSession
     private let streamSession: URLSession
     private let onEvent: @Sendable (APIEvent) -> Void
+    let appAttest: AppAttestSetup?
     private var cookies: [String: String]
 
     init(
@@ -29,6 +30,7 @@ actor APIClient {
         cookieStore: any CookieStore,
         session: URLSession = APIClient.makeSession(),
         streamSession: URLSession = APIClient.makeSession(streaming: true),
+        appAttest: AppAttestSetup? = nil,
         onEvent: @escaping @Sendable (APIEvent) -> Void = { _ in }
     ) {
         self.baseURL = baseURL
@@ -37,6 +39,7 @@ actor APIClient {
         self.session = session
         self.streamSession = streamSession
         self.onEvent = onEvent
+        self.appAttest = appAttest
         cookies = cookieStore.read()
     }
 
@@ -77,9 +80,10 @@ actor APIClient {
         _ path: String,
         query: [URLQueryItem] = [],
         body: (any Encodable & Sendable)? = nil,
-        rawBody: Data? = nil
+        rawBody: Data? = nil,
+        headers: [String: String] = [:]
     ) async throws -> Data {
-        let request = try makeRequest(method, path, query: query, body: body, rawBody: rawBody)
+        let request = try makeRequest(method, path, query: query, body: body, rawBody: rawBody, headers: headers)
 
         let data: Data
         let response: HTTPURLResponse
@@ -101,7 +105,8 @@ actor APIClient {
 
     /// The request with the headers every call carries: version, session cookie, and for sign-in the origin.
     func makeRequest(
-        _ method: String, _ path: String, query: [URLQueryItem] = [], body: (any Encodable & Sendable)? = nil, rawBody: Data? = nil
+        _ method: String, _ path: String, query: [URLQueryItem] = [], body: (any Encodable & Sendable)? = nil, rawBody: Data? = nil,
+        headers: [String: String] = [:]
     ) throws -> URLRequest {
         var components = URLComponents(url: baseURL, resolvingAgainstBaseURL: false)
         components?.path = path
@@ -115,6 +120,7 @@ actor APIClient {
         if method == "POST", path.hasPrefix("/api/auth/") {
             request.setValue(Self.origin, forHTTPHeaderField: "Origin")
         }
+        for (name, value) in headers { request.setValue(value, forHTTPHeaderField: name) }
         if let header = CookieJar.header(cookies) {
             request.setValue(header, forHTTPHeaderField: "Cookie")
         }
@@ -144,8 +150,9 @@ actor APIClient {
         let retryAfter = (response.value(forHTTPHeaderField: "Retry-After") ?? response.value(forHTTPHeaderField: "X-Retry-After")).flatMap { Int($0) }
         let error = APIError.from(status: response.statusCode, data: data, retryAfter: retryAfter)
         switch error.kind {
-        case .unauthorized where path.hasPrefix("/api/v1/"):
-            // Under /api/auth, 401 is also a wrong code or a wrong password, not the end of the session.
+        case .unauthorized where path.hasPrefix("/api/v1/") && !path.hasPrefix("/api/v1/app/"):
+            // Under /api/auth, 401 is also a wrong code or a wrong password, not the end of the session. The same holds for
+            // the app proof (`/api/v1/app/*`), which runs before there is a session.
             clearCookies()
             onEvent(.sessionEnded)
         case .appOutdated:
