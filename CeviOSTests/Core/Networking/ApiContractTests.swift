@@ -286,6 +286,11 @@ struct ApiContractTests {
         _ = try? await client.createCampPackingPoint(campId: id, CampPackingPointCreate(section: "A", text: "B"))
         _ = try? await client.updateCampPackingPoint(campId: id, pointId: other, CampPackingPointPatch(version: 1))
         try? await client.deleteCampPackingPoint(campId: id, pointId: other, version: 1)
+        _ = try? await client.campCheck(campId: id)
+        _ = try? await client.campCheckPoints(campId: id)
+        _ = try? await client.createCampCheckPoint(campId: id, CampCheckPointCreate(title: "A"))
+        _ = try? await client.updateCampCheckPoint(campId: id, pointId: other, CampCheckPointPatch(version: 1, done: true))
+        try? await client.deleteCampCheckPoint(campId: id, pointId: other, version: 1)
         _ = try? await client.setCampPackingState(campId: id, pointId: other, .checked)
         _ = try? await client.createOwnCampPackingPoint(campId: id, CampOwnPackingPointCreate(section: "A", text: "B"))
         _ = try? await client.updateOwnCampPackingPoint(campId: id, pointId: other, CampOwnPackingPointPatch(checked: true))
@@ -343,7 +348,7 @@ struct ApiContractTests {
 
         let contract = try Self.contractOperations()
         let calls = StubProtocol.requests(host: host).map { "\($0.httpMethod ?? "GET") \(Self.normalize($0.url?.path ?? ""))" }
-        #expect(calls.count >= 262)
+        #expect(calls.count >= 267)
         let missing = Set(calls).subtracting(contract)
         #expect(missing.isEmpty, "Not in the API description: \(missing.sorted())")
     }

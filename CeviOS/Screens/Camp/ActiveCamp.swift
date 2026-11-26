@@ -11,6 +11,8 @@ nonisolated enum CampDestination: Hashable, Sendable {
     case attendance, dayPages, shopping, packing, emergency, infos
     /// The storage and search screens (B5). No push leads there.
     case documents, addressBook, search
+    /// The camp check; no push leads there.
+    case check
 }
 
 /// The emergency window as it was last loaded, with the time of loading.

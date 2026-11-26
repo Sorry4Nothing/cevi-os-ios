@@ -324,6 +324,22 @@ Nicht gebaut: **L38 Papierkorb** (alle Boards: Normal, Laden, Leer, Fehler, Erfo
 - UI-Abläufe: `CampFlowTests` (Lagerleitung, Team, abgeschlossenes Lager, grösste Schrift, Dunkelmodus, alle Einträge von «Mehr»).
 - Lesende Routen liefern feste Beispieldaten. Schreibende Routen ausser Status, Checkliste und neuer Pinnwand-Beitrag antworten 204 ohne Inhalt (die Bildschirme zeigen dann einen Fehler beim Speichern).
 
+## Schnitt D1 Lager-Check (Issue #108)
+
+Ohne Entwurf gebaut: Das Design hat kein Board für den Lager-Check. Der Bildschirm besteht aus vorhandenen Bausteinen (Karten, Chips, `StateView`, `CampScroll`, Konfliktansicht) und folgt `docs/design.md` und dem UX-Handbuch.
+
+| Was | Route | Code |
+| --- | --- | --- |
+| Gesamtstand und Stand je Prüfer, Hinweise, bis zu fünf Beispiele | `GET …/check` | `CampCheck`, `CampChecker`, `CampCheckNote`, `CampCheckExample` |
+| Eigene Punkte lesen, anlegen, ändern (abhaken, umbenennen), löschen | `GET/POST …/check/punkte`, `PATCH/DELETE …/check/punkte/{punktId}` | `CampCheckPoint`, `CampCheckModel` |
+| Bildschirm «Lager-Check» im Blatt «Mehr» | | `CampCheckView`, `CampCheckScreen` |
+
+- Der Eintrag steht in «Mehr» für Lagerleitung, Leitung und Lesen (Vorgabe von `check.lesen`). Die Lagerleitung kann das Recht dem Team geben; die Antwort nennt die Rechte nicht, darum zeigt die App den Eintrag dem Team nicht (Route fehlt: Rechte der Person im Lager). Knöpfe zum Schreiben nur für die Lagerleitung (`zeitplan.bearbeiten` und `check.lesen`) im Lager ohne Schreibschutz.
+- Schreibaktionen gehen direkt hinaus. Die Warteschlange kennt keine Operation für Check-Punkte und der Vertrag keine Idempotenz-Kennung: Ohne Netz scheitert die Aktion sichtbar mit «Nochmals versuchen»; nichts wird still wiederholt. `VERSION_KONFLIKT` beim Ändern öffnet die Konfliktansicht (Felder «Punkt» und «Erledigt»); beim Löschen lädt die Liste neu. Kein lokaler Speicher.
+- Ein Prüfer, den die Rolle nicht lesen darf, fehlt in der Antwort und damit auf dem Bildschirm. Ein unbekannter Prüfer wird gezeigt (Fall `unknown`), ein unbekannter Stand ist ein Dekodierfehler.
+- Wetter-Ort einstellen entfällt: `PUT …/wetter/ort` steht nicht mehr im Vertrag.
+- Nicht gebaut: Umordnen der eigenen Punkte (`reihenfolge` ist im Vertrag, der Bildschirm bietet keine Bedienung), Testserver-Routen (kein UI-Ablauf braucht sie).
+
 ## Offene Fragen zum Entwurf
 
 - L1: «62 Prozent erledigt, 4 überfällig» braucht `GET …/start` je Lager; «Übungslager» (Abschnitt, Chip «Übung») hat kein Feld in der API. Beides fehlt in der App.
@@ -346,7 +362,7 @@ Nicht gebaut: **L38 Papierkorb** (alle Boards: Normal, Laden, Leer, Fehler, Erfo
 | A0b: Namen der `typ`-Werte und Nutzlast-Felder der Operationen | Beschreibung nennt nur das Beispiel `aufgabe.aendern`; Module melden ihre Operationen an | L0c |
 | Papierkorb, Verlauf, Fassungen | Revisionen | L0e |
 | Dateien (Dokumente, Bilder) | Lager-Dateien im Medienspeicher | L0g |
-| A1: Lager-Check «Sind wir bereit?» | keine Route in der Beschreibung | L1 |
+| ~~A1: Lager-Check «Sind wir bereit?»~~ | erledigt: `GET …/check` und Punkte (Stand 25.11.), siehe Schnitt D1; offen bleibt eine Rechteliste der Person im Lager | L1 |
 | ~~A1: Vorlagen auflisten~~ | erledigt: `GET …/vorlagen` (Stand 25.11.), `campTemplates`; ein Bildschirm zur Vorlagenwahl fehlt noch | L1 |
 | A1: frühere Fassungen einer Aufgabe, Zurückholen | Verlauf kennt nur Art, Version, Zeitpunkt; keine Inhalte | L0e |
 | A2: Protokoll-Abschnitte (Text im Protokoll) | nur Zeile mit Dateiverweis, kein Inhalt, keine Abschnitte | L2 |

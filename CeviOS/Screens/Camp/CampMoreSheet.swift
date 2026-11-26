@@ -12,6 +12,7 @@ struct CampMoreSheet: View {
     /// Entries whose target exists and that the role may open.
     private var rights: CampCommsRights { CampCommsRights(role: active.role, readOnly: active.isReadOnly) }
     private var onSite: CampOnSiteRights { CampOnSiteRights(role: active.role, readOnly: active.isReadOnly) }
+    private var checkRights: CampCheckRights { CampCheckRights(role: active.role, readOnly: active.isReadOnly) }
     private var storage: CampStorageRights { CampStorageRights(role: active.role, readOnly: active.isReadOnly) }
 
     var body: some View {
@@ -25,6 +26,7 @@ struct CampMoreSheet: View {
                     NavigationLink(value: CampDestination.mentions) { row("Erwähnungen", symbol: "at") }
                     if rights.readsInbox { NavigationLink(value: CampDestination.inbox) { row("Eingang", symbol: "tray") } }
                     NavigationLink(value: CampDestination.notifications) { row("Benachrichtigungen", symbol: "bell") }
+                    if checkRights.reads { NavigationLink(value: CampDestination.check) { row("Lager-Check", symbol: "checkmark.seal") } }
                 }
                 Section("Einteilung") {
                     NavigationLink(value: CampDestination.rooms) { row("Zimmer und Zelte", symbol: "bed.double") }
@@ -84,6 +86,7 @@ struct CampMoreSheet: View {
                 case .documents: CampDocumentsView()
                 case .addressBook: CampAddressBookView()
                 case .search: CampSearchView()
+                case .check: CampCheckView()
                 case .notices: EmptyView()
                 }
             }

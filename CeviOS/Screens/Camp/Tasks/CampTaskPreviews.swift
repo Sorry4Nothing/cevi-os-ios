@@ -16,7 +16,7 @@ enum CampPreview {
     static func active(role: CampRole = .campLeader, status: String = "aktiv", waiting: Int = 0, offline: Bool = false) -> ActiveCamp {
         let camp: Camp = decode("""
         {"id":"0190a000-0000-7000-8000-000000000001","titel":"Sommerlager 2027","von":"2027-07-17","bis":"2027-07-24","vorbereitungAb":null,
-         "ort":"Lagerhaus Beispielberg","adresse":null,"status":"\(status)","farbe":null,"logoMediumId":null}
+         "ort":"Lagerhaus Beispielberg","adresse":null,"status":"\(status)","farbe":null,"logoMediumId":null,"wetterOrt":{"status":"kein_ort","name":null}}
         """)
         let active = ActiveCamp()
         active.open(camp: camp, role: role, client: nil)
