@@ -104,6 +104,9 @@ struct EventTextField: View {
                 .lineLimit(multiline ? 3...8 : 1...1)
                 .padding(.vertical, multiline ? Spacing.s3 : 0)
                 .focused($isFocused)
+                // Single-line fields close the keyboard with the return key; multi-line fields keep it for new lines.
+                .submitLabel(multiline ? .return : .done)
+                .onSubmit { if !multiline { isFocused = false } }
                 .accessibilityLabel(Text(accessibility))
         }
     }
