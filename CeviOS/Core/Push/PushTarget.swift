@@ -6,6 +6,9 @@ nonisolated enum PushTarget: Equatable, Sendable {
     case program(UUID)
     /// Push of the camp module: the camp id is not in the push, the app resolves it (`GET /api/v1/lager/aufloesen/{typ}/{id}`).
     case camp(CampPushType, UUID)
+    /// Tap on a widget: the chat list, or a page of the camp (the camp id is in the link).
+    case chats
+    case campArea(CampWidgetArea, UUID)
     /// A room request waits for the team: opens the list of requests to decide on (the push has no screen for one request).
     case roomRequests
     /// Announcement from the administration: no target, the app just opens.
@@ -19,6 +22,10 @@ nonisolated enum PushTarget: Equatable, Sendable {
         case "chat": return id.map(PushTarget.chat)
         case "programm": return id.map(PushTarget.program)
         case "mitteilung": return .announcement
+        case "chats": return .chats
+        case "lager_heute": return id.map { .campArea(.today, $0) }
+        case "lager_aufgaben": return id.map { .campArea(.tasks, $0) }
+        case "lager_notfall": return id.map { .campArea(.emergency, $0) }
         case "raum_anfrage": return .roomRequests
         default: return CampPushType(rawValue: type).flatMap { campType in id.map { .camp(campType, $0) } }
         }
@@ -37,3 +44,6 @@ nonisolated enum PushToken {
         token.wholeMatch(of: /[A-Za-z0-9_:.\-]{20,512}/) != nil
     }
 }
+
+/// Pages of a camp that a widget opens.
+nonisolated enum CampWidgetArea: Equatable, Sendable { case today, tasks, emergency }

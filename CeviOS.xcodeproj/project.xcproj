@@ -24,13 +24,36 @@
     { "kind": "folder", "path": "CeviOSTests", "target-membership": [ "CeviOSTests" ] },
     { "kind": "folder", "path": "CeviOSUITests", "target-membership": [ "CeviOSUITests" ] },
     { "kind": "folder", "path": "Config" },
+    { "kind": "folder", "path": "CeviShared", "target-membership": [ "CeviOS", "CeviOSWidgetsExtension" ] },
     {
+      "kind": "folder",
+      "path": "CeviOSWidgets",
+      "target-membership": [
+        "CeviOSWidgetsExtension",
+      ],
+      "membership-exceptions": [
+        {
+          "target": "CeviOSWidgetsExtension",
+          "exclusions": [
+            "Info.plist",
+          ],
+        },
+      ],
+    }, {
+      "kind": "group",
+      "name": "Frameworks",
+      "children": [
+        { "path": "/System/Library/Frameworks/WidgetKit.framework", "target-membership": [ "CeviOSWidgetsExtension/frameworks" ] },
+        { "path": "/System/Library/Frameworks/SwiftUI.framework", "target-membership": [ "CeviOSWidgetsExtension/frameworks" ] },
+      ],
+    }, {
       "kind": "group",
       "name": "Products",
       "children": [
         { "path": "<PRODUCTS>/CeviOS.app", "id": "000000000000000000000120", "type": "wrapper.application", "index": false },
         { "path": "<PRODUCTS>/CeviOSTests.xctest", "id": "000000000000000000000121", "type": "wrapper.cfbundle", "index": false },
         { "path": "<PRODUCTS>/CeviOSUITests.xctest", "id": "000000000000000000000122", "type": "wrapper.cfbundle", "index": false },
+        { "path": "<PRODUCTS>/CeviOSWidgetsExtension.appex", "id": "91D46A3030B88DBA00A5D0DE", "type": "wrapper.app-extension", "index": false, "target-membership": [ { "build-phase": "CeviOS/copy/Embed Foundation Extensions", "header-preservation": "remove-on-copy" } ] },
       ],
     },
   ],
@@ -40,10 +63,18 @@
       "id": "000000000000000100000000",
       "product": "Products/CeviOS.app",
       "product-type": "application",
+      "dependencies": [
+        "CeviOSWidgetsExtension",
+      ],
       "build-phases": [
         "compile-sources",
         "frameworks",
         "resources",
+        {
+          "kind": "copy",
+          "name": "Embed Foundation Extensions",
+          "bundle-base-path": "plugins-directory",
+        },
       ],
       "package-product-members": [
         {
@@ -123,6 +154,43 @@
         "SWIFT_VERSION": "6.0",
         "TARGETED_DEVICE_FAMILY": "1",
         "TEST_TARGET_NAME": "CeviOS",
+      },
+    }, {
+      "name": "CeviOSWidgetsExtension",
+      "id": "91D46A2F30B88DBA00A5D0DE",
+      "product": "Products/CeviOSWidgetsExtension.appex",
+      "product-type": "app-extension",
+      "build-phases": [
+        "compile-sources",
+        "frameworks",
+        "resources",
+      ],
+      "build-settings": {
+        "ASSETCATALOG_COMPILER_APPICON_NAME": "",
+        "ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME": "AccentColor",
+        "ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME": "cevi-surface-container-low",
+        "CODE_SIGN_ENTITLEMENTS": "$(WIDGET_ENTITLEMENTS)",
+        "CODE_SIGN_STYLE": "Automatic",
+        "CURRENT_PROJECT_VERSION": "1",
+        "GENERATE_INFOPLIST_FILE": "YES",
+        "INFOPLIST_FILE": "CeviOSWidgets/Info.plist",
+        "INFOPLIST_KEY_CFBundleDisplayName": "Cevi OS",
+        "INFOPLIST_KEY_NSHumanReadableCopyright": "",
+        "LD_RUNPATH_SEARCH_PATHS": [
+          "$(inherited)",
+          "@executable_path/Frameworks",
+          "@executable_path/../../Frameworks",
+        ],
+        "MARKETING_VERSION": "1.0.0",
+        "PRODUCT_BUNDLE_IDENTIFIER": "$(APP_BUNDLE_IDENTIFIER).widgets",
+        "PRODUCT_NAME": "$(TARGET_NAME)",
+        "SKIP_INSTALL": "YES",
+        "STRING_CATALOG_GENERATE_SYMBOLS": "YES",
+        "SWIFT_APPROACHABLE_CONCURRENCY": "YES",
+        "SWIFT_EMIT_LOC_STRINGS": "YES",
+        "SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY": "YES",
+        "SWIFT_VERSION": "6.0",
+        "TARGETED_DEVICE_FAMILY": "1",
       },
     },
   ],
@@ -211,5 +279,5 @@
     "SWIFT_OPTIMIZATION_LEVEL[config=Dev]": "-Onone",
   },
   "last-upgrade": "27.0",
-  "last-swift-update": "27.0",
+  "last-swift-update": "27.2",
 }

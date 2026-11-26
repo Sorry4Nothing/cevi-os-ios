@@ -47,6 +47,10 @@ struct CampTabView: View {
         // A tapped push: the Pinnwand is a tab, the other targets sit in the «Mehr» sheet.
         .onChange(of: active.destination, initial: true) { _, destination in
             if destination == .notices { selected = .notices; active.destination = nil }
+            else if destination == .tasks {
+                if CampTaskRights(role: active.role, readOnly: false, personId: nil).seesTaskList { selected = .tasks }
+                active.destination = nil
+            }
             else if destination == .attendance, active.role == .team { selected = .attendance; active.destination = nil }
             else if destination != nil { showsMore = true }
         }

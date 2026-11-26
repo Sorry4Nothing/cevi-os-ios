@@ -29,6 +29,8 @@ Auf ausdrückliche Handlung der Person (Herunterladen) liegen Aushänge als PDF 
 
 Alles andere: nicht erhoben. Die Antworten müssen mit der Datenschutzerklärung des Servers (`/datenschutz`) übereinstimmen. Das prüft die Abteilung.
 
+Widgets (Homescreen und Sperrbildschirm): Die App schreibt geschwärzte Zahlen und Titel (nächstes Programm, Termine, Lagertag, Aufgaben, Zähler ungelesener Chats; keine Namen, keine Chat-Inhalte, keine Nummern) in den Container der App-Gruppe auf dem Gerät, ohne Backup. Das ist lokale Speicherung, keine zusätzliche Erhebung: Die Antworten der Tabelle bleiben gleich. Die Daten werden beim Abmelden und Sitzungsende gelöscht. Die Datenschutzerklärung soll es nennen (Details: `docs/widgets.md`).
+
 ## Review-Hinweise (Vorlage, Zugangsdaten nur in App Store Connect)
 
 - Die App ist für genau eine Abteilung des Cevi (Jugendverband) und für Eltern, Leitende und Stufenleitung gedacht. Admins arbeiten im Admin-Bereich im Browser; meldet sich ein Admin in der App an, zeigt sie einen Hinweis und bleibt abgemeldet. Nur iPhone, nur Hochformat. Konten legt die Leitung im Browser an. Es gibt keine Selbstregistrierung.

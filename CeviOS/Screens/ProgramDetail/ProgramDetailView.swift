@@ -192,7 +192,10 @@ struct ProgramDetailView: View {
                     .accessibilityElement(children: .combine)
                     if program.canAnswer {
                         AnswerButtons(name: child.firstName, selected: child.answer, disabled: model.saving.contains(child.id)) { answer in
-                            Task { await model.answer(answer, for: child, programId: program.id, client: appState.client) }
+                            Task {
+                                await model.answer(answer, for: child, programId: program.id, client: appState.client)
+                                appState.refreshWidgets()
+                            }
                         }
                     }
                 }

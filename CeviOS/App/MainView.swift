@@ -99,6 +99,12 @@ struct MainView: View {
             activeCamp.leave()
             selectedTab = .programs
             programPath = [id]
+        case .chats where hasChat:
+            activeCamp.leave()
+            selectedTab = .chat
+            chatPath = []
+        case .campArea(let area, let id):
+            Task { pushState = await CampRouter.open(area: area, campId: id, client: state.client, list: campList, active: activeCamp) }
         case .roomRequests:
             activeCamp.leave()
             selectedTab = .profile

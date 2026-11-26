@@ -39,11 +39,17 @@ struct CeviOSApp: App {
                     push.attach(state)
                     lock.biometryChanged = { [state] in await state.signOutAfterBiometryChange() }
                 }
+                .onOpenURL { url in
+                    if let info = WidgetLink.userInfo(from: url), let target = PushTarget.from(userInfo: info) { state.pendingTarget = target }
+                }
                 .onChange(of: scenePhase) { _, new in
+                    state.widgetsHideContent = lock.isEnabled
+                    if new != .inactive { state.refreshWidgets() }
                     if lock.scenePhase(new, hasSession: state.hasSession) { state.lock() }
                 }
                 .onChange(of: state.phase, initial: true) { _, new in
                     // The password unlocks. `.ready` is only reached unlocked; there a lost key is created anew.
+                    if case .ready = new { state.widgetsHideContent = lock.isEnabled; state.refreshWidgets() }
                     switch new {
                     case .signIn, .ready: lock.signedInWithPassword()
                     default: break

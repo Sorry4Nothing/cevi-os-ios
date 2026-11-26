@@ -100,7 +100,11 @@ extension PushManager: UNUserNotificationCenterDelegate {
         _ center: UNUserNotificationCenter, willPresent notification: UNNotification
     ) async -> UNNotificationPresentationOptions {
         let target = PushTarget.from(userInfo: notification.request.content.userInfo)
-        let hidden = await MainActor.run { target?.isHidden(openChatId: appState?.openChatId) ?? false }
+        let hidden = await MainActor.run {
+            // A push means new data: redraw the widgets (counts, programs).
+            appState?.refreshWidgets()
+            return target?.isHidden(openChatId: appState?.openChatId) ?? false
+        }
         return hidden ? [] : [.banner, .list, .sound]
     }
 
