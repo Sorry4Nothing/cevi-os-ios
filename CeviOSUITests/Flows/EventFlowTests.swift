@@ -108,8 +108,10 @@ final class EventFlowTests: XCTestCase {
         try suggest.auditAccessibility()
 
         suggest.fill(programs.app.textFields["Titel"], with: "Serverfehler")
-        // The keyboard covers the lower half; close it so the audit sees the whole form.
-        programs.app.keyboards.buttons["Return"].tap()
+        // The keyboard covers the lower half; close it so the audit sees the whole form. The single-line field closes it on
+        // the return key; tapping the key itself fails on iOS 27 (hit point not reachable), so the test types the return.
+        programs.app.typeText("\n")
+        XCTAssertTrue(programs.app.keyboards.firstMatch.waitForNonExistence(timeout: 5), "keyboard still open")
         suggest.tap("Jungschar")
         suggest.assertSelected(suggest.group("Jungschar"))
         suggest.send()
