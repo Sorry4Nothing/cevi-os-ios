@@ -301,6 +301,8 @@ nonisolated struct World {
         let parts = request.path.split(separator: "/").map(String.init)
         if parts.starts(with: ["api", "auth"]) { return auth(request, Array(parts.dropFirst(2))) }
         guard parts.starts(with: ["api", "v1"]) else { return .notFound }
+        // App proof (App Attest): switched off on this server, so the app signs in without a ticket.
+        if parts.starts(with: ["api", "v1", "app"]) { return .notFound }
         guard let token = request.cookies[UITestBackend.sessionCookie], let username = sessions[token] else {
             return .error(401, "NICHT_ANGEMELDET", "Bitte melde dich an.")
         }

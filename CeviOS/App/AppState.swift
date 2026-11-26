@@ -53,7 +53,7 @@ final class AppState {
         let version = APIClient.appVersion(from: Bundle.main.infoDictionary ?? [:])
         // The client calls back before `self` is ready; hence a relay whose target is filled in afterwards.
         let relay = EventRelay()
-        client = APIClient(baseURL: baseURL, appVersion: version, cookieStore: cookieStore, session: session) { relay.report($0) }
+        client = APIClient(baseURL: baseURL, appVersion: version, cookieStore: cookieStore, session: session, appAttest: .device) { relay.report($0) }
         relay.target = { [weak self] event in
             Task { @MainActor in self?.handle(event) }
         }
