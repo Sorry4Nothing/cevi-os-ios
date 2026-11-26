@@ -31,7 +31,7 @@ nonisolated enum UITestLaunch {
         let cookies = signedInAs == nil ? [:] : [UITestBackend.sessionCookie: UITestBackend.seededToken]
         return AppState(
             configuration: configuration, cookieStore: FixedCookieStore(cookies: cookies),
-            session: APIClient.makeSession(protocolClasses: [UITestBackend.self])
+            session: APIClient.makeSession(protocolClasses: [UITestBackend.self]), campCache: CampMemoryCache()
         )
     }
 }

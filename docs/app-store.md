@@ -23,6 +23,8 @@ Alles hier ist ohne Zugangsdaten, echte Namen oder Adressen. Die Basis-Adresse d
 | Weitere Nutzerinhalte | ja (Chat) | ja | nein | App-Funktionalität |
 | Geräte-ID | ja (Push-Token) | ja | nein | App-Funktionalität |
 
+Lager-Daten (Aufgaben, Pinnwand, Tagesseiten, Packliste, Notfall und weitere, nie Personenlisten der Kinder) liegen als verschlüsselter Cache des zuletzt geladenen Lagers auf dem Gerät (AES-GCM, Schlüssel im Keychain, nicht im Geräte-Backup) und werden beim Abmelden, Sitzungsende oder wenn das Lager nicht mehr offen ist gelöscht. Das ist lokale Speicherung, keine zusätzliche Erhebung: Es ändert die Antworten der Tabelle nicht, die Datenschutzerklärung nennt sie aber.
+
 Alles andere: nicht erhoben. Die Antworten müssen mit der Datenschutzerklärung des Servers (`/datenschutz`) übereinstimmen. Das prüft die Abteilung.
 
 ## Review-Hinweise (Vorlage, Zugangsdaten nur in App Store Connect)

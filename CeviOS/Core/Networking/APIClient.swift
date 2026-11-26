@@ -1,4 +1,5 @@
 import Foundation
+import Synchronization
 
 /// Events the whole app has to react to.
 nonisolated enum APIEvent: Sendable {
@@ -23,6 +24,12 @@ actor APIClient {
     private let onEvent: @Sendable (APIEvent) -> Void
     let appAttest: AppAttestSetup?
     private var cookies: [String: String]
+    /// Cache of the last loaded camp data (`APIClient+Cache.swift`); `nil` caches nothing.
+    let campCache: (any CampCache)?
+    /// Camps the server lists as open; only their data is written to the cache. `nil` until the list is loaded.
+    var openCampIds: Set<UUID>?
+    /// Told after every camp read: when the answer came from the cache the date it was stored, else `nil`.
+    nonisolated let cacheObserver = Mutex<(@MainActor @Sendable (Date?) -> Void)?>(nil)
 
     init(
         baseURL: URL,
@@ -31,6 +38,7 @@ actor APIClient {
         session: URLSession = APIClient.makeSession(),
         streamSession: URLSession = APIClient.makeSession(streaming: true),
         appAttest: AppAttestSetup? = nil,
+        campCache: (any CampCache)? = nil,
         onEvent: @escaping @Sendable (APIEvent) -> Void = { _ in }
     ) {
         self.baseURL = baseURL
@@ -40,6 +48,7 @@ actor APIClient {
         self.streamSession = streamSession
         self.onEvent = onEvent
         self.appAttest = appAttest
+        self.campCache = campCache
         cookies = cookieStore.read()
     }
 
@@ -211,7 +220,7 @@ actor APIClient {
         query: [URLQueryItem] = [],
         body: (any Encodable & Sendable)? = nil
     ) async throws -> T {
-        let data = try await send(method, path, query: query, body: body)
+        let data = method == "GET" ? try await sendCaching(path, query: query) : try await send(method, path, query: query, body: body)
         do {
             return try JSONDecoder.api.decode(T.self, from: data)
         } catch {

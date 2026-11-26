@@ -340,6 +340,25 @@ Ohne Entwurf gebaut: Das Design hat kein Board für den Lager-Check. Der Bildsch
 - Wetter-Ort einstellen entfällt: `PUT …/wetter/ort` steht nicht mehr im Vertrag.
 - Nicht gebaut: Umordnen der eigenen Punkte (`reihenfolge` ist im Vertrag, der Bildschirm bietet keine Bedienung), Testserver-Routen (kein UI-Ablauf braucht sie).
 
+## Schnitt F5b Verschlüsselter Cache des zuletzt geladenen Lagers (Issue #116)
+
+Ohne Entwurf gebaut: Es gibt kein Board dafür. Der Hinweis «Ohne Netz» nutzt die vorhandene Karte (`CampOfflineNote`); sie nennt jetzt den Stand mit Tag («heute 18:02», «gestern 21:10»). Entscheid des Auftraggebers: Nichts bleibt offline, ausser man lädt es gezielt herunter oder es ist normaler Cache des zuletzt geladenen Lagers (Android: cevi-os-android#244). Sicherheit: SR-41, SR-43, SR-50, SR-42, SR-24, SR-54.
+
+| Was | Code |
+| --- | --- |
+| Schnittstelle `CampCache` (Speicher für Rohantworten), Datei-Umsetzung und Speicher-Umsetzung für Tests | `CampCache.swift`, `CampFileCache.swift` |
+| Regeln, was gespeichert werden darf (Positivliste), Zugriff, Löschen | `CampCachePolicy`, `APIClient+Cache.swift` |
+| Hinweis «Ohne Netz» auf jedem Lager-Bildschirm | `ActiveCamp.cachedSince`, `CampBannerStack` |
+
+- **Was liegt auf dem Gerät:** die Antworten des Servers, wie sie kamen, nur für die Bereiche Lagerdetail, Aufgaben, Pinnwand, Tagesseiten, Heute und Meine Woche, Zeitplan, Packliste, Einkauf, Notfall, Infos, Wetter, dazu die Lagerliste (Titel, Rolle, Zeitraum). Nur lesende Aufrufe (`GET`).
+- **Nie zwischengespeichert:** Teilnehmende, Zimmer, Fahrten, Gruppen, Anwesenheit, Abzählliste, Diensttausch, Schichtplan, Adressbuch, anonymer Eingang, Suche, Rechtetabelle, Mitglieder, private To-dos. Es ist eine Positivliste: Was nicht genannt ist, wird nie geschrieben.
+- **Verschlüsselung:** AES-GCM (CryptoKit), eine Datei je Lager in Application Support (`LagerCache`), der Dateiname gehört zu den authentisierten Daten. Der Schlüssel liegt im Keychain (`kSecAttrAccessibleWhenUnlockedThisDeviceOnly`). Dateischutz `complete`, Ordner und Datei sind vom Geräte-Backup ausgenommen. Eine Datei, die sich nicht öffnen lässt (verändert, falscher Schlüssel, umbenannt), wird gelöscht. Pro Antwort höchstens 1 MB.
+- **Schreiben nur für offene Lager:** Geschrieben wird erst, wenn die frische Lagerliste das Lager als Entwurf oder aktiv nennt. Abgeschlossen oder archiviert: nichts wird geschrieben.
+- **Löschen:** Die frische Lagerliste löscht alle Lager, die fehlen oder nicht mehr offen sind. 404 oder 403 auf dem Lager löscht das ganze Lager, 404 oder 403 auf einem Bereich nur diesen Eintrag. Abmelden, Sitzungsende (401) und Wechsel des Kontos löschen alles samt Schlüssel.
+- **Ohne Netz:** Nur bei einem Netzfehler (nicht bei 5xx oder 4xx) antwortet der Client mit dem letzten Stand; die Bildschirme laden wie sonst und zeigen die Karte «Ohne Netz». Die Lagerliste kommt beim Kaltstart ohne Netz aus dem Cache.
+- **Warteschlange:** `CampOutbox` bleibt im Arbeitsspeicher. Bei 403, 404, 409 (auch `LAGER_GESCHLOSSEN`) und 410 markiert sie die Einträge als abgelehnt und wiederholt nicht; bei 401 bleibt sie liegen, die Sitzung ist zu Ende und der Arbeitsspeicher geht mit der App.
+- Grenze: Die Lagerliste im Cache kann ein Lager noch zeigen, das inzwischen geschlossen ist; sie wird beim nächsten Netz ersetzt.
+
 ## Offene Fragen zum Entwurf
 
 - L1: «62 Prozent erledigt, 4 überfällig» braucht `GET …/start` je Lager; «Übungslager» (Abschnitt, Chip «Übung») hat kein Feld in der API. Beides fehlt in der App.
@@ -381,7 +400,7 @@ Nicht ableitbar: Welche Rechte die eigene Rolle hat. Die Matrix darf nur die Lag
 
 ## Entscheide, die der Auftraggeber treffen muss
 
-1. Lokaler Speicher für das Lager (SwiftData, mit Dateischutz) für Offline-Lesen und die Warteschlange (`CampOutbox` liegt bis dahin nur im Arbeitsspeicher hinter `CampOutboxStore`). Widerspricht `docs/architektur.md` (Serverdaten nur im Arbeitsspeicher).
+1. Lokaler Speicher: Entschieden für den verschlüsselten Cache des zuletzt geladenen Lagers (Schnitt F5b) und für gezielte Downloads. Offen bleibt die Warteschlange (`CampOutbox` liegt im Arbeitsspeicher hinter `CampOutboxStore`).
 2. Zwischenspeicher für Widgets (App-Gruppe), nötig erst für A7.
 3. Design-Entwurf «Cevi Lager iOS» liefern (Bildschirme erst danach).
 

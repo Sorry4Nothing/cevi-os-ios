@@ -29,6 +29,8 @@ final class ActiveCamp {
     /// Changes waiting to be sent (U6); refreshed with `refreshQueue()`.
     private(set) var waitingCount = 0
     private(set) var isOffline = false
+    /// Set while the last camp read came from the cache (no network): when that data was loaded.
+    private(set) var cachedSince: Date?
     /// The camp choice (L1) is open.
     var showsChooser = false
     /// Set by a tapped push, cleared by the screen that opens it.
@@ -52,6 +54,8 @@ final class ActiveCamp {
         self.role = role
         self.client = client
         outbox = client.map { CampOutbox(campId: camp.id, client: $0) }
+        cachedSince = nil
+        client?.setCacheObserver { [weak self] in self?.cachedSince = $0 }
         waitingCount = 0
         isOffline = false
         destination = nil
@@ -75,7 +79,9 @@ final class ActiveCamp {
         camp = nil
         role = nil
         outbox = nil
+        client?.setCacheObserver(nil)
         client = nil
+        cachedSince = nil
         waitingCount = 0
         isOffline = false
         emergencySnapshot = nil
