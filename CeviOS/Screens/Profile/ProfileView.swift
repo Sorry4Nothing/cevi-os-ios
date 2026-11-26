@@ -70,6 +70,7 @@ struct ProfileView: View {
 
                 Section {
                     NavigationLink { NotificationsView() } label: { row("Benachrichtigungen", symbol: "bell") }
+                    NavigationLink { DownloadedFilesView() } label: { row("Heruntergeladene Dateien", symbol: "arrow.down.circle") }
                     // Without Face ID or Touch ID there is nothing to lock, so the row is hidden.
                     if lock.isAvailable {
                         Toggle(isOn: Binding(get: { lock.isEnabled }, set: { lock.setEnabled($0) })) {

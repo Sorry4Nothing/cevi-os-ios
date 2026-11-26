@@ -18,11 +18,17 @@ struct CampAgendaScreen: View {
     @State private var editing: CampAgendaItem?
     @State private var showsNew = false
     @State private var deleting: CampAgendaItem?
+    @State private var downloader: CampDownloader
+
+    init(model: CampAgendaModel) {
+        self.model = model
+        _downloader = State(initialValue: CampDownloader(active: model.active))
+    }
 
     var body: some View {
         CampPhaseView(phase: model.phase, loading: "Traktanden werden geladen", notFound: "Diesen Hoeck gibt es nicht mehr.",
                       back: .init(title: "Zu den Hoecks") { dismiss() }, retry: { Task { await model.load() } }) {
-            CampScroll(staleSince: model.staleSince, error: model.error, notice: noticeData, refresh: { await model.load() }) { content }
+            CampScroll(staleSince: model.staleSince, error: model.error ?? downloader.error, notice: noticeData ?? downloadNotice, refresh: { await model.load() }) { content }
                 .safeAreaInset(edge: .bottom) { if model.canEdit { CampMainAction(title: "Traktandum hinzufügen") { showsNew = true } } }
         }
         .navigationTitle("Traktanden")
@@ -34,6 +40,9 @@ struct CampAgendaScreen: View {
                         if let id = model.meeting?.id {
                             if model.rights.seesAllMeetings { NavigationLink(value: CampMeetingRoute.mode(id)) { Label("Hoeck-Modus", systemImage: "play.circle") } }
                             if model.rights.readsProtocols { NavigationLink(value: CampMeetingRoute.minutes(id)) { Label("Protokoll", systemImage: "doc.text") } }
+                            Button("Kalenderdatei herunterladen", systemImage: "arrow.down.circle") {
+                                Task { await downloader.download(.meetingCalendar(id), title: String(localized: "Kalenderdatei \(model.meeting?.title ?? "Hoeck")")) }
+                            }
                         }
                     }
                 }
@@ -44,6 +53,10 @@ struct CampAgendaScreen: View {
         .confirmationDialog("Traktandum löschen?", isPresented: .init(get: { deleting != nil }, set: { if !$0 { deleting = nil } }), titleVisibility: .visible) {
             Button("Löschen", role: .destructive) { if let deleting { Task { await model.delete(deleting) } } }
         }
+    }
+
+    private var downloadNotice: CampNoticeData? {
+        downloader.notice.map { CampNoticeData(title: $0, dismiss: downloader.dismissNotice) }
     }
 
     private var noticeData: CampNoticeData? {

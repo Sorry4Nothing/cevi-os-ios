@@ -10,7 +10,7 @@ nonisolated enum CampDestination: Hashable, Sendable {
     /// The on-site screens (B4). Only the attendance is the target of a push (`lager_anwesenheit`).
     case attendance, dayPages, shopping, packing, emergency, infos
     /// The storage and search screens (B5). No push leads there.
-    case documents, addressBook, search
+    case documents, addressBook, search, handouts
     /// The camp check; no push leads there.
     case check
 }

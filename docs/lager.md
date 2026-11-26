@@ -359,6 +359,22 @@ Ohne Entwurf gebaut: Es gibt kein Board dafür. Der Hinweis «Ohne Netz» nutzt 
 - **Warteschlange:** `CampOutbox` bleibt im Arbeitsspeicher. Bei 403, 404, 409 (auch `LAGER_GESCHLOSSEN`) und 410 markiert sie die Einträge als abgelehnt und wiederholt nicht; bei 401 bleibt sie liegen, die Sitzung ist zu Ende und der Arbeitsspeicher geht mit der App.
 - Grenze: Die Lagerliste im Cache kann ein Lager noch zeigen, das inzwischen geschlossen ist; sie wird beim nächsten Netz ersetzt.
 
+## Schnitt F5a Gezielter Download von Dateien (Issue #118)
+
+Ohne Entwurf gebaut: Es gibt kein Board dafür. Der Bildschirm «Aushänge» und die Liste «Heruntergeladene Dateien» bestehen aus Listenzeilen, Textknöpfen und dem Quick-Look-Fenster des Systems (`docs/design.md`, UX-Handbuch). Entscheid des Auftraggebers: Nichts bleibt offline, ausser man lädt es gezielt herunter (Android: cevi-os-android#245). Keine Rechtstexte, keine Auto-Downloads. Sicherheit: SR-41, SR-23, SR-24, SR-42, SR-50.
+
+| Was | Code |
+| --- | --- |
+| Download-Speicher (Schnittstelle, Datei-Umsetzung), Herkunft und Art | `CampDownloads.swift`, `CampDownload.swift` |
+| Herunterladen, Öffnen, Entfernen im offenen Lager | `CampDownloader`, `CampHandoutsView` («Mehr», Ablage, «Aushänge»), Menü der Traktanden («Kalenderdatei herunterladen») |
+| Liste «Heruntergeladene Dateien» (Profil, Abschnitt «App») | `DownloadedFilesView` |
+
+- **Was sich laden lässt:** die PDF-Aushänge (`GET …/aushaenge/{art}`) und die Kalenderdatei eines Hoecks (`GET …/hoecks/{id}.ics`). **Nicht** die «Dateien» im Lager (Dokumente, Protokolle, Infos): Das sind nur Verknüpfungen auf einen fremden Ablageort (`https`), die die App nicht selbst abruft (siehe Schnitt A2/A5). Der Eintrag «Aushänge» erscheint für Lagerleitung und Leitung; der Server entscheidet je Aushang (403 zeigt eine Fehlermeldung).
+- **Speicherort:** Application Support, Ordner `Downloads`, vom Backup ausgenommen, Dateischutz `complete`. Dateinamen erzeugt die App (UUID und `pdf` oder `ics`), nie der Name vom Server. Eine Datei wird nur behalten, wenn die ersten Bytes zur Art passen (`%PDF-`, `BEGIN:VCALENDAR`) und sie höchstens 20 MB hat. Ein Eintrag im Index mit fremdem Dateinamen wird ignoriert.
+- **Öffnen:** Quick Look des Systems, ohne Netz. Der Inhalt verlässt die App nur, wenn die Person ihn im Quick-Look-Fenster teilt.
+- **Löschen:** «Entfernen» je Datei; Abmelden und Sitzungsende löschen alles; die frische Lagerliste löscht die Downloads von Lagern, die nicht mehr darin stehen (ein abgeschlossenes Lager steht weiter darin: seine Downloads bleiben); 404 auf dem Lager löscht seine Downloads, 403 nicht.
+- **Hinweis:** Zimmerliste, Gruppenlisten und Fahrtenliste enthalten Namen von Kindern. Sie liegen nur nach einer ausdrücklichen Handlung der Person auf dem Gerät (Entscheid des Auftraggebers).
+
 ## Offene Fragen zum Entwurf
 
 - L1: «62 Prozent erledigt, 4 überfällig» braucht `GET …/start` je Lager; «Übungslager» (Abschnitt, Chip «Übung») hat kein Feld in der API. Beides fehlt in der App.
