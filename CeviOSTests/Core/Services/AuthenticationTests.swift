@@ -11,7 +11,7 @@ nonisolated enum Samples {
         let json = """
         {"id":"11111111-1111-1111-1111-111111111111","name":"Test Person","ceviName":null,"benutzername":"test.person",
          "mussPasswortAendern":\(mustChangePassword),"datenschutzGelesenAm":\(privacy.map { "\"\($0)\"" } ?? "null"),
-         "telefon":null,"bildUrl":null,"pushChat":true,"pushProgramme":true,"admin":false,"zweiterFaktor":false,
+         "telefon":null,"bildUrl":null,"pushChat":true,"pushProgramme":true,"geschlecht":null,"abteilungsleitung":false,"entwickler":false,"clientArt":"web","rechte":[],"zweiterFaktor":false,
          "rollen":\(roles),"stufen":[],"kinder":[]}
         """
         return try JSONDecoder.api.decode(Profile.self, from: Data(json.utf8))

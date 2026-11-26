@@ -679,3 +679,26 @@ nonisolated struct CampGroupShuffle: Decodable, Equatable, Sendable {
 
     enum CodingKeys: String, CodingKey { case preview = "vorschau", seed, groups = "gruppen", changed = "geaendert" }
 }
+
+// MARK: Members (Mitglieder)
+
+/// A member of the camp with the display name of the camp (`GET /api/v1/lager/{id}/mitglieder`).
+nonisolated struct CampMember: Decodable, Equatable, Identifiable, Sendable {
+    let personId: UUID
+    let name: String
+    /// Path of the profile picture, `nil` without one. Only read through `ImagePath`, never as a free URL.
+    let imagePath: String?
+    let role: CampRole
+    /// Short names of the portfolios of the person.
+    let portfolios: [String]
+
+    var id: UUID { personId }
+
+    enum CodingKeys: String, CodingKey { case personId, name, imagePath = "bildUrl", role = "rolle", portfolios = "ressorts" }
+}
+
+nonisolated struct CampMemberList: Decodable, Sendable {
+    let members: [CampMember]
+
+    enum CodingKeys: String, CodingKey { case members = "mitglieder" }
+}

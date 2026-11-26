@@ -164,7 +164,7 @@ struct ProfileView: View {
                 ? String(localized: "Stufenleitung · \(unit)")
                 : String(localized: "Leitung · \(unit)"))
         }
-        if profile.admin { lines.append(String(localized: "Administration")) }
+        if profile.isDepartmentLead { lines.append(String(localized: "Administration")) }
         return lines
     }
 
@@ -268,7 +268,7 @@ struct ProfileView: View {
     let json = """
     {"id":"11111111-1111-1111-1111-111111111111","name":"Eva Beispiel","ceviName":null,"benutzername":"e.beispiel",
      "mussPasswortAendern":false,"datenschutzGelesenAm":"2026-10-01T10:00:00.000Z","telefon":null,"bildUrl":null,
-     "pushChat":true,"pushProgramme":true,"admin":false,"zweiterFaktor":false,"rollen":[],"stufen":[],
+     "pushChat":true,"pushProgramme":true,"geschlecht":null,"abteilungsleitung":false,"entwickler":false,"clientArt":"web","rechte":[],"zweiterFaktor":false,"rollen":[],"stufen":[],
      "kinder":[{"id":"22222222-2222-2222-2222-222222222222","vorname":"Lena","nachname":"Keller","stufeId":"33333333-3333-3333-3333-333333333333"},
                {"id":"44444444-4444-4444-4444-444444444444","vorname":"Noah","nachname":"Keller","stufeId":"33333333-3333-3333-3333-333333333333"}]}
     """

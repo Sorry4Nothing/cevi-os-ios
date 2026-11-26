@@ -34,6 +34,9 @@ final class ActiveCamp {
     private(set) var outbox: CampOutbox?
     /// The last loaded emergency window, kept in memory only so it opens without network (no local storage yet).
     var emergencySnapshot: CampEmergencySnapshot?
+    /// Display names of the members by person id, for screens where a list gives only the id. Empty if the role may not read them.
+    private(set) var memberNames: [UUID: String] = [:]
+    @ObservationIgnored private var namesLoadedFor: UUID?
     @ObservationIgnored private(set) var client: APIClient?
 
     var isOpen: Bool { camp != nil }
@@ -51,6 +54,16 @@ final class ActiveCamp {
         isOffline = false
         destination = nil
         emergencySnapshot = nil
+        memberNames = [:]
+        namesLoadedFor = nil
+    }
+
+    /// Loads the names once per camp. A refusal or a network failure leaves the directory empty (screens then say «Person»).
+    func loadMemberNames() async {
+        guard let client, let id = camp?.id, namesLoadedFor != id else { return }
+        guard let members = try? await client.campMembers(campId: id), camp?.id == id else { return }
+        namesLoadedFor = id
+        memberNames = Dictionary(members.map { ($0.personId, $0.name) }, uniquingKeysWith: { first, _ in first })
     }
 
     func open(_ entry: CampListEntry, client: APIClient?) { open(camp: entry.camp, role: entry.role, client: client) }
@@ -64,6 +77,8 @@ final class ActiveCamp {
         waitingCount = 0
         isOffline = false
         emergencySnapshot = nil
+        memberNames = [:]
+        namesLoadedFor = nil
     }
 
     func refreshQueue() async {

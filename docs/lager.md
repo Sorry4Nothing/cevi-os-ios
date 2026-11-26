@@ -98,7 +98,9 @@ Anwesenheit: Das Team trägt offene Felder bis zur Frist direkt ein (`setOwnCamp
 | Anfragen: stellen, auflisten, entscheiden | `POST`/`GET …/anwesenheit/anfragen`, `POST …/anfragen/entscheid` | `CampAttendanceRequest*`, `decideCampAttendanceRequests` |
 | Tagesseiten (Tageschef, Notiz), Tag lesen mit Blöcken, Wetter, To-dos | `GET …/tagesseiten`, `GET`/`POST`/`PATCH …/tagesseiten/{lagertagId}` | `CampDayPage*`, `CampDayPageDetail` (To-dos des Tages sind die Aufgaben mit Frist an dem Tag) |
 | Blöcke (Wichtig, Idee, Programmbild) | `POST …/bloecke`, `PATCH`/`DELETE …/bloecke/{id}` | `CampDayBlock*` |
-| Wetter lesen, Ort setzen | `GET …/wetter`, `PUT …/wetter/ort` | `CampWeather`, `setCampWeatherPlace` |
+| Wetter lesen (Ort bestimmt der Server aus dem Lagerort, `Camp.weatherPlace`) | `GET …/wetter` | `CampWeather`, `CampWeatherPlace` |
+| Mitglieder mit Anzeigenamen (Recht `einteilung.lesen`) | `GET …/mitglieder` | `campMembers`, `ActiveCamp.memberNames` |
+| Vorlagen als Auswahl (Recht `vorlagen.anwenden`) | `GET …/vorlagen` | `campTemplates` |
 | Heute, Meine Woche | `GET …/heute`, `GET …/meine-woche` | `CampToday`, `CampMyWeek` (Teile `nil` ohne Leserecht, 403 ohne lesbaren Teil) |
 | Einkauf (Filter `einkaeufer`=`ich` oder ID, `erledigt`), zusammengezählt, Vorschläge | `…/einkauf`, `…/einkauf/zusammen`, `…/einkauf/vorschlaege`, `…/einkauf/{id}` | `CampShopping*`, `CampShoppingPage.byGroup` (nach Warengruppe) |
 | Packliste: Vorlage, Zustand abhaken, eigene Punkte | `…/packliste`, `…/packliste/punkte`, `PUT …/punkte/{id}/zustand`, `…/packliste/eigene` | `CampPackingList`, `setCampPackingState`, `CampOwnPackingPoint*` |
@@ -345,15 +347,15 @@ Nicht gebaut: **L38 Papierkorb** (alle Boards: Normal, Laden, Leer, Fehler, Erfo
 | Papierkorb, Verlauf, Fassungen | Revisionen | L0e |
 | Dateien (Dokumente, Bilder) | Lager-Dateien im Medienspeicher | L0g |
 | A1: Lager-Check «Sind wir bereit?» | keine Route in der Beschreibung | L1 |
-| A1: Vorlagen auflisten (Auswahl für `anwenden`) | nur `/api/v1/admin/vorlagen` (Admin), die App ruft Admin nie auf | L1 |
+| ~~A1: Vorlagen auflisten~~ | erledigt: `GET …/vorlagen` (Stand 25.11.), `campTemplates`; ein Bildschirm zur Vorlagenwahl fehlt noch | L1 |
 | A1: frühere Fassungen einer Aufgabe, Zurückholen | Verlauf kennt nur Art, Version, Zeitpunkt; keine Inhalte | L0e |
 | A2: Protokoll-Abschnitte (Text im Protokoll) | nur Zeile mit Dateiverweis, kein Inhalt, keine Abschnitte | L2 |
 | A2: Dateien zum Hochladen (Pinnwand, Protokoll) | `dateiIds` setzen vorhandene Dateien voraus, Hochladen: Lager-Dateien | L0g |
 | A2: Reaktionen auf anderes als Pinnwand | `zielTyp` kennt nur `pinnwand_beitrag` | L3 |
-| A3: Namen der Mitglieder (Schichtplan, Diensttausch, Gruppen-Auswahl) | Liste der Lagermitglieder für Nicht-Admins; `…/lager/{id}/mitglieder` gibt es nur unter `/api/v1/admin` (die App ruft Admin nie auf). Schichten tragen `name`, ein Tausch nur `personId`s | L4 |
+| ~~A3 (B1): Namen der Mitglieder~~ erledigt mit `GET …/mitglieder` (Stand 25.11.): `ActiveCamp.memberNames` füllt Diensttausch und Anwesenheit. Alt: | Liste der Lagermitglieder für Nicht-Admins; `…/lager/{id}/mitglieder` gibt es nur unter `/api/v1/admin` (die App ruft Admin nie auf). Schichten tragen `name`, ein Tausch nur `personId`s | L4 |
 | A3: Tauschanfrage mit Namen, Zimmer-Namen der Teilnehmenden im Team | Tausch liefert keine Namen und keine Schicht-Details; Fahrer nur als `fahrer.name` | L4 |
 | A4: Namen der Anwesenheits-Matrix, des Tageschefs im Team und der Einkäufer-Auswahl | Matrix nennt nur IDs (Mitglieder und Teilnehmende löst die App über Listen auf); Mitglieder-Liste fehlt für Nicht-Admins | L4 |
-| B3: Namen in Diensttausch, Schichtauswahl und Zimmer-/Fahrtenauswahl des Teams | wie A3: Mitgliederliste für Nicht-Admins fehlt; die App zeigt «Person», wo nur `personId` kommt | L4 |
+| ~~B3/B4: Namen~~ Diensttausch und Anwesenheit erledigt; Schichtauswahl, Zimmer und Fahrten zeigen den Namen der Liste. Das Team sieht über `…/mitglieder` nur Personen aus seinen Listen. Alt: wie A3: Mitgliederliste für Nicht-Admins fehlt; die App zeigt «Person», wo nur `personId` kommt | L4 |
 | A5: Wissen früherer Lager übernehmen | keine Route in der Beschreibung | L6 |
 | A5: Papierkorb ansehen, Wiederherstellen, Verlauf (ausser `…/aufgaben/{id}/verlauf`) | keine Routen (Löschen ist weich, aber nicht abrufbar) | L0e |
 | A5: Exporte als Word und Excel | nur Aushänge als PDF (`…/aushaenge/{art}`) | L7 |
@@ -366,3 +368,8 @@ Nicht ableitbar: Welche Rechte die eigene Rolle hat. Die Matrix darf nur die Lag
 1. Lokaler Speicher für das Lager (SwiftData, mit Dateischutz) für Offline-Lesen und die Warteschlange (`CampOutbox` liegt bis dahin nur im Arbeitsspeicher hinter `CampOutboxStore`). Widerspricht `docs/architektur.md` (Serverdaten nur im Arbeitsspeicher).
 2. Zwischenspeicher für Widgets (App-Gruppe), nötig erst für A7.
 3. Design-Entwurf «Cevi Lager iOS» liefern (Bildschirme erst danach).
+
+## Stand 25.11. (Backend 31fb03f)
+
+- Profilbilder (`bildUrl` bei Personen im Lager, `LagerBildUrl`) werden in den Lager-Bildschirmen noch nicht gezeigt: `ProfileAvatar` kann den Pfad sicher laden (`ImagePath`), aber jede Zeile müsste umgebaut werden. Bis dahin Initialen.
+- Felder ohne Verwendung: `Lager.uebung`, `bildUrl` der Lager-Personen, `LagerAnwesenheitSeite.bilder`.

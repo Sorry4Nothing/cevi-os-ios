@@ -13,12 +13,6 @@ nonisolated enum ProgramStatus: String, Decodable, Sendable {
     case review = "pruefen"
 }
 
-nonisolated enum Visibility: String, Decodable, Sendable {
-    case internalOnly = "intern"
-    case leaders = "leitende"
-    case parents = "eltern"
-}
-
 nonisolated struct UnitRef: Decodable, Equatable, Identifiable, Sendable {
     let id: UUID
     let name: String
@@ -40,7 +34,6 @@ nonisolated struct Program: Decodable, Equatable, Identifiable, Sendable {
     let id: UUID
     let title: String
     let status: ProgramStatus
-    let visibility: Visibility
     let isAllDay: Bool
     let start: Date?
     let end: Date?
@@ -66,7 +59,7 @@ nonisolated struct Program: Decodable, Equatable, Identifiable, Sendable {
     var occasion: EventOccasionRef? = nil
 
     enum CodingKeys: String, CodingKey {
-        case id, units = "stufen", visibility = "sichtbarkeit", status, start = "beginn", end = "ende"
+        case id, units = "stufen", status, start = "beginn", end = "ende"
         case title = "titel", isAllDay = "ganztaegig", dayFrom = "tagVon", dayTo = "tagBis"
         case children = "kinder"
         case meetingPoint = "treffpunkt", closingPlace = "schlussOrt", closingTime = "schlussZeit"

@@ -322,4 +322,19 @@ struct CampRosterServiceTests {
         r = try await sent(swapJSON) { _ = try await $0.withdrawCampShiftSwap(campId: camp, swapId: id, version: 1) }
         #expect(r.method == "POST" && r.path == campPath + "/diensttausch/" + idText + "/zurueckziehen" && r.body?["version"] as? Int == 1)
     }
+
+    @Test func memberAndTemplateLists() async throws {
+        var members: [CampMember] = []
+        var r = try await sent(#"{"mitglieder":[{"personId":"\#(idText)","name":"Lea","bildUrl":"/api/v1/personen/\#(idText)/bild?v=3","rolle":"team","ressorts":["PR"]}]}"#) {
+            members = try await $0.campMembers(campId: camp)
+        }
+        #expect(r.method == "GET" && r.path == campPath + "/mitglieder")
+        #expect(members.first?.id == id && members.first?.name == "Lea" && members.first?.role == .team && members.first?.portfolios == ["PR"])
+        var templates: [CampTemplateEntry] = []
+        r = try await sent(#"{"vorlagen":[{"id":"\#(idText)","art":"packliste","name":"Standard","anzahl":12}]}"#) {
+            templates = try await $0.campTemplates(campId: camp)
+        }
+        #expect(r.method == "GET" && r.path == campPath + "/vorlagen")
+        #expect(templates.first?.kind == .packingList && templates.first?.count == 12)
+    }
 }

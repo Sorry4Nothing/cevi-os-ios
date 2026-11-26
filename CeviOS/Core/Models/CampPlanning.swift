@@ -704,6 +704,23 @@ nonisolated enum CampTemplateKind: String, Decodable, Sendable {
     case packingList = "packliste"
 }
 
+/// A template to choose for `applyCampTemplate` (`GET …/vorlagen`): never the content.
+nonisolated struct CampTemplateEntry: Decodable, Equatable, Identifiable, Sendable {
+    let id: UUID
+    let kind: CampTemplateKind
+    let name: String
+    /// Number of tasks or packing list items.
+    let count: Int
+
+    enum CodingKeys: String, CodingKey { case id, kind = "art", name, count = "anzahl" }
+}
+
+nonisolated struct CampTemplateList: Decodable, Sendable {
+    let templates: [CampTemplateEntry]
+
+    enum CodingKeys: String, CodingKey { case templates = "vorlagen" }
+}
+
 /// `POST …/vorlagen/{id}/anwenden`. With `dryRun` the list shows what would be created; without, what was created.
 nonisolated struct CampTemplateApplication: Decodable, Equatable, Sendable {
     nonisolated struct Task: Decodable, Equatable, Sendable {

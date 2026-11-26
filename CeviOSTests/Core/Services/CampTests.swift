@@ -5,7 +5,7 @@ import Testing
 struct CampModelsTests {
     private static let campJSON = """
     {"id":"0190a000-0000-7000-8000-000000000001","titel":"Sommerlager","von":"2027-07-10","bis":"2027-07-17",
-     "vorbereitungAb":null,"ort":"Beispielwald","adresse":null,"status":"aktiv","farbe":"#003973","logoMediumId":null,
+     "vorbereitungAb":null,"ort":"Beispielwald","adresse":null,"status":"aktiv","farbe":"#003973","logoMediumId":null,"wetterOrt":{"status":"kein_ort","name":null},
      "rolle":"team"
     """
 

@@ -258,7 +258,8 @@ struct ApiContractTests {
         _ = try? await client.updateCampDayBlock(campId: id, dayId: other, blockId: id, CampDayBlockPatch(version: 1))
         try? await client.deleteCampDayBlock(campId: id, dayId: other, blockId: id, version: 1)
         _ = try? await client.campWeather(campId: id)
-        _ = try? await client.setCampWeatherPlace(campId: id, latitude: 46.9, longitude: 7.4)
+        _ = try? await client.campMembers(campId: id)
+        _ = try? await client.campTemplates(campId: id)
         _ = try? await client.campToday(campId: id)
         _ = try? await client.campMyWeek(campId: id)
         _ = try? await client.campShopping(campId: id)
@@ -329,7 +330,7 @@ struct ApiContractTests {
 
         let contract = try Self.contractOperations()
         let calls = StubProtocol.requests(host: host).map { "\($0.httpMethod ?? "GET") \(Self.normalize($0.url?.path ?? ""))" }
-        #expect(calls.count >= 261)
+        #expect(calls.count >= 262)
         let missing = Set(calls).subtracting(contract)
         #expect(missing.isEmpty, "Not in the API description: \(missing.sorted())")
     }

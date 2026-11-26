@@ -10,7 +10,7 @@ private nonisolated func uid(_ n: Int) -> String { "0190a000-0000-7000-8000-0000
 private func campActive(_ role: CampRole = .campLeader, status: String = "aktiv", host: String) throws -> ActiveCamp {
     let json = """
     {"id":"\(campUUID.uuidString)","titel":"Sommerlager","von":"2027-07-17","bis":"2027-07-24","vorbereitungAb":null,"ort":null,
-     "adresse":null,"status":"\(status)","farbe":null,"logoMediumId":null}
+     "adresse":null,"status":"\(status)","farbe":null,"logoMediumId":null,"wetterOrt":{"status":"kein_ort","name":null}}
     """
     let client = APIClient(baseURL: URL(string: "https://\(host)")!, appVersion: "1.0.0", cookieStore: InMemoryCookieStore(["s": "1"]),
                            session: APIClient.makeSession(protocolClasses: [StubProtocol.self]))
@@ -443,7 +443,7 @@ struct CampOnSiteNavigationTests {
         let campId = campUUID.uuidString.lowercased()
         stub(host) { request in
             if path(request).contains("/aufloesen/") { return (200, #"{"lagerId":"\#(campId)","objektTyp":"anwesenheit","objektId":"\#(uid(1))"}"#) }
-            if path(request).hasSuffix("/lager") { return (200, #"{"lager":[{"id":"\#(campId)","titel":"Sommerlager","von":"2027-07-17","bis":"2027-07-24","vorbereitungAb":null,"ort":null,"adresse":null,"status":"aktiv","farbe":null,"logoMediumId":null,"rolle":"team"}]}"#) }
+            if path(request).hasSuffix("/lager") { return (200, #"{"lager":[{"id":"\#(campId)","titel":"Sommerlager","von":"2027-07-17","bis":"2027-07-24","vorbereitungAb":null,"ort":null,"adresse":null,"status":"aktiv","farbe":null,"logoMediumId":null,"wetterOrt":{"status":"kein_ort","name":null},"rolle":"team"}]}"#) }
             return (200, "{}")
         }
         let client = APIClient(baseURL: URL(string: "https://\(host)")!, appVersion: "1.0.0", cookieStore: InMemoryCookieStore(["s": "1"]),

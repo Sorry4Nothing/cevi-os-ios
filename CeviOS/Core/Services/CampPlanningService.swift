@@ -261,6 +261,12 @@ extension APIClient {
 
     // MARK: Templates, start, decisions
 
+    /// The templates of the department to choose from. Needs the right `vorlagen.anwenden` (403 otherwise).
+    func campTemplates(campId: UUID) async throws -> [CampTemplateEntry] {
+        let list: CampTemplateList = try await load("GET", rowPath(campId, "vorlagen"))
+        return list.templates
+    }
+
     /// With `dryRun` the answer lists what would be created and nothing is written.
     func applyCampTemplate(campId: UUID, templateId: UUID, dryRun: Bool = false) async throws -> CampTemplateApplication {
         let query = dryRun ? [URLQueryItem(name: "trocken", value: "true")] : []

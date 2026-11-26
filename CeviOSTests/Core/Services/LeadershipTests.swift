@@ -9,7 +9,7 @@ struct LeadershipPermissionsTests {
         let rolesJSON = roles.map { #"{"stufeId":"\#($0.0.uuidString)","typ":"\#($0.1)"}"# }.joined(separator: ",")
         let json = """
         {"id":"11111111-1111-1111-1111-111111111111","name":"T","ceviName":null,"benutzername":"t","mussPasswortAendern":false,
-         "datenschutzGelesenAm":null,"telefon":null,"bildUrl":null,"pushChat":true,"pushProgramme":true,"admin":\(admin),
+         "datenschutzGelesenAm":null,"telefon":null,"bildUrl":null,"pushChat":true,"pushProgramme":true,"geschlecht":null,"abteilungsleitung":\(admin),"entwickler":false,"clientArt":"web","rechte":[],
          "zweiterFaktor":false,"rollen":[\(rolesJSON)],"stufen":[],"kinder":[]}
         """
         return try JSONDecoder.api.decode(Profile.self, from: Data(json.utf8))
@@ -19,7 +19,7 @@ struct LeadershipPermissionsTests {
         let unitsJSON = units.map { #"{"id":"\#($0.uuidString)","name":"S"}"# }.joined(separator: ",")
         let ownJSON = own.map { #","eigeneAnmeldung":"\#($0)""# } ?? ""
         let json = """
-        {"id":"22222222-2222-2222-2222-222222222222","titel":"T","status":"aktiv","sichtbarkeit":"eltern","ganztaegig":false,
+        {"id":"22222222-2222-2222-2222-222222222222","titel":"T","status":"aktiv","ganztaegig":false,
          "beginn":"\(start)","ende":"2099-01-01T12:00:00Z","tagVon":null,"tagBis":null,"googleOrt":null,"stufen":[\(unitsJSON)],
          "googleBeschreibung":null,"kinder":[]\(ownJSON)}
         """

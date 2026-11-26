@@ -59,7 +59,7 @@ struct EventScreenTests {
         func profile(children: String, roles: String) throws -> Profile {
             try decode("""
             {"id":"22222222-2222-2222-2222-222222222222","name":"T","ceviName":null,"benutzername":"t","mussPasswortAendern":false,
-             "datenschutzGelesenAm":null,"telefon":null,"bildUrl":null,"pushChat":true,"pushProgramme":true,"admin":false,
+             "datenschutzGelesenAm":null,"telefon":null,"bildUrl":null,"pushChat":true,"pushProgramme":true,"geschlecht":null,"abteilungsleitung":false,"entwickler":false,"clientArt":"web","rechte":[],
              "rollen":[\(roles)],"stufen":[{"id":"\(unit)","name":"Wölfe","kuerzel":"W"}],"kinder":[\(children)]}
             """)
         }
@@ -224,7 +224,7 @@ struct EventScreenTests {
         let unit = "11111111-1111-1111-1111-111111111111"
         let profile: Profile = try decode("""
         {"id":"22222222-2222-2222-2222-222222222222","name":"T","ceviName":null,"benutzername":"t","mussPasswortAendern":false,
-         "datenschutzGelesenAm":null,"telefon":null,"bildUrl":null,"pushChat":true,"pushProgramme":true,"admin":false,
+         "datenschutzGelesenAm":null,"telefon":null,"bildUrl":null,"pushChat":true,"pushProgramme":true,"geschlecht":null,"abteilungsleitung":false,"entwickler":false,"clientArt":"web","rechte":[],
          "rollen":[{"stufeId":"\(unit)","typ":"stufenleitung"}],"stufen":[{"id":"\(unit)","name":"Wölfe","kuerzel":"W"}],"kinder":[]}
         """)
         #expect(ProfileGroups.names(for: profile, camps: ["Sommerlager"]) == ["Stufe Wölfe", "Funktion Stufenleitung", "Lager Sommerlager"])

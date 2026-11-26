@@ -81,6 +81,7 @@ final class CampSwapsModel: CampRosterModel {
         guard let client = active.client, let campId = active.camp?.id else { return }
         do {
             let seesAll = rights.seesAllSwaps
+            await active.loadMemberNames()
             async let loadedContext = CampShiftContext.load(client: client, campId: campId, requireSchedule: false)
             var all: [CampShiftSwap] = []
             if seesAll {
@@ -104,7 +105,7 @@ final class CampSwapsModel: CampRosterModel {
 
     private func name(_ id: UUID?, context: CampShiftContext) -> String {
         guard let id else { return CampRosterText.unknownPerson }
-        return context.personName(id) ?? CampRosterText.unknownPerson
+        return context.personName(id) ?? active.memberNames[id] ?? CampRosterText.unknownPerson
     }
 
     private func row(_ swap: CampShiftSwap, _ context: CampShiftContext) -> Row {
