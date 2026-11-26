@@ -26,6 +26,8 @@ final class AppState {
     var openChatId: UUID?
     /// Target of a tapped push; the main view opens it and clears it.
     var pendingTarget: PushTarget?
+    /// A push asked for the list of room requests to decide on; the profile opens it and clears this.
+    var showsRoomDecisions = false
     /// Notice for the sign-in screen after the app signed the person out on its own (admins).
     var signInNotice: String?
     /// Push tokens and caches that must be dropped on sign-out hook in here.

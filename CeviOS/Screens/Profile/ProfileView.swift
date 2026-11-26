@@ -15,6 +15,8 @@ struct ProfileView: View {
     @State private var confirmsRevoke = false
     @Environment(CampListModel.self) private var campList: CampListModel?
     @State private var phone = ""
+    @State private var decisions = RoomDecisionsModel()
+    @State private var showsDecisions = false
     @State private var isPickingPhoto = false
     @State private var photo: PhotosPickerItem?
 
@@ -41,6 +43,22 @@ struct ProfileView: View {
                         .padding(.vertical, Spacing.s2)
                 } header: {
                     sectionHeader("Mein Kalender-Link")
+                }
+
+                // Only for people who decide on room requests: the list of open requests of the answer is not empty.
+                if decisions.hasOpen {
+                    Section {
+                        NavigationLink { RoomDecisionsView(model: decisions) } label: {
+                            HStack {
+                                row("Raumanfragen entscheiden", symbol: "door.left.hand.open")
+                                Spacer(minLength: Spacing.s2)
+                                Text("\(decisions.requests.count)").foregroundStyle(Color.ceviOnSurfaceVariant)
+                                    .accessibilityLabel(Text(decisions.requests.count == 1 ? "1 offen" : "\(decisions.requests.count) offen"))
+                            }
+                        }
+                    } header: {
+                        sectionHeader("Räume")
+                    }
                 }
 
                 Section {
@@ -79,7 +97,15 @@ struct ProfileView: View {
             .scrollContentBackground(.hidden)
             .ceviScreenBackground()
             .navigationTitle("Profil")
-            .refreshable { await state.reloadProfile() }
+            .refreshable { await state.reloadProfile(); await decisions.load(client: state.client) }
+            .task { await decisions.load(client: state.client) }
+            .navigationDestination(isPresented: $showsDecisions) { RoomDecisionsView(model: decisions) }
+            // A tapped push opens the list at once, also when no request is open any more.
+            .onChange(of: state.showsRoomDecisions, initial: true) { _, asked in
+                guard asked else { return }
+                state.showsRoomDecisions = false
+                showsDecisions = true
+            }
         }
         .onAppear {
             phone = profile.phone ?? ""

@@ -14,6 +14,11 @@ struct PushTests {
         #expect(PushTarget.from(userInfo: ["typ": "mitteilung", "id": ""]) == .announcement)
     }
 
+    @Test func roomRequestPushOpensTheListWithoutAnId() {
+        #expect(PushTarget.from(userInfo: ["typ": "raum_anfrage", "id": id.uuidString]) == .roomRequests)
+        #expect(PushTarget.from(userInfo: ["typ": "raum_anfrage"]) == .roomRequests)
+    }
+
     @Test func unknownTypesAndBrokenIdsYieldNil() {
         #expect(PushTarget.from(userInfo: ["typ": "unbekannt", "id": id.uuidString]) == nil)
         #expect(PushTarget.from(userInfo: ["typ": "chat", "id": "kein-uuid"]) == nil)

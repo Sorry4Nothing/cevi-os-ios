@@ -59,10 +59,22 @@ Tests: `CeviOSTests/Core/Services/EventTests.swift`; alle Aufrufe stehen im Vert
 | K2 | Raum anfragen | `RequestRoomView`, `RequestRoomModel` |
 | K3 | Meine Raumanfragen | `MyRoomRequestsView`, `MyRoomRequestsModel` |
 | K4 | Anlass-Anmeldung | `EventRegistrationView`, `EventRegistrationModel` |
+| K5 | Raumanfragen entscheiden (siehe unten) | `RoomDecisionsView`, `RoomDecisionsModel` |
 
 Erreichbar: K1 bis K3 über das «+»-Menü im Programme-Tab, K4 über die Zeile «Zur Anmeldung» im Detail eines Termins mit Anlass, A7 über Profil, «App».
 
 Rückbau (Backend #449): `PUT /programme/{id}/zuordnung`, `LeadershipService.assign`, der Zuordnungs-Bildschirm, `programs(from:to:)` und `program(id:)` sind entfernt.
+
+### K5 Raumanfragen entscheiden (Issue #110)
+
+Ohne Entwurf gebaut: Das Design hat kein Board dafür. Der Bildschirm besteht aus vorhandenen Bausteinen (Karten, Fehlerzeile, `StateView`, `LoadFailureView`) und folgt `docs/design.md` und dem UX-Handbuch. Referenz: Android-Issue #241.
+
+- Routen (Datenschicht stand schon): `GET /raeume/anfragen/offen` (`openRoomRequests`), `POST /raeume/anfragen/{id}/entscheid` (`decideRoomRequest`; `ablehnen` mit Begründung von 1 bis 500 Zeichen, `annehmen` ohne).
+- Einstieg: Zeile «Raumanfragen entscheiden» mit Zahl im Profil, nur wenn die Antwort offene Anfragen ausweist. Wer über nichts entscheidet, bekommt eine leere Liste, die Zeile fehlt dann (auch bei Fehler oder ohne Netz). Die Rechte (`raum.anfrage_entscheiden`) kennt die App nicht, sie folgt der Antwort.
+- Push `raum_anfrage` (ans Team) öffnet das Profil mit der Liste (`PushTarget.roomRequests`, die `id` wird nicht gebraucht).
+- Fehler: `STATUS_UNGUELTIG` (schon entschieden, zurückgezogen oder vorbei) und 404 nehmen die Anfrage aus der Liste und sagen es; `RAUM_BELEGT` lässt nur noch «Ablehnen» (kein «Bestätigen» mehr); 403 `EIGENE_ANFRAGE` und übriges 403 mit eigenem Text; ohne Netz und bei Serverfehlern bleibt die Anfrage mit «Nochmals versuchen».
+- Kein Entscheid wird still wiederholt (der Vertrag kennt keine `clientOpId`, keine Warteschlange): Jeder Versuch ist ein Tippen der Person. Kein lokaler Speicher.
+- Nicht gebaut: Belegungsplan, Räume verwalten (nur Web), Entscheid für mehrere Anfragen auf einmal.
 
 ### Abweichungen vom Entwurf
 - Nur «Mein Kalender» (Design-Abweichung 1), keine Kindernamen in den Antwortzeilen.
