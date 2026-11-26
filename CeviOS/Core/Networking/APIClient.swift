@@ -28,6 +28,8 @@ actor APIClient {
     let campCache: (any CampCache)?
     /// Camps the server lists as open; only their data is written to the cache. `nil` until the list is loaded.
     var openCampIds: Set<UUID>?
+    /// Files the person downloaded on purpose; they go with the camp (`APIClient+Cache.swift`).
+    let campDownloads: (any CampDownloadStore)?
     /// Told after every camp read: when the answer came from the cache the date it was stored, else `nil`.
     nonisolated let cacheObserver = Mutex<(@MainActor @Sendable (Date?) -> Void)?>(nil)
 
@@ -39,6 +41,7 @@ actor APIClient {
         streamSession: URLSession = APIClient.makeSession(streaming: true),
         appAttest: AppAttestSetup? = nil,
         campCache: (any CampCache)? = nil,
+        campDownloads: (any CampDownloadStore)? = nil,
         onEvent: @escaping @Sendable (APIEvent) -> Void = { _ in }
     ) {
         self.baseURL = baseURL
@@ -49,6 +52,7 @@ actor APIClient {
         self.onEvent = onEvent
         self.appAttest = appAttest
         self.campCache = campCache
+        self.campDownloads = campDownloads
         cookies = cookieStore.read()
     }
 

@@ -47,6 +47,7 @@ struct CampMoreSheet: View {
                 Section("Ablage") {
                     NavigationLink(value: CampDestination.documents) { row("Dokumente", symbol: "doc") }
                     if storage.seesAddressBook { NavigationLink(value: CampDestination.addressBook) { row("Adressbuch", symbol: "person.crop.rectangle") } }
+                    if active.role == .campLeader || active.role == .leader { NavigationLink(value: CampDestination.handouts) { row("Aushänge", symbol: "printer") } }
                     NavigationLink(value: CampDestination.search) { row("Suche", symbol: "magnifyingglass") }
                 }
                 Section("Weiteres") {
@@ -86,6 +87,7 @@ struct CampMoreSheet: View {
                 case .documents: CampDocumentsView()
                 case .addressBook: CampAddressBookView()
                 case .search: CampSearchView()
+                case .handouts: CampHandoutsView()
                 case .check: CampCheckView()
                 case .notices: EmptyView()
                 }
