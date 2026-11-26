@@ -146,7 +146,7 @@ struct CampCheckModelTests {
 
     @Test func aFailedWriteShowsRetryAndNothingRepeatsOnItsOwn() async throws {
         let host = newHost()
-        serve(host) { _ in (500, #"{"message":"Fehler"}"#) }
+        serve(host) { _ in (500, #"{"code":"FEHLER","message":"Fehler"}"#) }
         let model = CampCheckModel(active: try active(.campLeader, host: host))
         await model.load()
         await model.toggle(model.points[0])

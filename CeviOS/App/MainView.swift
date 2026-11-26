@@ -99,6 +99,10 @@ struct MainView: View {
             activeCamp.leave()
             selectedTab = .programs
             programPath = [id]
+        case .roomRequests:
+            activeCamp.leave()
+            selectedTab = .profile
+            state.showsRoomDecisions = true
         case .camp(let type, let id):
             Task { pushState = await CampRouter.open(type: type, objectId: id, client: state.client, list: campList, active: activeCamp) }
         default:
