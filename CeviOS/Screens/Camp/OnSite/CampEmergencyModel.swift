@@ -39,8 +39,9 @@ final class CampEmergencyModel: CampRosterModel {
         do {
             let loaded = try await client.campEmergency(campId: campId)
             emergency = loaded
-            loadedAt = now()
-            active.emergencySnapshot = CampEmergencySnapshot(data: loaded, loadedAt: now())
+            // Without network the client answers from the encrypted cache; `cachedSince` then says when it was loaded.
+            loadedAt = active.cachedSince ?? now()
+            active.emergencySnapshot = CampEmergencySnapshot(data: loaded, loadedAt: loadedAt ?? now())
             self.loaded()
         } catch is CancellationError {
         } catch {

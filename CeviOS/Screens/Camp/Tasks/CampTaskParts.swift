@@ -10,7 +10,7 @@ struct CampBannerStack: View {
             CampQueueBanner(waiting: active.waitingCount, offline: active.isOffline) { Task { await active.sendWaiting() } }
         }
         if active.isReadOnly { CampClosedBanner() }
-        if let staleSince { CampOfflineNote(since: staleSince) }
+        if let staleSince = staleSince ?? active.cachedSince { CampOfflineNote(since: staleSince) }
     }
 }
 
@@ -19,10 +19,10 @@ struct CampOfflineNote: View {
     let since: Date
 
     var body: some View {
-        let time = since.formatted(Date.FormatStyle(locale: Locale(identifier: "de_CH"), timeZone: DateFormats.timeZone).hour().minute())
+        let time = CampRosterText.stamp(since, now: Date())
         VStack(alignment: .leading, spacing: Spacing.s1) {
             Label("Ohne Netz", systemImage: "wifi.slash").font(.headline)
-            Text("Du siehst den Stand von heute \(time). Änderungen warten, bis du wieder Netz hast.").font(.subheadline)
+            Text("Du siehst den Stand von \(time). Änderungen warten, bis du wieder Netz hast.").font(.subheadline)
         }
         .foregroundStyle(Color.ceviOnSecondaryContainer)
         .frame(maxWidth: .infinity, alignment: .leading)
